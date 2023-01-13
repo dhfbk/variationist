@@ -1,0 +1,4 @@
+streamlit==1.16.0
+leafmap==0.12.1
+transformers==4.24.0
+emoji==2.2.0
