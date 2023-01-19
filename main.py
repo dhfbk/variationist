@@ -42,29 +42,40 @@ def main():
     # Create file uploader on the sidebar
     uploaded_file = st.sidebar.file_uploader("Upload dataset")
 
-    # Preprocess dataset: read and tokenize
-    #dataframe = preprocess.read_dataset(uploaded_file)
-    texts, labels = preprocess.read_dataset(uploaded_file)
+    # Read the input file
+    # @TODO: the function implicitly assumes the file has an header, the text is on a specific
+    # column, and so on. But all this may not be true. We need to limit as much as possible the 
+    # forms and thus unneeded or too technical inputs from users to avoid a messy interface and
+    # a bad user experience: a good way is to have defaults and clearly state them (again, 
+    # without being wordy in the interface). The unexperienced users should have to do as less
+    # as possible to have a result (max 3-4 interactions), and the experienced user should have 
+    # the possibility to do much more but in an intuitive way (hidden from the default interface).
+    # @TODO: as for now, "dataframe" is a list tuple ([texts], [labels])
+    # @TODO: this should be executed only once: when streamlit reload the interface the dataset
+    # is readed again and again (not sure, recheck)
+    dataframe = preprocess.read_dataset(
+        input_file=uploaded_file, has_header=True)
 
+    # Tokenize the text
+    # @TODO: this should be executed only once: when streamlit reload the interface the dataset
+    # is tokenized again and again (not sure, recheck)
+    dataframe = preprocess.tokenize(dataframe)
+
+    # Create the selector for variables of interest on the sidebar
     options = st.sidebar.multiselect(
         'What are your favorite colors',
-        labels)
+        dataframe[1])
         #default=[])
 
-    import sys
-    sys.exit()
-
-    # Get column names to fill next forms
-    #get_column_names()
-
     # Create text input on the sidebar
-    label_of_interest = st.sidebar.text_input("Label of interest")
+    #label_of_interest = st.sidebar.text_input("Label of interest")
 
     # Create compute button on the sidebar
-    st.sidebar.button(
-        "Compute artifacts", 
-        on_click=compute(uploaded_file, label_of_interest)
-    )
+    # @TODO: After the last edits, this does not work anymore (to generalize)
+    #st.sidebar.button(
+    #    "Compute artifacts", 
+    #    on_click=compute(uploaded_file, label_of_interest)
+    #)
 
 
 def compute(uploaded_file, label_of_interest):
