@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from io import StringIO
 
+from src.data_handler import preprocess
 from src.methods import lexical_artifacts
 from src.visualization import visualizer
 
@@ -33,14 +33,29 @@ def visualize(artifacts_df):
     visualizer.bar_chart(artifacts_df)
 
 
-def create_interface():
-    """"""
+def main():
+    """Create interface and do main operations"""
 
     # Set page title
     st.title('Variation explorer')
 
     # Create file uploader on the sidebar
     uploaded_file = st.sidebar.file_uploader("Upload dataset")
+
+    # Preprocess dataset: read and tokenize
+    #dataframe = preprocess.read_dataset(uploaded_file)
+    texts, labels = preprocess.read_dataset(uploaded_file)
+
+    options = st.sidebar.multiselect(
+        'What are your favorite colors',
+        labels)
+        #default=[])
+
+    import sys
+    sys.exit()
+
+    # Get column names to fill next forms
+    #get_column_names()
 
     # Create text input on the sidebar
     label_of_interest = st.sidebar.text_input("Label of interest")
@@ -65,5 +80,5 @@ def compute(uploaded_file, label_of_interest):
 
 
 if __name__ == "__main__":
-    create_interface()
+    main()
 
