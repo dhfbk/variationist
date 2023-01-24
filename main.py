@@ -3,8 +3,10 @@ import pandas as pd
 import numpy as np
 
 from src.data_handler import preprocess
+from src.data_handler import data_dispatcher
 from src.methods import lexical_artifacts
 from src.visualization import visualizer
+
 
 
 def calc_artifacts(string_data, label_of_interest):
@@ -42,6 +44,7 @@ def main():
     # Create file uploader on the sidebar
     uploaded_file = st.sidebar.file_uploader("Upload dataset")
 
+
     # Read the input file
     # @TODO: the function implicitly assumes the file has an header, the text is on a specific
     # column, and so on. But all this may not be true. We need to limit as much as possible the 
@@ -53,8 +56,12 @@ def main():
     # @TODO: as for now, "dataframe" is a list tuple ([texts], [labels])
     # @TODO: this should be executed only once: when streamlit reload the interface the dataset
     # is readed again and again (not sure, recheck)
+    
     dataframe = preprocess.read_dataset(
         input_file=uploaded_file, has_header=True)
+
+    labels = list(dataframe.columns.values)
+    
 
     # Tokenize the text
     # @TODO: this should be executed only once: when streamlit reload the interface the dataset
@@ -62,10 +69,27 @@ def main():
     dataframe = preprocess.tokenize(dataframe)
 
     # Create the selector for variables of interest on the sidebar
-    options = st.sidebar.multiselect(
-        'What are your favorite colors',
-        dataframe[1])
+    # options = st.sidebar.multiselect(
+    #     'What are your favorite colors',
+    #     labels)
         #default=[])
+
+
+
+    user_preferences = []
+    processing_type = ['Dont use', 'labels', 'text']
+    for label in labels:
+        user_preferences.append(st.sidebar.selectbox(label,processing_type))
+    
+    if st.sidebar.button('Process'):
+        final_user_preferences = user_preferences
+        metrics_to_do = ['most_frequent']
+        results = data_dispatcher.process_dataset(
+            dataframe,labels,user_preferences,has_header=True,metrics=metrics_to_do)
+    
+    print(results)
+    st.write(results)
+
 
     # Create text input on the sidebar
     #label_of_interest = st.sidebar.text_input("Label of interest")
