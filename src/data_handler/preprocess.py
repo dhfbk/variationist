@@ -41,7 +41,15 @@ def read_dataset(input_file, has_header=True):
     #     # @TODO: handle errors in a better way
     # return None
 
+def whitespace_tokenization(text_column):
+    tok_column = text_column.squeeze().apply(lambda x: x.split(" "))
+    return tok_column
 
-def tokenize(dataframe):
+def tokenize(text_column, tokenization_type="whitespace"):
     """"""
-    return dataframe
+    #TODO take an array/series of texts and tokenize it, return same array/series but tokenized
+    if tokenization_type == "whitespace":
+        tokenized_text_column = whitespace_tokenization(text_column)
+    else:
+        raise Exception("Only whitespace tokenization is currently supported")
+    return tokenized_text_column

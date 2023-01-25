@@ -66,7 +66,7 @@ def main():
     # Tokenize the text
     # @TODO: this should be executed only once: when streamlit reload the interface the dataset
     # is tokenized again and again (not sure, recheck)
-    dataframe = preprocess.tokenize(dataframe)
+    # dataframe = preprocess.tokenize(dataframe)
 
     # Create the selector for variables of interest on the sidebar
     # options = st.sidebar.multiselect(
@@ -82,11 +82,12 @@ def main():
         user_preferences.append(st.sidebar.selectbox(label,processing_type))
     
     if st.sidebar.button('Process'):
-        final_user_preferences = user_preferences
+        # final_user_preferences = user_preferences
         metrics_to_do = ['most_frequent']
         results = data_dispatcher.process_dataset(
-            dataframe,labels,user_preferences,has_header=True,metrics=metrics_to_do)
+            dataframe,user_preferences,has_header=True,metrics=metrics_to_do)
     
+    # @TODO: Check user input.
     print(results)
     st.write(results)
 
