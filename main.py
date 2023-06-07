@@ -64,7 +64,7 @@ def main():
     # is tokenized again and again (not sure, recheck)
 
 
-    series_list = data_dispatcher.process_dataset(dataframe,
+    series_dict = data_dispatcher.process_dataset(dataframe,
                                                   column_names_dict,
                                                   metrics=metrics_to_do)
     
