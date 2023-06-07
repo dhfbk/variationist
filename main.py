@@ -50,7 +50,9 @@ def main():
     # e.g.: no header, only use some columns, use column names or indices etc...
     # at the very least let's add a function that infers if tsv or csv based on
     # the file name.
-    dataframe = pd.read_csv(df_filename, sep="\t")
+    # for now I am supposing all datasets will have two columns, of which the first
+    # containing the label and the second the text.
+    dataframe = pd.read_csv(df_filename, sep="\t", names=["label", "text"])
 
     column_names_dict = {"text": text_columns,
                          "labels": label_columns}
@@ -60,16 +62,13 @@ def main():
     # TODO remove the streamlit stuff
     # @TODO: this should be executed only once: when streamlit reload the interface the dataset
     # is tokenized again and again (not sure, recheck)
-    dataframe = preprocess.tokenize(dataframe)
 
 
-    results = data_dispatcher.process_dataset(dataframe,
-                                              column_names_dict,
-                                              metrics=metrics_to_do)
+    series_list = data_dispatcher.process_dataset(dataframe,
+                                                  column_names_dict,
+                                                  metrics=metrics_to_do)
     
     # @TODO: Check user input.
-    print(results)
-
 
     # Create text input on the sidebar
     #label_of_interest = st.sidebar.text_input("Label of interest")

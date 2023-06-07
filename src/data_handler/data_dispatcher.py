@@ -63,10 +63,10 @@ def get_subset_dict(input_dataframe, col_names_dict, tok_columns_dict, label_val
 
 
 def process_dataset(input_dataframe, col_names_dict, metrics=[]):
-    """"""
-    # TODO this function should be split into smaller functions
+    """function that returns a list of pandas series, one for each label value
+    for each label the user selected as relevant, containing the corresponding 
+    tokenized texts"""
     # TODO there currently is an error when there are multiple text columns
-    output_metrics = dict()
 
 
     tokenized_dataframe, tok_columns_dict = preprocess.tokenize_add_tok_column(input_dataframe,
@@ -75,12 +75,14 @@ def process_dataset(input_dataframe, col_names_dict, metrics=[]):
 
     label_values_dict = preprocess.get_label_values(input_dataframe, col_names_dict)
     
-    subsets_of_interest = get_subset_dict(input_dataframe,
+    subsets_of_interest = get_subset_dict(tokenized_dataframe,
                                           col_names_dict,
                                           tok_columns_dict,
                                           label_values_dict)
 
     print("subsets of interest")
+    print(list(subsets_of_interest.keys()))
+    print(subsets_of_interest["label"])
     # print(subsets_of_interest)
     # output_metrics = {}
     # if 'most_frequent' in metrics:
@@ -93,6 +95,3 @@ def process_dataset(input_dataframe, col_names_dict, metrics=[]):
     #     else:
     #         print('Text or labels missing')
     return subsets_of_interest
-    # stringio = StringIO(input_file.getvalue().decode("utf-8"))
-    # df = pd.read_csv(stringio,sep='\t', header=0, index_col=False)
-    # return df

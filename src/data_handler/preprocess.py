@@ -20,7 +20,7 @@ def tokenize_add_tok_column(input_dataframe, col_names_dict):
     tokenized_col_names = {}
     for text_column in col_names_dict["text"]:
         tokenized_col_names[text_column] = f"tok_{text_column}"
-        input_dataframe[tokenized_col_names[text_column]] = tokenize_column(input_dataframe[text_column])
+        input_dataframe[tokenized_col_names[text_column]] = tokenize_column(input_dataframe[[str(text_column)]])
     return input_dataframe, tokenized_col_names
 
 
