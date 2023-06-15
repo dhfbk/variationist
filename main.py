@@ -1,96 +1,74 @@
-import streamlit as st
+# import streamlit as st
 import pandas as pd
 import numpy as np
+import argparse
 
 from src.data_handler import preprocess
 from src.data_handler import data_dispatcher
 from src.methods import lexical_artifacts
-from src.visualization import visualizer
+# from src.visualization import visualizer
 
 
-
-def calc_artifacts(string_data, label_of_interest):
-    """"""
-
-    texts = []
-    labels = []
+def import_args():
+    """Define the command line arguments to use when running Variationist."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("dataset_filename", 
+                        help="Path to the csv/tsv file containing the data.")
+    parser.add_argument("--text_cols", nargs='+', 
+                        help="List columns containing text data to be analyzed.")
+    parser.add_argument("--label_cols", nargs='+', 
+                        help="List columns containing the labels to be analyzed.")
     
-    for line in string_data:
-        label, text = line.split("\t")
-        texts.append(text)
-        labels.append(label)
-
-    # Compute lexical artifacts for the dataset with focus on label "abusive"
-    artifacts_df = lexical_artifacts.compute(
-        texts=texts, labels=labels, label_of_interest=label_of_interest)
-
-    return artifacts_df
-
-
-def visualize(artifacts_df):
-    # Visualize table (top 10)
-    visualizer.raw_table(artifacts_df[:10])
-
-    # Visualize bar chart
-    visualizer.bar_chart(artifacts_df)
+    # This clearly has to be made easier. Right now it takes n arguments given by the user
+    # of metrics to calculate. Ideally we could have flags for specific things that
+    # one could want to measure. Also have a default set of tests to run.
+    # It now does most frequent only as a default just as a placeholder, since this
+    # was already there.
+    parser.add_argument("--metrics", default="most-frequent", nargs='+',
+                        help="List names of measures to apply to current dataset")
+    
+    # TODO add argument that lets the user input column names
+    # TODO allow for users to only input indices of columns if the dataset has
+    # no header and no column names are provided (see main())
+    args = parser.parse_args()
+    return args
 
 
 def main():
-    """Create interface and do main operations"""
+    """Do main operations"""
 
-    # Set page title
-    st.title('Variation explorer')
-
-    # Create file uploader on the sidebar
-    uploaded_file = st.sidebar.file_uploader("Upload dataset")
-
-
-    # Read the input file
-    # @TODO: the function implicitly assumes the file has an header, the text is on a specific
-    # column, and so on. But all this may not be true. We need to limit as much as possible the 
-    # forms and thus unneeded or too technical inputs from users to avoid a messy interface and
-    # a bad user experience: a good way is to have defaults and clearly state them (again, 
-    # without being wordy in the interface). The unexperienced users should have to do as less
-    # as possible to have a result (max 3-4 interactions), and the experienced user should have 
-    # the possibility to do much more but in an intuitive way (hidden from the default interface).
-    # @TODO: as for now, "dataframe" is a list tuple ([texts], [labels])
-    # @TODO: this should be executed only once: when streamlit reload the interface the dataset
-    # is readed again and again (not sure, recheck)
+    # import arguments    
+    args = import_args()
+    df_filename = args.dataset_filename
+    text_columns = args.text_cols
+    label_columns = args.label_cols
+    metrics_to_do = args.metrics
     
-    dataframe = preprocess.read_dataset(
-        input_file=uploaded_file, has_header=True)
+    
+    # read input file into pandas dataframe. 
+    # TODO don't make TSV the default maybe? add more options for file reading
+    # e.g.: no header, only use some columns, use column names or indices etc...
+    # at the very least let's add a function that infers if tsv or csv based on
+    # the file name.
+    # for now I am supposing all datasets will have two columns, of which the first
+    # containing the label and the second the text.
+    dataframe = pd.read_csv(df_filename, sep="\t", names=["label", "text"])
 
-    labels = list(dataframe.columns.values)
+    column_names_dict = {"text": text_columns,
+                         "labels": label_columns}
     
 
     # Tokenize the text
+    # TODO remove the streamlit stuff
     # @TODO: this should be executed only once: when streamlit reload the interface the dataset
     # is tokenized again and again (not sure, recheck)
-    # dataframe = preprocess.tokenize(dataframe)
-
-    # Create the selector for variables of interest on the sidebar
-    # options = st.sidebar.multiselect(
-    #     'What are your favorite colors',
-    #     labels)
-        #default=[])
 
 
-
-    user_preferences = []
-    processing_type = ['Dont use', 'labels', 'text']
-    for label in labels:
-        user_preferences.append(st.sidebar.selectbox(label,processing_type))
-    
-    if st.sidebar.button('Process'):
-        # final_user_preferences = user_preferences
-        metrics_to_do = ['most_frequent']
-        results = data_dispatcher.process_dataset(
-            dataframe,user_preferences,has_header=True,metrics=metrics_to_do)
+    series_dict = data_dispatcher.process_dataset(dataframe,
+                                                  column_names_dict,
+                                                  metrics=metrics_to_do)
     
     # @TODO: Check user input.
-    print(results)
-    st.write(results)
-
 
     # Create text input on the sidebar
     #label_of_interest = st.sidebar.text_input("Label of interest")
@@ -112,7 +90,6 @@ def compute(uploaded_file, label_of_interest):
             stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
 
             artifacts_df = calc_artifacts(stringio, label_of_interest)
-            visualize(artifacts_df)
 
 
 if __name__ == "__main__":
