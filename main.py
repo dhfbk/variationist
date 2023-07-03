@@ -12,7 +12,7 @@ from src.methods import lexical_artifacts
 def import_args():
     """Define the command line arguments to use when running Variationist."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("dataset_filename", 
+    parser.add_argument("--dataset_filename", 
                         help="Path to the csv/tsv file containing the data.")
     parser.add_argument("--text_cols", nargs='+', 
                         help="List columns containing text data to be analyzed.")
@@ -53,6 +53,7 @@ def main():
     # for now I am supposing all datasets will have two columns, of which the first
     # containing the label and the second the text.
     dataframe = pd.read_csv(df_filename, sep="\t", names=["label", "text"])
+    # dataframe = pd.read_csv(df_filename, sep="\t")
 
     column_names_dict = {"text": text_columns,
                          "labels": label_columns}

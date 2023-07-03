@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.methods import most_frequent
+from src.methods import most_frequent,pmi
 from src.data_handler import preprocess
 
 # def get_data_type_dict(input_columns, input_processing_type):
@@ -38,6 +38,7 @@ def get_text_series_based_on_column(input_dataframe, current_labels, tok_columns
 def get_subset_dict(input_dataframe, col_names_dict, tok_columns_dict, label_values_dict):
     """create a dictionary containing all the subsets of the datasets we will be analyzing."""
     current_labels = col_names_dict["labels"]
+    
     subsets_of_interest = {}
     # loop through all columns containing text
     for text_column in tok_columns_dict:
@@ -45,19 +46,22 @@ def get_subset_dict(input_dataframe, col_names_dict, tok_columns_dict, label_val
         
         # Loop through all columns containing labels
         for label in current_labels:
+
             current_label_subset = []
             for label_value in label_values_dict[label]:
+
                 df_slice_with_current_label = input_dataframe[(input_dataframe[label] == label_value)]
-                # print(df_slice_with_current_label)
+
                 # TODO [camilla] This has to be fixed. It doesn't work with squeeze when there's only one line in the series,
                 # but with more lines it probably won't work WITHOUT the squeeze().
                 series_with_current_label = df_slice_with_current_label[tokenized_text_column].squeeze()
                 # series_with_current_label = df_slice_with_current_label[tokenized_text_column]
-                # print(series_with_current_label)
+         
                 series_with_current_label = series_with_current_label.rename(label_value)
                 current_label_subset.append(series_with_current_label)
             subsets_of_interest[label] = current_label_subset
-            # print(subsets_of_interest)
+
+    
     return subsets_of_interest
 
 
@@ -80,12 +84,26 @@ def process_dataset(input_dataframe, col_names_dict, metrics=[]):
                                           tok_columns_dict,
                                           label_values_dict)
 
-    print("subsets of interest")
-    print(list(subsets_of_interest.keys()))
-    print(subsets_of_interest["label"])
+    # print("subsets of interest")
+    
+    # print(list(subsets_of_interest.keys()))
+    # print(subsets_of_interest["label"])
     # print(subsets_of_interest)
+    # for column in label_values_dict:
+        
+    #     for l in label_values_dict[column]:
+    #         print(column,l)  
+    #         print(subsets_of_interest[column][0])
+    # print(metrics)
     # output_metrics = {}
-    # if 'most_frequent' in metrics:
+
+    if 'most-frequent' in metrics:
+        most_frequent_dict = most_frequent.create_most_frequent_dictionary(label_values_dict, subsets_of_interest)
+        print(most_frequent_dict)
+    if 'pmi' in metrics:
+        pmi_dict = pmi.create_pmi_dictionary(label_values_dict, subsets_of_interest)
+        print(pmi_dict)
+        # print(most_frequent_dict)
     #     output_metrics['most_frequent'] = {}
     #     if len(col_names_dict['text']) > 0 and len(col_names_dict['labels']) > 0:
     #         for label in current_labels:
