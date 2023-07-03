@@ -16,9 +16,9 @@ streamlit run main.py
 # Run without interface
 
 ```
-python3 main.py --dataset_filename data/netflix-toy.tsv  --text_cols text --label_cols label --metrics pmi
+python3 main.py --dataset_filepath data/netflix-toy.tsv  --text_cols text --label_cols label --metrics pmi
 ```
 
 ```
-python3 main.py --dataset_filename data/netflix-toy.tsv  --text_cols text --label_cols label --metrics most-frequent
+python3 main.py --dataset_filepath data/netflix-toy.tsv  --text_cols text --label_cols label --metrics most-frequent
 ```
