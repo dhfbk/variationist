@@ -20,7 +20,7 @@ def import_args():
     """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--dataset_filepath", 
+    parser.add_argument("--dataset_filepath", "-D",
                         type=str, required=True,
                         help="Path to the csv/tsv file containing the data.")
     parser.add_argument("--text_cols", "-T",
@@ -47,37 +47,51 @@ def import_args():
     return args
 
 
+def convert_file_to_dataframe(data_filepath):
+    """A function that checks the data format, reads the input file, and store relevant 
+    columns in a pandas dataframe. Files ending in ".tsv" and ".csv" are considered TSV and CSV files,
+    respectively. By default, a file with no or different extension is considered a TSV file.
+
+    Returns
+    -------
+    args: argparse.Namespace
+        An object holding command line arguments
+    """
+    if data_filepath.lower().endswith('.tsv'):
+        return pd.read_csv(data_filepath, sep="\t", quoting=csv.QUOTE_NONE, names=["label", "text"])
+    elif data_filepath.lower().endswith('.csv'):
+        return pd.read_csv(data_filepath, sep=",", names=["label", "text"])
+    else:
+        print("WARNING. '{data_filepath}' has no '.tsv' or '.csv' extension and will thus be considered\
+            as a TSV file by default. If this is not expected, we suggest the user to convert their file\
+            to either a '.tsv' or '.csv' format and run Variationist again.")
+        return pd.read_csv(data_filepath, sep="\t", quoting=csv.QUOTE_NONE, names=["label", "text"])
+
+
 def main():
     """A function that orchestrates all the operations of Variationist."""
 
     # Get values for the command line arguments
     args = import_args()
-    data_filepath = args.dataset_filepath
-    text_columns = args.text_cols
-    label_columns = args.label_cols
-    metrics_to_compute = args.metrics
 
     # Check if the file exists: if not, exit
     if not os.path.isfile(args.dataset_filepath):
         sys.exit(f"ERROR! The file '{args.dataset_filepath}' does not exist. Exit.")
-    
+
     # Read the input file and store relevant columns in a pandas dataframe
-    # @TODO: don't make TSV the default maybe? add more options for file reading
+    # @TODO: add more options for file reading
     # e.g.: no header, only use some columns, use column names or indices etc...
-    # at the very least let's add a function that infers if tsv or csv based on
-    # the file name.
     # for now I am supposing all datasets will have two columns, of which the first
     # containing the label and the second the text.
-    dataframe = pd.read_csv(
-        data_filepath, sep="\t", quoting=csv.QUOTE_NONE, names=["label", "text"])
+    dataframe = convert_file_to_dataframe(args.dataset_filepath)
 
-    column_names_dict = {"text": text_columns,
-                         "labels": label_columns}
+    column_names_dict = {"text": args.text_cols,
+                         "labels": args.label_cols}
 
     # Run the actual computation
     series_dict = data_dispatcher.process_dataset(dataframe,
                                                   column_names_dict,
-                                                  metrics=metrics_to_compute)
+                                                  metrics=args.metrics)
 
 
 if __name__ == "__main__":
