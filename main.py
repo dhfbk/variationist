@@ -21,21 +21,24 @@ def import_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--dataset_filepath", "-D",
+                        # @TODO: Eventually support the processing/comparison of multiple datasets
                         type=str, required=True,
                         help="Path to the csv/tsv file containing the data.")
     parser.add_argument("--text_cols", "-T",
                         required=True, nargs='+', 
                         help="List of column name(s) or index(es) indicating text data to be analyzed.\
                               In the case of multiple columns, provide names/indexes separated by space.\
-                              If you provide indexes, we will consider 1 as the first column, 2 as the second\
-                              column, etc.")
+                              Note that column names with spaces must be enclosed by quotation marks (e.g.,\
+                              \"my col\"). If you provide indexes, we will consider 0 as the first column,\
+                              1 as the second column, etc.")
     parser.add_argument("--label_cols", "-L",
                         type=str, required=False, nargs='+', 
                         help="List of column name(s) or index(es) indicating the labels to be analyzed.\
                               In the case of multiple columns, provide names/indexes separated by space.\
-                              Note that if none is provided, only basic statistics at the text-only level\
-                              will be computed. If you provide indexes, we will consider 1 as the first column,\
-                              2 as the second column, etc.")
+                              Note that column names with spaces must be enclosed by quotation marks (e.g.,\
+                              \"my col\"). If none is provided, basic statistics at the text-only level\
+                              will be computed. If you provide indexes, we will consider 0 as the first\
+                              column, 1 as the second column, etc.")
     parser.add_argument("--metrics", "-M",
                         # @TODO: Specify a set of default metrics for unlabeled and labeled scenarios
                         type=str, required=False, default="most-frequent", nargs='+',
@@ -48,9 +51,10 @@ def import_args():
 
 
 def convert_file_to_dataframe(data_filepath, cols_type):
-    """A function that checks the data format, reads the input file, and store relevant 
-    columns in a pandas dataframe. Files ending in ".tsv" and ".csv" are considered TSV and CSV files,
-    respectively. By default, a file with no or different extension is considered a TSV file.
+    """A function that checks the data format, reads the input file, and stores it in a pandas dataframe. 
+    Files ending in ".tsv" and ".csv" are considered TSV and CSV files, respectively. By default, a file 
+    with no or different extension is considered a TSV file. Input files with no header are assigned 
+    index numbers as header, whereas column names are preserved in the ones with a header.
 
     Parameters
     ----------
@@ -66,18 +70,38 @@ def convert_file_to_dataframe(data_filepath, cols_type):
     """
     if data_filepath.lower().endswith('.tsv'):
         print(f"INFO: '{data_filepath}' is loaded as a TSV file.")
-        # @TODO: Use cols_type in the function below to use or not headers or indexes
-        return pd.read_csv(data_filepath, sep="\t", quoting=csv.QUOTE_NONE, names=["label", "text"])
+        if cols_type == "names":
+            dataframe = pd.read_csv(data_filepath, sep="\t", quoting=csv.QUOTE_NONE, header=0)
+            print("INFO: given the provided column names, we consider the first line as the header.")
+        else:
+            dataframe = pd.read_csv(data_filepath, sep="\t", quoting=csv.QUOTE_NONE, header=None)
+            dataframe.columns = dataframe.columns.astype(str)
+            print("INFO: given the provided column indices, we add and use those as the header.")
+
     elif data_filepath.lower().endswith('.csv'):
         print(f"INFO: '{data_filepath}' is loaded as a CSV file.")
-        # @TODO: Use cols_type in the function below to use or not headers or indexes
-        return pd.read_csv(data_filepath, sep=",", names=["label", "text"])
+        if cols_type == "names":
+            dataframe = pd.read_csv(data_filepath, sep=",", header=0)
+            print("INFO: given the provided column names, we consider the first line as the header.")
+        else:
+            dataframe = pd.read_csv(data_filepath, sep=",", header=None)
+            dataframe.columns = dataframe.columns.astype(str)
+            print("INFO: given the provided column indices, we add and use those as the header.")
+
     else:
         print(f"WARNING. '{data_filepath}' has no '.tsv' or '.csv' extension and will thus be considered\
             as a TSV file by default. If this is not expected, we suggest the user to convert their file\
             to either a '.tsv' or '.csv' format and run Variationist again.")
-        # @TODO: Use cols_type in the function below to use or not headers or indexes
-        return pd.read_csv(data_filepath, sep="\t", quoting=csv.QUOTE_NONE, names=["label", "text"])
+        print(f"INFO: '{data_filepath}' is loaded as a TSV file.")
+        if cols_type == "names":
+            dataframe = pd.read_csv(data_filepath, sep="\t", quoting=csv.QUOTE_NONE, header=0)
+            print("INFO: given the provided column names, we consider the first line as the header.")
+        else:
+            dataframe = pd.read_csv(data_filepath, sep="\t", quoting=csv.QUOTE_NONE, header=None)
+            dataframe.columns = dataframe.columns.astype(str)
+            print("INFO: given the provided column indices, we add and use those as the header.")
+
+    return dataframe
 
 
 def check_column_type(cols):
@@ -124,11 +148,16 @@ def main():
     cols_type = text_cols_type
     print(f"INFO: all column identifiers are treated as column {cols_type}.")
 
-    # Read the input file and store relevant columns in a pandas dataframe
-    # @TODO: for now I am supposing all datasets will have two columns, of which the first
-    # containing the label and the second the text. To be generalized to actual columns
+    # Read the input file and store its content in a pandas dataframe
     dataframe = convert_file_to_dataframe(args.dataset_filepath, cols_type=cols_type)
 
+    # Check if the specified columns are actually in the dataframe
+    dataframe_cols = [col_name for col_name in dataframe.columns]
+    for col in args.text_cols+args.label_cols:
+        if col not in dataframe_cols:
+            sys.exit(f"ERROR: the '{col}' column is not present in the dataframe.")
+
+    # Create a dictionary consisting of relevant column names/indexes (values) for both texts and labels (keys)
     column_names_dict = {"text": args.text_cols,
                          "labels": args.label_cols}
 
