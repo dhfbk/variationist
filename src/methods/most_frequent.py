@@ -10,16 +10,15 @@ def create_most_frequent_dictionary(label_values_dict, subsets_of_interest):
     
     output_freqs = dict()
     for column in label_values_dict:
-        for l in label_values_dict[column]:
-
-            
+        for l in range(len(label_values_dict[column])):
+            curr_label = subsets_of_interest[column][l].name
             mydict = shared_metrics.get_all_frequencies(subsets_of_interest[column][l])
             
             sorted_mydict = sorted(mydict.items(), key=lambda x:x[1], reverse=True)
             converted_dict = dict(sorted_mydict)
 
             n_items = take(10, converted_dict.items())
-            output_freqs[l] = n_items
+            output_freqs[curr_label] = n_items
             
      
     return output_freqs

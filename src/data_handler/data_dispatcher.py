@@ -3,6 +3,8 @@ import pandas as pd
 from src.methods import most_frequent,pmi
 from src.data_handler import preprocess
 
+from src import utils
+
 # def get_data_type_dict(input_columns, input_processing_type):
 #     processing_type_dict = dict()
 #     for n in range(len(input_columns)):
@@ -37,7 +39,7 @@ def get_text_series_based_on_column(input_dataframe, current_labels, tok_columns
 
 def get_subset_dict(input_dataframe, col_names_dict, tok_columns_dict, label_values_dict):
     """create a dictionary containing all the subsets of the datasets we will be analyzing."""
-    current_labels = col_names_dict["labels"]
+    current_labels = col_names_dict[utils.LABEL_COLS_KEY]
     
     subsets_of_interest = {}
     # loop through all columns containing text
@@ -60,7 +62,6 @@ def get_subset_dict(input_dataframe, col_names_dict, tok_columns_dict, label_val
                 series_with_current_label = series_with_current_label.rename(label_value)
                 current_label_subset.append(series_with_current_label)
             subsets_of_interest[label] = current_label_subset
-
     
     return subsets_of_interest
 
@@ -78,7 +79,6 @@ def process_dataset(input_dataframe, col_names_dict, metrics=[]):
 
 
     label_values_dict = preprocess.get_label_values(input_dataframe, col_names_dict)
-    
     subsets_of_interest = get_subset_dict(tokenized_dataframe,
                                           col_names_dict,
                                           tok_columns_dict,

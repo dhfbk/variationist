@@ -19,17 +19,18 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest):
     totals_dict= dict()
     label_count = dict()
     for column in label_values_dict:
-        for l in label_values_dict[column]:            
+        for l in range(len(label_values_dict[column])):
+            curr_label = subsets_of_interest[column][l].name
             mydict = shared_metrics.get_all_frequencies(subsets_of_interest[column][l])
-            freqs_dict[l] = mydict
+            freqs_dict[curr_label] = mydict
             for i in mydict:
                 if i not in freqs_merged_dict:
                     freqs_merged_dict[i] = 0
                 freqs_merged_dict[i] += mydict[i]
             for i in subsets_of_interest[column][l]:
-                if l not in label_count:
-                    label_count[l] = 0
-                label_count[l]+=1
+                if curr_label not in label_count:
+                    label_count[curr_label] = 0
+                label_count[curr_label]+=1
     
     total = get_total(freqs_merged_dict)
     
