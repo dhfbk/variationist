@@ -40,6 +40,30 @@ def import_args():
                         type=str, required=False, default="most-frequent", nargs='+',
                         help="List of metric name(s) to compute.\
                               Possible metrics are: 'most-frequent', 'pmi'.")
+    parser.add_argument("--lowercase",
+                        # @TODO: To be implemented (for now, we do not perform lowercasing)
+                        required=False, default=False, action="store_true",
+                        help="Whether or not to lowercase the texts from --text_cols before running the\
+                        analysis. By default, it does not perform lowercasing.")
+    parser.add_argument("--stopwords", "-S",
+                        # @TODO: To be implemented (for now, we always assume no stopwords)
+                        type=str, required=False, default=None, choices=[None],
+                        help="A list of stopwords, i.e., tokens not to be considered for the purpose of the\
+                              analysis. By default, we assume no stopwords (i.e., None) and thus all tokens\
+                              contribute to the results. Stopword lists can be declared by their ISO-639-1 code\
+                              (e.g., \"en\", \"it\"): the list of stopwords from https://github.com/stopwords-iso\
+                              will be automatically downloaded and used. Alternatively, you can define a path to\
+                              your own file, formatted with a stopword per line and no header.")
+    parser.add_argument("--n_tokens", "-N",
+                        # @TODO: To be implemented (for now, we always assume token-level analysis)
+                        type=int, required=False, default=1,
+                        help="An integer denoting the number of contiguous tokens from instances in\
+                              --text_cols to be considered in the analysis. By default, it is set to 1\
+                              (i.e., a token-level analysis will be carried out). Note that values higher\
+                              than 1 will significantly slow down the computation, especially in the case\
+                              of large datasets. If you choose from a default stopword list, please note that\
+                              those match single tokens (i.e., --n_tokens 1). If you want to exclude some\
+                              n-tokens from your analysis you will need to declare your own stopword list.")
 
     args = parser.parse_args()
 
@@ -84,7 +108,8 @@ def main():
 
     # Run the actual computation
     series_dict = data_dispatcher.process_dataset(
-        dataframe, column_names_dict, metrics=args.metrics)
+        dataframe, column_names_dict, metrics=args.metrics, n_tokens=args.n_tokens, stopwords=args.stopwords,
+        lowercase=args.lowercase)
 
 
 if __name__ == "__main__":
