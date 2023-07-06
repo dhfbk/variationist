@@ -1,12 +1,19 @@
 import pandas as pd
-
+import re
 from src import utils
 
 def whitespace_tokenization(text_column, lowercase):
+    # Takes as input an array/series of texts and tokenize it, return same array/series but tokenized splitting on whitespaces
+    # Remove punctuation and any not alphanumeric charachter
+    # ONLY WORKS ON LATIN ALPHABET
+    
     if lowercase:
-        tok_column = text_column.squeeze().apply(lambda x: x.lower().split(" "))
-    else:
-        tok_column = text_column.squeeze().apply(lambda x: x.split(" "))
+        tok_column = text_column.squeeze().apply(lambda x: x.lower())
+
+    tok_column = tok_column.squeeze().apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
+    tok_column = tok_column.squeeze().apply(lambda x: re.sub(r' +', ' ', x))
+    tok_column = tok_column.squeeze().apply(lambda x: x.split(" "))
+    
     return tok_column
 
 def tokenize_column(text_column, n_tokens, stopwords, lowercase, tokenization_type="whitespace"):
@@ -23,8 +30,16 @@ def tokenize_column(text_column, n_tokens, stopwords, lowercase, tokenization_ty
             raise Exception("Stopword removal is not currently supported")
     else:
         raise Exception("Only whitespace tokenization is currently supported")
+    # if stopwords:
+    
     return tokenized_text_column
 
+def remove_stopwords(text_column, language):
+    # Takes as input an already tokenized array/series of texts and a language and return it without stopwords
+    # Language need to be ISO 639-1  two-letter codes e.g en, it, fr, de 
+    # TODO to be done
+    with open(os.path.join('stopwords', language+'txt')) as file: 
+        stopwords = [line.rstrip() for line in file]
 
 def tokenize_add_tok_column(input_dataframe, col_names_dict, n_tokens, stopwords, lowercase):
     # Tokenize and create new columns with tokenized text, name them "tok_{original_column}"
