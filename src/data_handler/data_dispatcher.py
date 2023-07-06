@@ -67,12 +67,11 @@ def get_subset_dict(input_dataframe, col_names_dict, tok_columns_dict, label_val
 
 
 
-def process_dataset(input_dataframe, col_names_dict, metrics=[], n_tokens=1, stopwords=None, lowercase=False):
+def process_dataset(input_dataframe, col_names_dict, metrics, n_tokens, stopwords, lowercase):
     """function that returns a list of pandas series, one for each label value
     for each label the user selected as relevant, containing the corresponding 
     tokenized texts"""
     # TODO there currently is an error when there are multiple text columns
-
 
     tokenized_dataframe, tok_columns_dict = preprocess.tokenize_add_tok_column(input_dataframe,
                                                                                col_names_dict,
