@@ -19,7 +19,9 @@ def import_args():
     parser.add_argument("--dataset_filepath", "-D",
                         # @TODO: Eventually support the processing/comparison of multiple datasets
                         type=str, required=True,
-                        help="Path to the csv/tsv file containing the data.")
+                        help="Path to the csv/tsv file containing the data. Alternatively, the name and split\
+                              of a text classification dataset from the HuggingFace Datasets repository\
+                              (https://huggingface.co/datasets/) following the template: hf::DATASET_NAME::SPLIT.")
     parser.add_argument("--text_cols", "-T",
                         required=True, nargs='+', 
                         help="List of column name(s) or index(es) indicating text data to be analyzed.\
@@ -76,22 +78,23 @@ def main():
     # Get values for the command line arguments
     args = import_args()
 
-    # Check if the file exists: if not, exit
-    if not os.path.isfile(args.dataset_filepath):
-        sys.exit(f"ERROR! The file '{args.dataset_filepath}' does not exist. Exit.")
+    # If the input filepath is local, check if the file exists. If not, exit
+    if not args.dataset_filepath.startswith("hf::"):
+        if not os.path.isfile(args.dataset_filepath):
+            sys.exit(f"ERROR! The file '{args.dataset_filepath}' does not exist. Exit.")
 
     # Check if column strings are names or indices (for both texts and labels)
     text_cols_type = utils.check_column_type(args.text_cols)
     label_cols_type = utils.check_column_type(args.label_cols)
 
-    # Since the input file is the same, we require texts and labels columns to be of the same type
+    # Since the input file/dataset is the same, we require texts and labels columns to be of the same type
     if text_cols_type != label_cols_type:
-        sys.exit(f"ERROR! text_cols are {text_cols_type} while label_cols are {label_cols_type}.\
-            Please provide all column identifiers as names (as in the header line) or indexes.")
+        sys.exit(f"ERROR! text_cols are {text_cols_type} while label_cols are {label_cols_type}. "
+            "Please provide all column identifiers as names (as in the header line) or indexes.")
     cols_type = text_cols_type
     print(f"INFO: all column identifiers are treated as column {cols_type}.")
 
-    # Read the input file and store its content in a pandas dataframe
+    # Read the input file/dataset and store its content in a pandas dataframe
     dataframe = utils.convert_file_to_dataframe(args.dataset_filepath, cols_type=cols_type)
 
     # Check if the specified columns are actually in the dataframe

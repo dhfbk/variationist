@@ -15,11 +15,14 @@ def convert_file_to_dataframe(data_filepath, cols_type):
     dataframe. Files ending in ".tsv" and ".csv" are considered TSV and CSV files, respectively. By 
     default, a file with no (or other) extension is considered a TSV file. Input files with no header 
     are assigned index numbers as header, whereas column names are preserved in the ones with a header.
+    Moreover, if the input is a string of the format "hf::DATASET_NAME::SPLIT", this is considered as a
+    HuggingFace dataset, and thus the function takes care of downloading and storing the relevant SPLIT 
+    portion of DATASET_NAME as a pandas dataframe. 
 
     Parameters
     ----------
     data_filepath: str
-        A string denoting the path to an input dataset file
+        A string denoting the path to an input file/dataset
     cols_type: str
         A string denoting if the column strings are to be considered as names or indexes
 
@@ -28,7 +31,19 @@ def convert_file_to_dataframe(data_filepath, cols_type):
     dataframe: pandas.core.frame.DataFrame
         A Pandas dataframe with a header (either expressed with names or indexes)
     """
-    if data_filepath.lower().endswith('.tsv'):
+    if data_filepath.lower().startswith('hf::'):
+        from datasets import load_dataset
+        string_parts = data_filepath.split("::")
+        if len(string_parts) == 3:
+            prefix, dataset_name, split = string_parts
+            print(f"INFO: '{data_filepath}' is loaded as a HuggingFace dataset (\"{split}\" split).")
+            dataframe = pd.DataFrame(load_dataset(dataset_name)[split])
+        else:
+            raise Exception(f"ERROR: {data_filepath} seems to refer to a HuggingFace dataset, however " 
+                "there is no specification about the split to use. Please ensure that \"data_filepath\" "
+                "follows the format hf::DATASET_NAME::SPLIT.")
+
+    elif data_filepath.lower().endswith('.tsv'):
         print(f"INFO: '{data_filepath}' is loaded as a TSV file.")
         if cols_type == "names":
             dataframe = pd.read_csv(data_filepath, sep="\t", quoting=csv.QUOTE_NONE, header=0)
