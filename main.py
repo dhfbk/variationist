@@ -44,9 +44,9 @@ def import_args():
                               Possible metrics are: 'most-frequent', 'pmi'.")
     parser.add_argument("--lowercase",
                         # @TODO: To be implemented (for now, we do not perform lowercasing)
-                        required=False, default=False, action="store_true",
+                        required=False, default=True, action="store_false",
                         help="Whether or not to lowercase the texts from --text_cols before running the\
-                        analysis. By default, it does not perform lowercasing.")
+                        analysis. By default, it performs lowercasing.")
     parser.add_argument("--stopwords", "-S",
                         # @TODO: To be implemented (for now, we always assume no stopwords)
                         type=str, required=False, default=None, choices=[None],

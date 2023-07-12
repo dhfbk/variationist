@@ -7,6 +7,7 @@ def whitespace_tokenization(text_column, lowercase):
     # Remove punctuation and any not alphanumeric charachter
     # ONLY WORKS ON LATIN ALPHABET
     
+    # @TODO: Error if not using lowercase
     if lowercase:
         tok_column = text_column.squeeze().apply(lambda x: x.lower())
 
