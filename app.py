@@ -1,20 +1,25 @@
 import csv
+import os
 import pandas as pd
+import shutil
 import streamlit as st
 import subprocess
 import sys
 import time
 
+from datetime import datetime
 from io import StringIO
 from PIL import Image
 
 from src.visualization import visualizer
 
 
-LABEL_TYPES = ["---", "time", "space"] # @TODO: Get directly from constants in the repo
-METRICS = ["most-frequent", "pmi"] # @TODO: Get directly from constants in the repo
-STOPWORDS = ["---", "en", "it"] # @TODO: Get directly from constants in the repo
-N_TOKENS = ["1", "2", "3"] # @TODO: Get directly from constants in the repo
+# @TODO: Directly get those from a constants file in the repo
+LABEL_TYPES = ["---", "time", "space"]
+METRICS = ["most-frequent", "pmi"]
+STOPWORDS = ["---", "en", "it"]
+N_TOKENS = ["1", "2", "3"]
+TEMP_DATA_FOLDER_NAME = "data-temp"
 
 
 def run_variationist(args):
@@ -122,6 +127,48 @@ def show_arguments_for_debugging():
     st.write("**args_options** session state", st.session_state["args_options"])
 
 
+def serialize_dataframe(dataframe, orig_filename):
+    """A function that writes a dataframe into a file and return its path.
+
+    Parameters
+    ----------
+    dataframe: pandas.core.frame.DataFrame
+        A Pandas dataframe for the input_file with a header
+    orig_filename: str
+        The original filename from which the data has been read and the dataframe created
+
+    Returns
+    -------
+    current_filepath: str
+        The filepath to the file containing data
+    """
+
+    # Create the folder containing temp data if does not exist yet
+    if not os.path.exists(TEMP_DATA_FOLDER_NAME):
+        os.makedirs(TEMP_DATA_FOLDER_NAME)
+
+    # Get current datetime
+    current_datetime = datetime.now().strftime("%Y%m%d-%H%M%S")
+
+    # Clean directory from previous executions
+    current_datetime = current_datetime.replace("-", "")
+    current_datatime_as_int = int(current_datetime)
+    for f in os.listdir(TEMP_DATA_FOLDER_NAME):
+        if os.path.isdir(os.path.join(TEMP_DATA_FOLDER_NAME, f)):
+            old_datetime_as_int = int(f.replace("-", ""))
+            if old_datetime_as_int < current_datatime_as_int:
+                shutil.rmtree(os.path.join(TEMP_DATA_FOLDER_NAME, f))
+
+    # Write dataframe as a TSV file in a directory named datetime, keeping its original name
+    if not os.path.exists(os.path.join(TEMP_DATA_FOLDER_NAME, current_datetime)):
+        os.makedirs(os.path.join(TEMP_DATA_FOLDER_NAME, current_datetime))
+    current_filepath = os.path.join(TEMP_DATA_FOLDER_NAME, current_datetime, orig_filename)
+    dataframe.to_csv(current_filepath, sep="\t", quoting=csv.QUOTE_NONE, index=False)
+    st.write(f"File has been created at {current_filepath}")
+
+    return current_filepath
+
+
 def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
     """A function that checks the existence of a dataset and loads it, either from a local file or from
     the HuggingFace datasets hub. It also handles a variety of error, warning, and success messages that
@@ -218,8 +265,9 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
             try:
                 with st.spinner(f"Loading \"**{local_dataset.name}**\"..."):
                     dataframe = load_local_dataset(local_dataset)
+                    temp_filepath = serialize_dataframe(dataframe, local_dataset.name)
                     set_session_state({"dataframe": dataframe})
-                    set_session_state({"dataset_filepath": local_dataset.name}, is_args=True)
+                    set_session_state({"dataset_filepath": temp_filepath}, is_args=True)
                 alert_s = st.success(f"The local dataset from the file \"**{local_dataset.name}**\" "
                     f"has been successfully loaded!", icon="🎉")
                 with st.expander(label=f":mag: **Dataset \"**{local_dataset.name}**\"**", 
