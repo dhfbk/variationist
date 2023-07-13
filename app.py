@@ -22,13 +22,15 @@ N_TOKENS = ["1", "2", "3"]
 TEMP_DATA_FOLDER_NAME = "data-temp"
 
 
-def run_variationist(args):
+def run_variationist(args, content_sections):
     """A function that calls the main.py variationist script with the defined commands.
 
     Parameters
     ----------
     args: Dict[str->type]
         The set of command line arguments as key-value pairs
+    content_sections: 
+        A list of handles for the content section objects
     """
 
     # @TODO: Temporary handling of interface-only markers
@@ -46,9 +48,10 @@ def run_variationist(args):
         "--metrics", " ".join([metric for metric in args["metrics"]])
         # @TODO: --lowercase, --stopwords, --n_tokens
     ], capture_output=True, text=True)
-    print(result)
 
-    st.text(result.stdout)
+    # Quite a hack just for temp visualization
+    content_sections[1].write(result.stdout)
+    # @TODO: Make them not to disappear when changing settings
 
 
 def initialize_session_states():
@@ -106,6 +109,22 @@ def customize_css():
         </style>
     """
     st.markdown(file_uploader, unsafe_allow_html=True)
+
+
+def initialize_content_sections():
+    """A function that creates content sections and returns a their handles as list.
+
+    Returns
+    -------
+    content_sections: 
+        A list of handles for the content section objects
+    """
+
+    content_sections = [
+        st.expander(label=":mag: **DATASET PREVIEW**", expanded=True),
+        st.expander(label=":bar_chart: **RESULTS**", expanded=True)]
+
+    return content_sections
 
 
 def make_disappear(component, seconds=3):
@@ -559,12 +578,15 @@ def main():
     # Adjust the stylesheets
     customize_css()
 
-    # Set the page title
-    st.title("🕵️‍♀️ Variationist")
-    st.write("---")
-
     # Initialize session states
     initialize_session_states()
+
+    # Set the page title
+    st.title("🕵️‍♀️ Variationist")
+    st.markdown("---")
+
+    # Initialize the content sections
+    content_sections = initialize_content_sections()
 
     # SIDEBAR #################################################################
     
@@ -583,15 +605,15 @@ def main():
     if run_button:
         with st.spinner(f"🕵️‍♀️ **Running**... (*depending on the size of the dataset and the chosen "
             "configuration this step may take a while, perhaps it's time for a coffee?* :coffee:)"):
-            run_variationist(st.session_state["args_options"])
+            run_variationist(st.session_state["args_options"], content_sections)
 
     # MAIN CONTENT ############################################################
 
     # show_arguments_for_debugging()
 
     if not st.session_state["dataframe"].empty:
-        with st.expander(label=f":mag: **Dataset \"{st.session_state['dataset_name']}\"**", expanded=True):
-            st.dataframe(data=st.session_state["dataframe"])
+        content_sections[0].markdown(f"**Dataset \"{st.session_state['dataset_name']}\"**")
+        content_sections[0].dataframe(data=st.session_state["dataframe"])
 
 
 if __name__ == "__main__":
