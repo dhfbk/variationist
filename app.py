@@ -164,7 +164,6 @@ def serialize_dataframe(dataframe, orig_filename):
         os.makedirs(os.path.join(TEMP_DATA_FOLDER_NAME, current_datetime))
     current_filepath = os.path.join(TEMP_DATA_FOLDER_NAME, current_datetime, orig_filename)
     dataframe.to_csv(current_filepath, sep="\t", quoting=csv.QUOTE_NONE, index=False)
-    st.write(f"File has been created at {current_filepath}")
 
     return current_filepath
 
@@ -320,7 +319,7 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
                     if is_local_defined:
                         alert_w = st.warning(f"Both the local dataset \"**{local_dataset.name}**\" "
                             f"and the HuggingFace dataset \"**{hf_name}**\" (\"**{hf_split}**\" "
-                            f"split) have been defined. We replace the local one with this ", 
+                            f"split) have been defined. We replace the local one with this "
                             f"HuggingFace's one.", icon="❗")
                     
                     alert_s = st.success(f"The dataset named \"**{hf_name}**\" (\"**{hf_split}**\" "
@@ -376,9 +375,6 @@ def set_container_data_loading():
                 "line, with text(s) or their label(s) as columns**. The first line is considered "
                 "as the header. For files >200MB or with no header, we suggest using our python "
                 "package instead (https://github.com/dhfbk/variationist).")
-        if local_dataset == None:
-            set_session_state({"dataframe": pd.DataFrame()})
-            set_session_state({"dataset_filepath": ""}, is_args=True)
         load_button_local = st.button(label="Confirm", key="load_local", on_click=placeholder_function)
 
         return local_dataset, load_button_local
@@ -573,7 +569,9 @@ def main():
         on_click=placeholder_function)
 
     if run_button:
-        run_variationist(st.session_state["args_options"])
+        with st.spinner(f"🕵️‍♀️ **Running**... (*depending on the size of the dataset and the chosen "
+            "configuration this step may take a while, perhaps it's time for a coffee?* :coffee:)"):
+            run_variationist(st.session_state["args_options"])
 
     # MAIN CONTENT ############################################################
 
