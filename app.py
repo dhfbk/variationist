@@ -60,12 +60,14 @@ def initialize_session_states():
         st.session_state["args_options"]["text_cols"] = []
         st.session_state["args_options"]["label_cols"] = []
         st.session_state["args_options"]["label_type_cols"] = [] # @TODO: Not implemented yet
-        st.session_state["args_options"]["metrics"] = ["most-frequent"]
+        st.session_state["args_options"]["metrics"] = ["pmi"]
         st.session_state["args_options"]["lowercase"] = True
         st.session_state["args_options"]["stopwords"] = False
         st.session_state["args_options"]["n_tokens"] = 1
     if "dataframe" not in st.session_state:
         st.session_state["dataframe"] = pd.DataFrame()
+    if "dataset_name" not in st.session_state:
+        st.session_state["dataset_name"] = ""
 
 
 def set_session_state(element_states_dict, is_args=False):
@@ -266,12 +268,10 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
                     dataframe = load_local_dataset(local_dataset)
                     temp_filepath = serialize_dataframe(dataframe, local_dataset.name)
                     set_session_state({"dataframe": dataframe})
+                    set_session_state({"dataset_name": local_dataset.name})
                     set_session_state({"dataset_filepath": temp_filepath}, is_args=True)
                 alert_s = st.success(f"The local dataset from the file \"**{local_dataset.name}**\" "
                     f"has been successfully loaded!", icon="🎉")
-                with st.expander(label=f":mag: **Dataset \"**{local_dataset.name}**\"**", 
-                    expanded=True):
-                    st.dataframe(data=dataframe)
                 hf_name = ""
                 hf_split = ""
             except Exception as err:
@@ -280,12 +280,14 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
                 f"the format requirements.", icon="⚠️")
                 if not is_hf_defined:
                     set_session_state({"dataframe": pd.DataFrame()})
+                    set_session_state({"dataset_name": ""})
                     set_session_state({"dataset_filepath": ""}, is_args=True)
         
         else:
             st.error(f"**No local dataset has been defined**.", icon="⚠️")
             if not is_hf_defined:
                 set_session_state({"dataframe": pd.DataFrame()})
+                set_session_state({"dataset_name": ""})
                 set_session_state({"dataset_filepath": ""}, is_args=True)
 
     # Case "Confirm" has been triggered from the "HuggingFace datasets" tab
@@ -297,6 +299,7 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
                     f"been defined, but **no data split has been specified**.", icon="⚠️")
                 if not is_local_defined:
                     set_session_state({"dataframe": pd.DataFrame()})
+                    set_session_state({"dataset_name": ""})
                     set_session_state({"dataset_filepath": ""}, is_args=True)
             
             elif (hf_name == ""):
@@ -305,6 +308,7 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
                     f"been specified**.", icon="⚠️")
                 if not is_local_defined:
                     set_session_state({"dataframe": pd.DataFrame()})
+                    set_session_state({"dataset_name": ""})
                     set_session_state({"dataset_filepath": ""}, is_args=True)
             
             else:
@@ -313,6 +317,7 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
                         "HuggingFace datasets hub..."):
                         dataframe = load_hf_dataset(hf_name, hf_split)
                         set_session_state({"dataframe": dataframe})
+                        set_session_state({"dataset_name": hf_name + " (" + hf_split + ")"})
                         set_session_state({
                             "dataset_filepath": "hf::" + hf_name + "::" + hf_split}, is_args=True)
                     
@@ -325,21 +330,20 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
                     alert_s = st.success(f"The dataset named \"**{hf_name}**\" (\"**{hf_split}**\" "
                         f"split) from the HuggingFace datasets hub has been successfully loaded!", 
                         icon="🎉")
-                    with st.expander(label=f":mag: **Dataset \"**{hf_name}**\" (\"**{hf_split}**\" split)**", 
-                        expanded=True):
-                        st.dataframe(data=dataframe)
                     local_dataset = None
                 except Exception as err:
                     st.error(f"The dataset named \"**{hf_name}**\" (or its \"**{hf_split}**\" split) "
                         f"seems not to exist on the HuggingFace datasets hub.", icon="⚠️")
                     if not is_local_defined:
                         set_session_state({"dataframe": pd.DataFrame()})
+                        set_session_state({"dataset_name": ""})
                         set_session_state({"dataset_filepath": ""}, is_args=True)
         
         else:
             st.error(f"**No dataset from the HuggingFace datasets hub has been defined**.", icon="⚠️")
             if not is_local_defined:
                 set_session_state({"dataframe": pd.DataFrame()})
+                set_session_state({"dataset_name": ""})
                 set_session_state({"dataset_filepath": ""}, is_args=True)
 
     # Case Unknown
@@ -488,7 +492,7 @@ def set_container_column_selectors():
                     label=":triangular_ruler: **Metrics** to compute",
                     help="List of metrics to compute.",
                     options=METRICS,
-                    default=[METRICS[0]])
+                    default=[METRICS[1]])
                 st.session_state["args_options"]["metrics"] = metrics
 
 
@@ -512,19 +516,28 @@ def set_container_custom_selectors():
             with side_exp_col_left:
                 stopwords = st.selectbox(
                     label=":paperclip: Select **stopwords**",
-                    help="TODO",
+                    help="A list of stopwords, i.e., tokens not to be considered for the purpose of "
+                        "the analysis. By default, we assume no stopwords (i.e., None) and thus all "
+                        "tokens contribute to the results. Stopword lists can be declared by their "
+                        "ISO-639-1 code (e.g., \"en\", \"it\"): a list from NLTK will be automatically "
+                        "downloaded and used.",
                     options=STOPWORDS)
                 st.session_state["args_options"]["stopwords"] = stopwords
 
             with side_exp_col_right:
                 n_tokens = st.selectbox(
                     label=":snowflake: Num of **tokens**",
-                    help="TODO",
+                    help="An integer denoting the number of contiguous tokens from instances in the "
+                        "\"Text column(s)\" field to be considered in the analysis. Note that values "
+                        "higher than 1 will significantly slow down the computation, especially in "
+                        "the case of large datasets.",
                     options=N_TOKENS,
                     disabled=True)
 
             lowercasing = st.checkbox(
                 label="Lowercase texts", 
+                help="Whether or not to lowercase the texts from \"Text column(s)\" before running "
+                    "the analysis.",
                 value=True)
             st.session_state["args_options"]["lowercase"] = lowercasing
 
@@ -559,7 +572,6 @@ def main():
     set_container_data_loading()
     set_container_column_selectors()
     set_container_custom_selectors()
-    # @TODO: Fix a bug using HuggingFace datasets (when selecting columns, the dataset disappears)
 
     # Define the run button
     is_run_disabled = True if st.session_state["dataframe"].empty else False
@@ -576,6 +588,10 @@ def main():
     # MAIN CONTENT ############################################################
 
     # show_arguments_for_debugging()
+
+    if not st.session_state["dataframe"].empty:
+        with st.expander(label=f":mag: **Dataset \"{st.session_state['dataset_name']}\"**", expanded=True):
+            st.dataframe(data=st.session_state["dataframe"])
 
 
 if __name__ == "__main__":
