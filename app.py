@@ -39,17 +39,21 @@ def run_variationist(args, content_sections):
     # if args["label_cols"] == "---": label_cols = ""
     if args["label_type_cols"] == "---": label_type_cols = ""
     
-    result = subprocess.run([
-        f"{sys.executable}", "main.py",
-        "--dataset_filepath", args["dataset_filepath"], # @TODO: Manage path
-        "--text_cols", " ".join([col for col in args["text_cols"]]),
-        "--label_cols", args["label_cols"], # @TODO: Generalize to multiple labels
-        # @TODO: --label_type_cols
-        "--metrics", " ".join([metric for metric in args["metrics"]])
-        # @TODO: --lowercase, --stopwords, --n_tokens
-    ], capture_output=True, text=True)
+    try:
+        result = subprocess.run([
+            f"{sys.executable}", "main.py",
+            "--dataset_filepath", args["dataset_filepath"], # @TODO: Manage path
+            "--text_cols", " ".join([col for col in args["text_cols"]]),
+            "--label_cols", args["label_cols"], # @TODO: Generalize to multiple labels
+            # @TODO: --label_type_cols
+            "--metrics", " ".join([metric for metric in args["metrics"]])
+            # @TODO: --lowercase, --stopwords, --n_tokens
+        ], capture_output=True, text=True)
+    except Exception as err: # @TODO: Not a real handle
+        st.error(err, icon="⚠️")
 
     # Quite a hack just for temp visualization
+    print(result)
     content_sections[1].write(result.stdout)
     # @TODO: Make them not to disappear when changing settings
 
@@ -106,6 +110,7 @@ def customize_css():
         <style>
             .css-1txgwv8 .eqdbnj015 { flex-direction: row; align-items: center; }
             .css-1txgwv8 .eqdbnj014 { margin-bottom: 0rem; }
+            .css-1aehpvj { font-size: 12px; }
         </style>
     """
     st.markdown(file_uploader, unsafe_allow_html=True)
@@ -180,11 +185,15 @@ def serialize_dataframe(dataframe, orig_filename):
             if old_datetime_as_int < current_datatime_as_int:
                 shutil.rmtree(os.path.join(TEMP_DATA_FOLDER_NAME, f))
 
-    # Write dataframe as a TSV file in a directory named datetime, keeping its original name
+    # Write dataframe as a TSV or CSV file in a directory named datetime, keeping its original name
     if not os.path.exists(os.path.join(TEMP_DATA_FOLDER_NAME, current_datetime)):
         os.makedirs(os.path.join(TEMP_DATA_FOLDER_NAME, current_datetime))
     current_filepath = os.path.join(TEMP_DATA_FOLDER_NAME, current_datetime, orig_filename)
-    dataframe.to_csv(current_filepath, sep="\t", quoting=csv.QUOTE_NONE, index=False)
+
+    if orig_filename.lower().endswith('.csv'):
+        dataframe.to_csv(current_filepath, sep=",", index=False)
+    else:
+        dataframe.to_csv(current_filepath, sep="\t", quoting=csv.QUOTE_NONE, index=False)
 
     return current_filepath
 
@@ -397,7 +406,8 @@ def set_container_data_loading():
             help="Upload a **TSV or CSV file** containing the data. **Instances must be one per "
                 "line, with text(s) or their label(s) as columns**. The first line is considered "
                 "as the header. For files >200MB or with no header, we suggest using our python "
-                "package instead (https://github.com/dhfbk/variationist).")
+                "package instead (https://github.com/dhfbk/variationist).",
+            type=["tsv", "csv"])
         load_button_local = st.button(label="Confirm", key="load_local", on_click=placeholder_function)
 
         return local_dataset, load_button_local
@@ -603,8 +613,8 @@ def main():
         on_click=placeholder_function)
 
     if run_button:
-        with st.spinner(f"🕵️‍♀️ **Running**... (*depending on the size of the dataset and the chosen "
-            "configuration this step may take a while, perhaps it's time for a coffee?* :coffee:)"):
+        with st.spinner(f"🕵️‍♀️ **Running**... (*depending on the size of the dataset, label space, "
+            "and the chosen configuration this step may take a while, time for a coffee?* :coffee:)"):
             run_variationist(st.session_state["args_options"], content_sections)
 
     # MAIN CONTENT ############################################################

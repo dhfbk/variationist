@@ -53,9 +53,9 @@ def import_args():
                         help="A list of stopwords, i.e., tokens not to be considered for the purpose of the\
                               analysis. By default, we assume no stopwords (i.e., None) and thus all tokens\
                               contribute to the results. Stopword lists can be declared by their ISO-639-1 code\
-                              (e.g., \"en\", \"it\"): the list of stopwords from https://github.com/stopwords-iso\
-                              will be automatically downloaded and used. Alternatively, you can define a path to\
-                              your own file, formatted with a stopword per line and no header.")
+                              (e.g., \"en\", \"it\"): a list of stopwords from NLTK will be automatically\
+                              downloaded and used. Alternatively, you can define a path to your own file,\
+                              formatted with a stopword per line and no header.")
     parser.add_argument("--n_tokens", "-N",
                         # @TODO: To be implemented (for now, we always assume token-level analysis)
                         type=int, required=False, default=1,
