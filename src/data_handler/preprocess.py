@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import os
 from src import utils
 
 def whitespace_tokenization(text_column, lowercase):
@@ -7,9 +8,10 @@ def whitespace_tokenization(text_column, lowercase):
     # Remove punctuation and any not alphanumeric charachter
     # ONLY WORKS ON LATIN ALPHABET
     
-    # @TODO: Error if not using lowercase
     if lowercase:
         tok_column = text_column.squeeze().apply(lambda x: x.lower())
+    else:
+        tok_column = text_column
 
     tok_column = tok_column.squeeze().apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
     tok_column = tok_column.squeeze().apply(lambda x: re.sub(r' +', ' ', x))
@@ -17,12 +19,13 @@ def whitespace_tokenization(text_column, lowercase):
     
     return tok_column
 
-def tokenize_column(text_column, n_tokens, stopwords, lowercase, tokenization_type="whitespace"):
+def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_type="whitespace"):
+    # print(stopwords)
     """"""
     #TODO take an array/series of texts and tokenize it, return same array/series but tokenized
     if tokenization_type == "whitespace":
         if n_tokens == 1:
-            print("x", lowercase)
+            
             tokenized_text_column = whitespace_tokenization(text_column, lowercase)
         else:
             raise Exception("Only n_tokens=1 is currently supported")
@@ -31,7 +34,8 @@ def tokenize_column(text_column, n_tokens, stopwords, lowercase, tokenization_ty
             raise Exception("Stopword removal is not currently supported")
     else:
         raise Exception("Only whitespace tokenization is currently supported")
-    # if stopwords:
+    # if stopwords != None:        
+    #     aaa = remove_stopwords(tokenized_text_column,stopwords)
     
     return tokenized_text_column
 
@@ -39,17 +43,19 @@ def remove_stopwords(text_column, language):
     # Takes as input an already tokenized array/series of texts and a language and return it without stopwords
     # Language need to be ISO 639-1  two-letter codes e.g en, it, fr, de 
     # TODO to be done
-    with open(os.path.join('stopwords', language+'txt')) as file: 
+    with open(os.path.join('src','data_handler','stopwords', str(language)+'.txt')) as file: 
         stopwords = [line.rstrip() for line in file]
+        print(stopwords)    
 
 def tokenize_add_tok_column(input_dataframe, col_names_dict, n_tokens, stopwords, lowercase):
+    
     # Tokenize and create new columns with tokenized text, name them "tok_{original_column}"
     # returns also a dictionary mapping text columns to their tokenized counterparts
     tokenized_col_names = {}
     for text_column in col_names_dict[utils.TEXT_COLS_KEY]:
         tokenized_col_names[text_column] = f"tok_{text_column}"
         input_dataframe[tokenized_col_names[text_column]] = tokenize_column(
-            input_dataframe[[str(text_column)]], n_tokens, stopwords, lowercase)
+            input_dataframe[[str(text_column)]], n_tokens, lowercase, stopwords)
     return input_dataframe, tokenized_col_names
 
 

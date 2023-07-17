@@ -49,7 +49,7 @@ def import_args():
                         analysis. By default, it performs lowercasing.")
     parser.add_argument("--stopwords", "-S",
                         # @TODO: To be implemented (for now, we always assume no stopwords)
-                        type=str, required=False, default=None, choices=[None],
+                        type=str, required=False, choices=["en","it"],
                         help="A list of stopwords, i.e., tokens not to be considered for the purpose of the\
                               analysis. By default, we assume no stopwords (i.e., None) and thus all tokens\
                               contribute to the results. Stopword lists can be declared by their ISO-639-1 code\
@@ -108,7 +108,7 @@ def main():
         utils.TEXT_COLS_KEY: args.text_cols,
         utils.LABEL_COLS_KEY: args.label_cols
     }
-
+    
     # Run the actual computation
     series_dict = data_dispatcher.process_dataset(
         dataframe, column_names_dict, metrics=args.metrics, n_tokens=args.n_tokens, stopwords=args.stopwords,
