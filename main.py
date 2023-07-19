@@ -44,12 +44,12 @@ def import_args():
                               Possible metrics are: 'most-frequent', 'pmi'.")
     parser.add_argument("--lowercase",
                         # @TODO: To be implemented (for now, we do not perform lowercasing)
-                        required=False, default=True, action="store_false",
+                        required=False, action="store_true",
                         help="Whether or not to lowercase the texts from --text_cols before running the\
                         analysis. By default, it performs lowercasing.")
     parser.add_argument("--stopwords", "-S",
                         # @TODO: To be implemented (for now, we always assume no stopwords)
-                        type=str, required=False, choices=["en","it"],
+                        type=str, required=False, choices=["en", "it"],
                         help="A list of stopwords, i.e., tokens not to be considered for the purpose of the\
                               analysis. By default, we assume no stopwords (i.e., None) and thus all tokens\
                               contribute to the results. Stopword lists can be declared by their ISO-639-1 code\
