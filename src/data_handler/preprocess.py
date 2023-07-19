@@ -16,6 +16,8 @@ def whitespace_tokenization(text_column, lowercase):
     tok_column = tok_column.squeeze().apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
     tok_column = tok_column.squeeze().apply(lambda x: re.sub(r' +', ' ', x))
     tok_column = tok_column.squeeze().apply(lambda x: x.split(" "))
+    # tok_column = tok_column.squeeze().apply(lambda x: pd.Series(x.split(" ")))
+     
     
     return tok_column
 
@@ -34,18 +36,42 @@ def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_ty
             raise Exception("Stopword removal is not currently supported")
     else:
         raise Exception("Only whitespace tokenization is currently supported")
-    # if stopwords != None:        
-    #     aaa = remove_stopwords(tokenized_text_column,stopwords)
     
+    # if stopwords != None:        
+    #     tokenized_text_column = remove_stopwords(tokenized_text_column,stopwords)
+    # print(tokenized_text_column)    
     return tokenized_text_column
+
+
+def remove_elements(token_list, stopwords):
+ 
+    # Take as input two lists first the list of tokens of the sentences and as second the list of stopwords
+    # Removes elements in  'stopwords' from 'token_list'.
+    # Returns token_list without stopwords
+    
+    new_array = []
+    for element in token_list:
+        if element not in stopwords:
+            new_array.append(element)
+    
+    return new_array
 
 def remove_stopwords(text_column, language):
     # Takes as input an already tokenized array/series of texts and a language and return it without stopwords
     # Language need to be ISO 639-1  two-letter codes e.g en, it, fr, de 
     # TODO to be done
+    
     with open(os.path.join('src','data_handler','stopwords', str(language)+'.txt')) as file: 
         stopwords = [line.rstrip() for line in file]
-        print(stopwords)    
+        
+        print(stopwords)
+        text_column = text_column.squeeze().apply(lambda x: remove_elements(x,stopwords))
+        
+        return(text_column)
+                                                            
+                                                            
+        
+
 
 def tokenize_add_tok_column(input_dataframe, col_names_dict, n_tokens, stopwords, lowercase):
     
