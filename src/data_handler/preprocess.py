@@ -32,13 +32,13 @@ def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_ty
         else:
             raise Exception("Only n_tokens=1 is currently supported")
         
-        if stopwords != None:
-            raise Exception("Stopword removal is not currently supported")
+        # if stopwords != None:
+        #     raise Exception("Stopword removal is not currently supported")
     else:
         raise Exception("Only whitespace tokenization is currently supported")
     
-    # if stopwords != None:        
-    #     tokenized_text_column = remove_stopwords(tokenized_text_column,stopwords)
+    if stopwords != None:        
+        tokenized_text_column = remove_stopwords(tokenized_text_column,stopwords)
     # print(tokenized_text_column)    
     return tokenized_text_column
 
@@ -63,8 +63,6 @@ def remove_stopwords(text_column, language):
     
     with open(os.path.join('src','data_handler','stopwords', str(language)+'.txt')) as file: 
         stopwords = [line.rstrip() for line in file]
-        
-        print(stopwords)
         text_column = text_column.squeeze().apply(lambda x: remove_elements(x,stopwords))
         
         return(text_column)
