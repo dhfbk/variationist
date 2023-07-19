@@ -16,9 +16,8 @@ def create_most_frequent_dictionary(label_values_dict, subsets_of_interest):
             
             sorted_mydict = sorted(mydict.items(), key=lambda x:x[1], reverse=True)
             converted_dict = dict(sorted_mydict)
-
-            n_items = take(10, converted_dict.items())
-            output_freqs[curr_label] = n_items
+            output_freqs[curr_label] = converted_dict
             
-     
+            print("most frequent", curr_label, take(10, converted_dict.items())) #print for debug
+            
     return output_freqs

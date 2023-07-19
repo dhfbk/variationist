@@ -1,5 +1,4 @@
 import pandas as pd
-
 from src.methods import most_frequent,pmi
 from src.data_handler import preprocess
 
@@ -99,13 +98,16 @@ def process_dataset(input_dataframe, col_names_dict, metrics, n_tokens, stopword
     #         print(subsets_of_interest[column][0])
     # print(metrics)
     # output_metrics = {}
-
+    results_dict = dict()
+    
     if 'most-frequent' in metrics:
         most_frequent_dict = most_frequent.create_most_frequent_dictionary(label_values_dict, subsets_of_interest)
-        print(most_frequent_dict)
+        results_dict['most-frequent'] = most_frequent_dict
+        
     if 'pmi' in metrics:
         pmi_dict = pmi.create_pmi_dictionary(label_values_dict, subsets_of_interest)
-        print(pmi_dict)
+        results_dict['pmi'] = pmi_dict
+        
         # print(most_frequent_dict)
     #     output_metrics['most_frequent'] = {}
     #     if len(col_names_dict['text']) > 0 and len(col_names_dict['labels']) > 0:
@@ -115,4 +117,5 @@ def process_dataset(input_dataframe, col_names_dict, metrics, n_tokens, stopword
     #             output_metrics['most_frequent'][label] = curr_label_most_frequent_dict
     #     else:
     #         print('Text or labels missing')
-    return subsets_of_interest
+        
+    return subsets_of_interest,results_dict

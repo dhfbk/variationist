@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import json
 
 from src import utils
 from src.data_handler import data_dispatcher
@@ -75,9 +76,20 @@ def import_args():
 def main():
     """A function that orchestrates all the operations of Variationist."""
 
+    # Dictionary for the metadata to be printed in the json output
+    metadata_dict = dict()
+    
     # Get values for the command line arguments
     args = import_args()
-
+    
+    metadata_dict["dataset"] = args.dataset_filepath
+    metadata_dict["text_columns"] = args.text_cols
+    metadata_dict["label_columns"] = args.label_cols
+    metadata_dict["metrics"] = args.metrics
+    metadata_dict["lowercase"] = args.lowercase
+    metadata_dict["stopwords"] = args.stopwords
+    metadata_dict["n_tokens"] = args.n_tokens
+    
     # If the input filepath is local, check if the file exists. If not, exit
     if not args.dataset_filepath.startswith("hf::"):
         if not os.path.isfile(args.dataset_filepath):
@@ -109,12 +121,23 @@ def main():
         utils.LABEL_COLS_KEY: args.label_cols
     }
     
+    
+    
     # Run the actual computation
-    series_dict = data_dispatcher.process_dataset(
+    series_dict,results_dict = data_dispatcher.process_dataset(
         dataframe, column_names_dict, metrics=args.metrics, n_tokens=args.n_tokens, stopwords=args.stopwords,
         lowercase=args.lowercase)
 
-
+    
+    
+    output_dict = dict()
+    output_dict["metadata"] = metadata_dict
+    output_dict["metrics"] = results_dict
+    
+    output_file = open("output.json", "w")
+    json.dump(output_dict, output_file, indent=4)
+    output_file.close()
+    
 if __name__ == "__main__":
     main()
 

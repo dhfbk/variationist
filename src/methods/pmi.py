@@ -47,8 +47,10 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest):
             label_pmi_dict[w] = pmi_value
         
         sorted_pmiDict = sorted(label_pmi_dict.items(), key=lambda x:x[1], reverse=True)
+
         converted_dict = dict(sorted_pmiDict)
-        n_items = take(15, converted_dict.items())
-        output_pmi[label] = n_items
-            
+        output_pmi[label] = converted_dict
+        
+        print("pmi", label, take(10, converted_dict.items())) #print for debug        
+        
     return output_pmi
