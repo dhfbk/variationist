@@ -7,13 +7,10 @@ def whitespace_tokenization(text_column, lowercase):
     # Takes as input an array/series of texts and tokenize it, return same array/series but tokenized splitting on whitespaces
     # Remove punctuation and any not alphanumeric charachter
     # ONLY WORKS ON LATIN ALPHABET
-    print(text_column)
     if lowercase:
         tok_column = text_column.squeeze().apply(lambda x: str(x).lower())
     else:
         tok_column = text_column.squeeze().astype(str)
-        
-    print(tok_column)
 
     tok_column = tok_column.apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
     tok_column = tok_column.apply(lambda x: re.sub(r' +', ' ', x))
