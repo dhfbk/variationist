@@ -15,7 +15,8 @@ from src import utils
 
 def get_text_series_based_on_column(input_dataframe, current_labels, tok_columns_dict):
     subsets_of_interest = []
-
+    # TODO handle labels with multiple values per example
+    
     # Create dictionary with names of label columns and label values
     label_values_dict = {}
     for label in current_labels:
@@ -38,26 +39,24 @@ def get_text_series_based_on_column(input_dataframe, current_labels, tok_columns
 
 def get_subset_dict(input_dataframe, col_names_dict, tok_columns_dict, label_values_dict):
     """create a dictionary containing all the subsets of the datasets we will be analyzing."""
+    # TODO handle nan values for a specific label.
+
     current_labels = col_names_dict[utils.LABEL_COLS_KEY]
-    
     subsets_of_interest = {}
     # loop through all columns containing text
     for text_column in tok_columns_dict:
         tokenized_text_column = tok_columns_dict[text_column]
-        
         # Loop through all columns containing labels
         for label in current_labels:
-
             current_label_subset = []
             for label_value in label_values_dict[label]:
 
                 df_slice_with_current_label = input_dataframe[(input_dataframe[label] == label_value)]
 
-                # TODO [camilla] This has to be fixed. It doesn't work with squeeze when there's only one line in the series,
-                # but with more lines it probably won't work WITHOUT the squeeze().
-                series_with_current_label = df_slice_with_current_label[tokenized_text_column].squeeze()
-                # series_with_current_label = df_slice_with_current_label[tokenized_text_column]
-         
+                series_with_current_label = df_slice_with_current_label[tokenized_text_column]
+                if len(series_with_current_label) > 1:
+                    series_with_current_label = series_with_current_label.squeeze()
+
                 series_with_current_label = series_with_current_label.rename(label_value)
                 current_label_subset.append(series_with_current_label)
             subsets_of_interest[label] = current_label_subset

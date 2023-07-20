@@ -7,18 +7,18 @@ def whitespace_tokenization(text_column, lowercase):
     # Takes as input an array/series of texts and tokenize it, return same array/series but tokenized splitting on whitespaces
     # Remove punctuation and any not alphanumeric charachter
     # ONLY WORKS ON LATIN ALPHABET
-    
+    print(text_column)
     if lowercase:
-        tok_column = text_column.squeeze().apply(lambda x: x.lower())
+        tok_column = text_column.squeeze().apply(lambda x: str(x).lower())
     else:
-        tok_column = text_column
+        tok_column = text_column.squeeze().astype(str)
+        
+    print(tok_column)
 
-    tok_column = tok_column.squeeze().apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
-    tok_column = tok_column.squeeze().apply(lambda x: re.sub(r' +', ' ', x))
-    tok_column = tok_column.squeeze().apply(lambda x: x.split(" "))
+    tok_column = tok_column.apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
+    tok_column = tok_column.apply(lambda x: re.sub(r' +', ' ', x))
+    tok_column = tok_column.apply(lambda x: x.split(" "))
     # tok_column = tok_column.squeeze().apply(lambda x: pd.Series(x.split(" ")))
-     
-    
     return tok_column
 
 def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_type="whitespace"):
@@ -56,6 +56,7 @@ def remove_elements(token_list, stopwords):
     
     return new_array
 
+
 def remove_stopwords(text_column, language):
     # Takes as input an already tokenized array/series of texts and a language and return it without stopwords
     # Language need to be ISO 639-1  two-letter codes e.g en, it, fr, de 
@@ -67,9 +68,6 @@ def remove_stopwords(text_column, language):
         
         return(text_column)
                                                             
-                                                            
-        
-
 
 def tokenize_add_tok_column(input_dataframe, col_names_dict, n_tokens, stopwords, lowercase):
     
