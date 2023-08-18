@@ -1,4 +1,5 @@
 import csv
+import json
 import os
 import pandas as pd
 import shutil
@@ -52,13 +53,11 @@ def run_variationist(args, content_sections):
             lowercasing
             # @TODO: --stopwords, --n_tokens
         ], capture_output=True, text=True)
+
+        json_result = json.load(open("output.json", "r"))
+        st.session_state["json_result"] = json_result
     except Exception as err: # @TODO: Not a real handle
         st.error(err, icon="⚠️")
-
-    # Quite a hack just for temp visualization
-    print(result)
-    content_sections[1].write(result.stdout)
-    # @TODO: Make them not to disappear when changing settings
 
 
 def initialize_session_states():
@@ -78,6 +77,8 @@ def initialize_session_states():
         st.session_state["dataframe"] = pd.DataFrame()
     if "dataset_name" not in st.session_state:
         st.session_state["dataset_name"] = ""
+    if "json_result" not in st.session_state:
+        st.session_state["json_result"] = ""
 
 
 def set_session_state(element_states_dict, is_args=False):
@@ -652,6 +653,11 @@ def main():
         content_sections[0].markdown(f"**Dataset \"{st.session_state['dataset_name']}\"**")
         content_sections[0].dataframe(
             data=st.session_state["dataframe"], use_container_width=False, height=250)
+
+    if st.session_state["json_result"] != "":
+        content_sections[1].json(body=st.session_state["json_result"], expanded=False)
+
+    # @TODO: Remove results dropdown when loading another dataset
 
 
 if __name__ == "__main__":
