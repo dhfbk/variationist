@@ -36,8 +36,10 @@ def run_variationist(args, content_sections):
     # @TODO: Temporary handling of interface-only markers
     label_cols = ""
     label_type_cols = ""
+    lowercasing = ""
     # if args["label_cols"] == "---": label_cols = ""
     if args["label_type_cols"] == "---": label_type_cols = ""
+    if args["lowercase"] == True: lowercasing = "--lowercase"
     
     try:
         result = subprocess.run([
@@ -46,8 +48,9 @@ def run_variationist(args, content_sections):
             "--text_cols", " ".join([col for col in args["text_cols"]]),
             "--label_cols", args["label_cols"], # @TODO: Generalize to multiple labels
             # @TODO: --label_type_cols
-            "--metrics", " ".join([metric for metric in args["metrics"]])
-            # @TODO: --lowercase, --stopwords, --n_tokens
+            "--metrics", " ".join([metric for metric in args["metrics"]]),
+            lowercasing
+            # @TODO: --stopwords, --n_tokens
         ], capture_output=True, text=True)
     except Exception as err: # @TODO: Not a real handle
         st.error(err, icon="⚠️")
@@ -68,7 +71,7 @@ def initialize_session_states():
         st.session_state["args_options"]["label_cols"] = []
         st.session_state["args_options"]["label_type_cols"] = [] # @TODO: Not implemented yet
         st.session_state["args_options"]["metrics"] = ["pmi"]
-        st.session_state["args_options"]["lowercase"] = True
+        st.session_state["args_options"]["lowercase"] = False
         st.session_state["args_options"]["stopwords"] = False
         st.session_state["args_options"]["n_tokens"] = 1
     if "dataframe" not in st.session_state:
@@ -587,7 +590,7 @@ def set_container_custom_selectors():
                 label="Lowercase texts", 
                 help="Whether or not to lowercase the texts from \"Text column(s)\" before running "
                     "the analysis.",
-                value=True)
+                value=False)
             st.session_state["args_options"]["lowercase"] = lowercasing
 
 
