@@ -97,7 +97,7 @@ def set_session_state(element_states_dict, is_args=False):
 def customize_css():
     """A function that updates the CSS of the page."""
 
-    # /* 4rem instead of 6rem */, /* 2rem instead of 6rem */
+    # padding 4rem instead of 6rem; padding 2rem instead of 6rem
     top_padding = """
         <style>
             .css-1544g2n { padding: 4rem 1rem 1.5rem; }
@@ -111,9 +111,19 @@ def customize_css():
             .css-1txgwv8 .eqdbnj015 { flex-direction: row; align-items: center; }
             .css-1txgwv8 .eqdbnj014 { margin-bottom: 0rem; }
             .css-1aehpvj { font-size: 12px; }
+            .css-7oyrr6 { font-size: 12px; }
         </style>
     """
     st.markdown(file_uploader, unsafe_allow_html=True)
+
+    # min-width=375 instead of min-width=244
+    left_panel = """
+        <style>
+            .css-vk3wp9 { min-width: 375px; }
+            .css-1cypcdb { min-width: 375px; }
+        </style>
+    """
+    st.markdown(left_panel, unsafe_allow_html=True)
 
 
 def initialize_content_sections():
@@ -126,7 +136,7 @@ def initialize_content_sections():
     """
 
     content_sections = [
-        st.expander(label=":mag: **DATASET PREVIEW**", expanded=True),
+        st.expander(label=":mag: **DATASET PREVIEW**", expanded=False),
         st.expander(label=":bar_chart: **RESULTS**", expanded=True)]
 
     return content_sections
@@ -198,7 +208,7 @@ def serialize_dataframe(dataframe, orig_filename):
     return current_filepath
 
 
-def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
+def check_and_load_dataset(local_dataset, hf_name, hf_split, mode, msg_holder):
     """A function that checks the existence of a dataset and loads it, either from a local file or from
     the HuggingFace datasets hub. It also handles a variety of error, warning, and success messages that
     are related to it.
@@ -216,6 +226,8 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
     mode: str
         A string denoting from which button the function has been triggered. It can be "local", if the
         button is the one from the "Local file" tab, or "hf" if it is from the "HuggingFace datasets" tab
+    msg_holder:
+        An empty container that is used to contain/display info/success/warning/error messages
 
     Returns
     -------
@@ -287,23 +299,24 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
     if mode == "local":
         if is_local_defined:
             if is_hf_defined:
-                alert_w = st.warning(f"Both the local dataset \"**{local_dataset.name}**\" and the "
+                alert_w = msg_holder.warning(f"Both the local dataset \"**{local_dataset.name}**\" and the "
                     f"HuggingFace dataset \"**{hf_name}**\" (\"**{hf_split}**\" split) have been "
                     f"defined. We replace the HuggingFace's one with this local one.", icon="❗")
 
             try:
-                with st.spinner(f"Loading \"**{local_dataset.name}**\"..."):
-                    dataframe = load_local_dataset(local_dataset)
-                    temp_filepath = serialize_dataframe(dataframe, local_dataset.name)
-                    set_session_state({"dataframe": dataframe})
-                    set_session_state({"dataset_name": local_dataset.name})
-                    set_session_state({"dataset_filepath": temp_filepath}, is_args=True)
-                alert_s = st.success(f"The local dataset from the file \"**{local_dataset.name}**\" "
+                with msg_holder:
+                    with st.spinner(f"Loading \"**{local_dataset.name}**\"..."):
+                        dataframe = load_local_dataset(local_dataset)
+                        temp_filepath = serialize_dataframe(dataframe, local_dataset.name)
+                        set_session_state({"dataframe": dataframe})
+                        set_session_state({"dataset_name": local_dataset.name})
+                        set_session_state({"dataset_filepath": temp_filepath}, is_args=True)
+                alert_s = msg_holder.success(f"The local dataset from the file \"**{local_dataset.name}**\" "
                     f"has been successfully loaded!", icon="🎉")
                 hf_name = ""
                 hf_split = ""
             except Exception as err:
-                st.error(f"An error occurred when reading the dataset named "
+                msg_holder.error(f"An error occurred when reading the dataset named "
                 f"\"**{local_dataset.name}**\". Please ensure it is in a TSV/CSV format and follows ", 
                 f"the format requirements.", icon="⚠️")
                 if not is_hf_defined:
@@ -312,7 +325,7 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
                     set_session_state({"dataset_filepath": ""}, is_args=True)
         
         else:
-            st.error(f"**No local dataset has been defined**.", icon="⚠️")
+            msg_holder.error(f"**No local dataset has been defined**.", icon="⚠️")
             if not is_hf_defined:
                 set_session_state({"dataframe": pd.DataFrame()})
                 set_session_state({"dataset_name": ""})
@@ -323,7 +336,7 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
         if is_hf_defined:
             
             if (hf_split == ""):
-                st.error(f"A dataset named \"**{hf_name}**\" from the HuggingFace datasets hub has "
+                msg_holder.error(f"A dataset named \"**{hf_name}**\" from the HuggingFace datasets hub has "
                     f"been defined, but **no data split has been specified**.", icon="⚠️")
                 if not is_local_defined:
                     set_session_state({"dataframe": pd.DataFrame()})
@@ -331,7 +344,7 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
                     set_session_state({"dataset_filepath": ""}, is_args=True)
             
             elif (hf_name == ""):
-                st.error(f"A split name \"**{hf_split}**\" has been defined but **no information "
+                msg_holder.error(f"A split name \"**{hf_split}**\" has been defined but **no information "
                     f"about to which dataset from the HuggingFace datasets hub it belongs has ", 
                     f"been specified**.", icon="⚠️")
                 if not is_local_defined:
@@ -341,26 +354,27 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
             
             else:
                 try:
-                    with st.spinner(f"Loading \"**{hf_name}**\" (\"**{hf_split}**\" split) from the "
-                        "HuggingFace datasets hub..."):
-                        dataframe = load_hf_dataset(hf_name, hf_split)
-                        set_session_state({"dataframe": dataframe})
-                        set_session_state({"dataset_name": hf_name + " (" + hf_split + ")"})
-                        set_session_state({
-                            "dataset_filepath": "hf::" + hf_name + "::" + hf_split}, is_args=True)
+                    with msg_holder:
+                        with st.spinner(f"Loading \"**{hf_name}**\" (\"**{hf_split}**\" split) from the "
+                            "HuggingFace datasets hub..."):
+                            dataframe = load_hf_dataset(hf_name, hf_split)
+                            set_session_state({"dataframe": dataframe})
+                            set_session_state({"dataset_name": hf_name + " (" + hf_split + ")"})
+                            set_session_state({
+                                "dataset_filepath": "hf::" + hf_name + "::" + hf_split}, is_args=True)
                     
                     if is_local_defined:
-                        alert_w = st.warning(f"Both the local dataset \"**{local_dataset.name}**\" "
+                        alert_w = msg_holder.warning(f"Both the local dataset \"**{local_dataset.name}**\" "
                             f"and the HuggingFace dataset \"**{hf_name}**\" (\"**{hf_split}**\" "
                             f"split) have been defined. We replace the local one with this "
                             f"HuggingFace's one.", icon="❗")
                     
-                    alert_s = st.success(f"The dataset named \"**{hf_name}**\" (\"**{hf_split}**\" "
+                    alert_s = msg_holder.success(f"The dataset named \"**{hf_name}**\" (\"**{hf_split}**\" "
                         f"split) from the HuggingFace datasets hub has been successfully loaded!", 
                         icon="🎉")
                     local_dataset = None
                 except Exception as err:
-                    st.error(f"The dataset named \"**{hf_name}**\" (or its \"**{hf_split}**\" split) "
+                    msg_holder.error(f"The dataset named \"**{hf_name}**\" (or its \"**{hf_split}**\" split) "
                         f"seems not to exist on the HuggingFace datasets hub.", icon="⚠️")
                     if not is_local_defined:
                         set_session_state({"dataframe": pd.DataFrame()})
@@ -368,7 +382,7 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
                         set_session_state({"dataset_filepath": ""}, is_args=True)
         
         else:
-            st.error(f"**No dataset from the HuggingFace datasets hub has been defined**.", icon="⚠️")
+            msg_holder.error(f"**No dataset from the HuggingFace datasets hub has been defined**.", icon="⚠️")
             if not is_local_defined:
                 set_session_state({"dataframe": pd.DataFrame()})
                 set_session_state({"dataset_name": ""})
@@ -376,7 +390,7 @@ def check_and_load_dataset(local_dataset, hf_name, hf_split, mode):
 
     # Case Unknown
     else:
-        st.error(f"The mode \"**{mode}**\" is not defined.", icon="⚠️")
+        msg_holder.error(f"The mode \"**{mode}**\" is not defined.", icon="⚠️")
 
     return local_dataset, hf_name, hf_split
 
@@ -386,8 +400,14 @@ def placeholder_function():
     pass
 
 
-def set_container_data_loading():
-    """A function that creates and handles the container with data loading options."""
+def set_container_data_loading(msg_holder):
+    """A function that creates and handles the container with data loading options.
+
+    Parameters
+    ----------
+    msg_holder:
+        An empty container that is used to contain/display info/success/warning/error messages
+    """
 
     def section_data_upload():
         """A function that creates and handles the widgets for the data upload section.
@@ -458,10 +478,10 @@ def set_container_data_loading():
     # Check and load the dataset if a button is clicked (also showing a preview)
     if load_button_local:
         local_dataset, hf_name, hf_split = check_and_load_dataset(
-            local_dataset, hf_name, hf_split, "local")
+            local_dataset, hf_name, hf_split, "local", msg_holder)
     if load_button_hf:
         local_dataset, hf_name, hf_split = check_and_load_dataset(
-            local_dataset, hf_name, hf_split, "hf")
+            local_dataset, hf_name, hf_split, "hf", msg_holder)
 
 
 def set_container_column_selectors():
@@ -593,7 +613,10 @@ def main():
 
     # Set the page title
     st.title("🕵️‍♀️ Variationist")
-    st.markdown("---")
+    # st.markdown("---")
+
+    # Set the container for user messages
+    msg_holder = st.empty()
 
     # Initialize the content sections
     content_sections = initialize_content_sections()
@@ -601,7 +624,7 @@ def main():
     # SIDEBAR #################################################################
     
     # Create all containers of the sidebar with their own relevant widgets
-    set_container_data_loading()
+    set_container_data_loading(msg_holder)
     set_container_column_selectors()
     set_container_custom_selectors()
 
@@ -613,9 +636,10 @@ def main():
         on_click=placeholder_function)
 
     if run_button:
-        with st.spinner(f"🕵️‍♀️ **Running**... (*depending on the size of the dataset, label space, "
-            "and the chosen configuration this step may take a while, time for a coffee?* :coffee:)"):
-            run_variationist(st.session_state["args_options"], content_sections)
+        with msg_holder:
+            with st.spinner(f"🕵️‍♀️ **Running**... (*depending on the size of the dataset, label space, "
+                "and the chosen configuration this step may take a while, time for a coffee?* :coffee:)"):
+                run_variationist(st.session_state["args_options"], content_sections)
 
     # MAIN CONTENT ############################################################
 
@@ -623,7 +647,8 @@ def main():
 
     if not st.session_state["dataframe"].empty:
         content_sections[0].markdown(f"**Dataset \"{st.session_state['dataset_name']}\"**")
-        content_sections[0].dataframe(data=st.session_state["dataframe"])
+        content_sections[0].dataframe(
+            data=st.session_state["dataframe"], use_container_width=False, height=250)
 
 
 if __name__ == "__main__":
