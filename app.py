@@ -16,9 +16,9 @@ from src.visualization import visualizer
 
 
 # @TODO: Directly get those from a constants file in the repo
-LABEL_TYPES = ["---", "time", "space"]
+LABEL_TYPES = ["generic", "time", "space"]
 METRICS = ["most-frequent", "pmi"]
-STOPWORDS = ["---", "en", "it"]
+STOPWORDS = ["en", "it"]
 N_TOKENS = ["1", "2", "3"]
 TEMP_DATA_FOLDER_NAME = "data-temp"
 
@@ -35,19 +35,15 @@ def run_variationist(args, content_sections):
     """
 
     # @TODO: Temporary handling of interface-only markers
-    label_cols = ""
-    label_type_cols = ""
     lowercasing = ""
-    # if args["label_cols"] == "---": label_cols = ""
-    if args["label_type_cols"] == "---": label_type_cols = ""
     if args["lowercase"] == True: lowercasing = "--lowercase"
     
     try:
         result = subprocess.run([
             f"{sys.executable}", "main.py",
-            "--dataset_filepath", args["dataset_filepath"], # @TODO: Manage path
+            "--dataset_filepath", args["dataset_filepath"],
             "--text_cols", " ".join([col for col in args["text_cols"]]),
-            "--label_cols", args["label_cols"], # @TODO: Generalize to multiple labels
+            "--label_cols", " ".join([col for col in args["label_cols"]]),
             # @TODO: --label_type_cols
             "--metrics", " ".join([metric for metric in args["metrics"]]),
             lowercasing
@@ -68,7 +64,7 @@ def initialize_session_states():
         st.session_state["args_options"]["dataset_filepath"] = ""
         st.session_state["args_options"]["text_cols"] = []
         st.session_state["args_options"]["label_cols"] = []
-        st.session_state["args_options"]["label_type_cols"] = [] # @TODO: Not implemented yet
+        st.session_state["args_options"]["label_type_cols"] = []
         st.session_state["args_options"]["metrics"] = ["pmi"]
         st.session_state["args_options"]["lowercase"] = False
         st.session_state["args_options"]["stopwords"] = False
@@ -104,18 +100,19 @@ def customize_css():
     # padding 4rem instead of 6rem; padding 2rem instead of 6rem
     top_padding = """
         <style>
-            .css-1544g2n { padding: 4rem 1rem 1.5rem; }
-            .css-z5fcl4 { padding: 2rem 6rem 1rem 6rem; }
+            .css-10oheav { padding: 4rem 1rem 1.5rem; }
+            .css-z5fcl4 { padding: 0rem 6rem 1rem 6rem; }
         </style>
     """
     st.markdown(top_padding, unsafe_allow_html=True)
 
     file_uploader = """
         <style>
-            .css-1txgwv8 .eqdbnj015 { flex-direction: row; align-items: center; }
-            .css-1txgwv8 .eqdbnj014 { margin-bottom: 0rem; }
+            .css-1v7f65g .e1b2p2ww15 { flex-direction: row; align-items: center; }
+            .css-1v7f65g .e1b2p2ww15 { margin-bottom: 0rem; }
             .css-1aehpvj { font-size: 12px; }
             .css-7oyrr6 { font-size: 12px; }
+            .css-1v7f65g .e1b2p2ww5 { margin-bottom: 0rem; }
         </style>
     """
     st.markdown(file_uploader, unsafe_allow_html=True)
@@ -511,35 +508,37 @@ def set_container_column_selectors():
                 label=":pencil: **Text** column(s)",
                 help="Select relevant column name(s) indicating text data to be analyzed.",
                 options=column_names,
-                default=[])
+                default=[],
+                placeholder="Select...")
             st.session_state["args_options"]["text_cols"] = text_cols
 
-            # Create a side-by-side container for selection of label names and types
-            with st.container():
-                side_col_left, side_col_right = st.columns(2)
+            residual_column_names = [
+                col for col in column_names if col not in st.session_state["args_options"]["text_cols"]]
 
-                with side_col_left:
-                    label_name_cols = st.selectbox(
-                        label=":label: **Label** column",
-                        help="Select a column name indicating the label to be analyzed. On the right, "
-                            "you will also have to choose how this column has to be treated. If you "
-                            "choose \"---\", basic statistics only will be computed.",
-                        options=["---"]+column_names)
-                    # @TODO: To generalize as list
-                    st.session_state["args_options"]["label_cols"] = label_name_cols
+            if st.session_state["args_options"]["text_cols"] != []:
+                label_cols = st.multiselect(
+                    label=":label: **Label** column(s)",
+                    help="Select relevant column name(s) indicating the label(s) to be analyzed.",
+                    options=residual_column_names,
+                    default=[],
+                    placeholder="Select...")
+                st.session_state["args_options"]["label_cols"] = label_cols
 
-                with side_col_right:
-                    label_type_cols = st.selectbox(
-                        label=":question: **Label** type",
-                        help="Select how the column name defined on the left has to be treated. If you "
-                            "choose \"---\" it will be a) treated as generic in the presence of a label "
-                            "column, or b) basic statistics only will be computed if also the column name "
-                            "is not defined.",
-                        options=LABEL_TYPES)
-                    # @TODO: To generalize as list
-                    st.session_state["args_options"]["label_type_cols"] = label_type_cols
-
-                add_label_button = st.button(label="Add another label", on_click=placeholder_function)
+            if st.session_state["args_options"]["label_cols"] != []:
+                # Create a side-by-side container for selection of label names and types
+                with st.container():
+                    for label_index, label in enumerate(st.session_state["args_options"]["label_cols"]):
+                        label_type_cols = st.selectbox(
+                            label=":question: Label type for **\"" + label + "\"**",
+                            help="Select how the column name on the left has to be "
+                                "treated. By default, it will be considered as a generic "
+                                "categorical variable.",
+                            options=LABEL_TYPES,
+                            key=label)
+                        # @TODO: To further check for misalignments
+                        if len(st.session_state["args_options"]["label_type_cols"]) > label_index:
+                            del st.session_state["args_options"]["label_type_cols"][label_index]
+                        st.session_state["args_options"]["label_type_cols"].insert(label_index, label_type_cols)
 
                 metrics = st.multiselect(
                     label=":triangular_ruler: **Metrics** to compute",
@@ -574,7 +573,8 @@ def set_container_custom_selectors():
                         "tokens contribute to the results. Stopword lists can be declared by their "
                         "ISO-639-1 code (e.g., \"en\", \"it\"): a list from NLTK will be automatically "
                         "downloaded and used.",
-                    options=STOPWORDS)
+                    placeholder="Select...", # do not work properly yet on streamlit 1.26.0
+                    options=[''] + STOPWORDS)
                 st.session_state["args_options"]["stopwords"] = stopwords
 
             with side_exp_col_right:
