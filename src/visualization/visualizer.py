@@ -1,10 +1,9 @@
-import altair as alt
 import json
-import os
 import pandas as pd
-import vl_convert as vlc
 
 from typing import Any, Optional, Union
+
+from chart import Chart
 
 
 def visualize(
@@ -12,7 +11,7 @@ def visualize(
     output_folder: str,
     filterable: Optional[bool] = True,
     ngrams: Optional[list[str]] = None,
-    save_to_pdf: Optional[bool] = False,
+    output_formats: Optional[list[str]] = ["html"],
 ) -> None:
     """
     A function that orchestrates the creation of charts based on the results
@@ -21,21 +20,22 @@ def visualize(
 
     Parameters
     ----------
-    input_json: str
+    input_json: Union[str, dict]
         A path to the json file or a json/dict object storing metadata and results 
         from a prior analysis using Variationist.
     output_folder: str
         A path to the output folder in which to store the charts and associated
         metadata. If the folder does not exist, it will be automatically created.
-    filterable: bool = True
+    filterable: Optional[bool] = True
         Whether the charts should be searchable by using regexes on ngrams or not.
     ngrams: Optional[list[str]] = None
         A list of n-grams of interest to focus the resulting visualizations on.
         N-grams should match the number of tokens used in the prior computation
         reflected by the "results" variable (e.g., if unigrams were chosen, this
         list should only contain unigrams).
-    save_to_pdf: bool = False
-        Whether or not to save the figures as a PDF files in addition to HTML files.
+    output_formats: Optional[list[str]] = ["html"]
+        A list of output formats for the charts. By default, only the interactive
+        HTML chart is saved, i.e., ["html"]. Extra choices: ["pdf", "svg", "png"].
     """
 
     # Load the json object storing metadata and results
@@ -50,63 +50,16 @@ def visualize(
             var_names = metadata["var_names"],
             focus_ngrams = ngrams)
 
-    # Create a chart for each computed metric
+    # Build a chart object for each computed metric based on variable types and
+    # semantics, then save it to the user-specified output folder
     for metric, df_data in df_metric_data.items():
+        # @TODO: Orchestrate the creation of charts
 
-        # If the chart has to be filterable, define a search component
-        if filterable == True:
-            search_input = alt.param(
-                value = "",
-                bind = alt.binding(
-                    input = "search",
-                    placeholder = "insert ngram...",
-                    name = "Filter by ngram ",
-                )
-            )
+        # Create the chart object
+        chart = Chart(df_data, metric, filterable)
 
-        #####################################################################
-        # WIP-START. @TODO: Generalize chart creation based on input metadata
-        #####################################################################
-
-        # Create the base chart object which stores the data
-        base_chart = alt.Chart(df_data).mark_line(point=True).encode(
-            alt.X("date:T"),
-            alt.Y("value:Q"),
-            alt.Color("ngram:N"),
-            alt.Tooltip("ngram:N"), # @TODO: Make it work on line plots
-        )
-
-        # Add the filtering option to the chart
-        if filterable == True:
-            base_chart = base_chart.encode(
-                opacity=alt.condition(
-                    alt.expr.test(alt.expr.regexp(search_input, 'i'), alt.datum.ngram),
-                    alt.value(1),
-                    alt.value(0.05)
-                )
-            )
-            base_chart = base_chart.add_params(search_input)
-
-        # Set extra properties
-        base_chart = base_chart.properties(width=1200).interactive()
-
-        # Create the final chart
-        chart = base_chart
-
-        #####################################################################
-        # WIP-END.
-        #####################################################################
-
-        # Create the output folder if it does not exist
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
-
-        # Save the chart to an HTML file in the output folder
-        chart.save(os.path.join(output_folder, "chart-" + metric + ".html"))
-
-        # Optionally, save the chart to a PDF file in the output folder
-        if save_to_pdf == True:
-            save_chart_to_pdf(chart, output_folder, metric)
+        # Save the chart to the output folder
+        chart.save(output_folder, output_formats)
 
 
 def load_json_data(
@@ -190,38 +143,12 @@ def get_df_from_json(
 
     # Create the long-form dataframe
     df_data = pd.DataFrame({
-        variable_key: variables, # @TODO: Get the original / define a general name for the variable
+        variable_key: variables,
         "ngram": ngrams,
         "value": values
     })
     
     return df_data
-
-
-def save_chart_to_pdf(
-    chart: alt.Chart,
-    output_folder: str,
-    metric: str,
-) -> None:
-    """
-    A function that saves a PDF version of the chart in a given output folder.
-
-    Parameters
-    ----------
-    chart: alt.Chart
-        A chart object to be saved to a PDF file
-    output_folder: str
-        A path to the output folder in which to save the chart as a PDF file.
-    metric: str
-        The metric associated to the chart (for setting the correct filename).
-    """
-
-    # Get the raw data from the chart (it requires "vl_convert" to be installed)
-    pdf_data = vlc.vegalite_to_pdf(chart.to_json())
-
-    # Write the raw data to the output filepath
-    with open(os.path.join(output_folder, "chart-" + metric + ".pdf"), "wb") as f:
-        f.write(pdf_data)
 
 
 if __name__ == "__main__":
@@ -231,4 +158,4 @@ if __name__ == "__main__":
         output_folder="my-charts",
         filterable=True,
         ngrams=None,
-        save_to_pdf=False)
+        output_formats=["html"])
