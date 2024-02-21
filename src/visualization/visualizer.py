@@ -4,11 +4,11 @@ import os
 import pandas as pd
 import vl_convert as vlc
 
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 
 def visualize(
-    input_filepath: str,
+    input_json: Union[str, dict],
     output_folder: str,
     filterable: Optional[bool] = True,
     ngrams: Optional[list[str]] = None,
@@ -21,9 +21,9 @@ def visualize(
 
     Parameters
     ----------
-    input_filepath: str
-        A path to the .json file storing metadata and results from a prior 
-        analysis using Variationist.
+    input_json: str
+        A path to the json file or a json/dict object storing metadata and results 
+        from a prior analysis using Variationist.
     output_folder: str
         A path to the output folder in which to store the charts and associated
         metadata. If the folder does not exist, it will be automatically created.
@@ -38,8 +38,8 @@ def visualize(
         Whether or not to save the figures as a PDF files in addition to HTML files.
     """
 
-    # Load the json object from the input filepath
-    json_data = json.load(open(input_filepath))
+    # Load the json object storing metadata and results
+    json_data = load_json_data(input_json)
 
     # Get the metadata and per-metric long-form dataframes from the json
     metadata = json_data["metadata"]
@@ -47,6 +47,7 @@ def visualize(
     for metric in metadata["metrics"]:
         df_metric_data[metric] = get_df_from_json(
             json_data = json_data["metrics"][metric], 
+            var_names = metadata["var_names"],
             focus_ngrams = ngrams)
 
     # Create a chart for each computed metric
@@ -69,7 +70,7 @@ def visualize(
 
         # Create the base chart object which stores the data
         base_chart = alt.Chart(df_data).mark_line(point=True).encode(
-            alt.X("$VAR:T"),
+            alt.X("date:T"),
             alt.Y("value:Q"),
             alt.Color("ngram:N"),
             alt.Tooltip("ngram:N"), # @TODO: Make it work on line plots
@@ -108,8 +109,43 @@ def visualize(
             save_chart_to_pdf(chart, output_folder, metric)
 
 
+def load_json_data(
+    input_json: Union[str, dict],
+) -> dict:
+    """
+    A function that loads the json/dict object from either a user-defined json 
+    filepath or a dict variable (in the latter case, it returns the dict itself).
+
+    Parameters
+    ----------
+    input_json: Union[str, dict]
+        A path to the json file or a json/dict object storing metadata and results 
+        from a prior analysis using Variationist.
+
+    Returns
+    -------
+    json_data: dict
+        A json/dict object storing metadata and results of a prior analysis.
+    """
+
+    # If the input is a json filepath, read it and store it
+    if type(input_json) == str:
+        print(f"Loading json data from the filepath \"{input_json}\"...")
+        json_data = json.load(open(input_json))
+    # If the input is already a json/dict object, use it
+    elif type(input_json) == dict:
+        print(f"Reading json data...")
+        json_data = input_json
+    # Otherwise, raise an error
+    else:
+        raise TypeError(f"ERROR: The input should be a json object or a json filepath.")
+    
+    return json_data
+
+
 def get_df_from_json(
     json_data: dict[str, Any],
+    var_names: list,
     focus_ngrams: Optional[list[str]] = None,
 ) -> pd.core.frame.DataFrame:
     """
@@ -122,6 +158,9 @@ def get_df_from_json(
     json_data: dict[str, Any]
         The json object storing the results from a prior analysis in the form:
         {varA: {ngram1: value1, ngram2: value2, ...}, varB: {...}, ...}
+    var_names: list
+        A list of variable names (i.e., original column names) to be used for
+        giving meaningful names to the long-form dataframe.
     fucus_ngrams: Optional[list[str]] = None
         A list of n-grams of interest to focus the filtering on. N-grams should 
         match the number of tokens used in the prior computation (e.g., if 
@@ -129,12 +168,15 @@ def get_df_from_json(
 
     Returns
     -------
-    pd.core.frame.DataFrame
+    df_data: pd.core.frame.DataFrame
         A long-form dataframe storing the results of a prior analysis.
     """
 
     # Initialize the lists for variables, ngrams, and values
     variables, ngrams, values = [], [], []
+
+    # Get a machine-readable name for the variable(s) under consideration
+    variable_key = " ".join(var_names)
 
     # Iterate over the json content to store items
     for variable, raw_items in json_data.items():
@@ -148,7 +190,7 @@ def get_df_from_json(
 
     # Create the long-form dataframe
     df_data = pd.DataFrame({
-        "$VAR": variables, # @TODO: Get the original / define a general name for the variable
+        variable_key: variables, # @TODO: Get the original / define a general name for the variable
         "ngram": ngrams,
         "value": values
     })
@@ -162,6 +204,8 @@ def save_chart_to_pdf(
     metric: str,
 ) -> None:
     """
+    A function that saves a PDF version of the chart in a given output folder.
+
     Parameters
     ----------
     chart: alt.Chart
@@ -183,8 +227,8 @@ def save_chart_to_pdf(
 if __name__ == "__main__":
     # Run the visualization test
     visualize(
-        input_filepath="example-time.json", 
+        input_json="example-time.json", # or: json.load(open("example-time.json"))
         output_folder="my-charts",
         filterable=True,
         ngrams=None,
-        save_to_pdf=True)
+        save_to_pdf=False)
