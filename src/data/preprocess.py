@@ -25,7 +25,7 @@ def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_ty
     # TODO do not check here for n_tokens, just tokenize first and THEN add a component that
     # will aggregate the tokens to create bi, tri-grams and so on.
     # TODO we want to add co-occurrences. Should we do that with context windows? e.g. 2 tokens
-    # before, 2 tokens after.
+    # before, 2 tokens after. Could also do co-occurrences of n-grams?
     if tokenization_type == "whitespace":
         if n_tokens == 1:
             
