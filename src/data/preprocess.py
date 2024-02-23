@@ -2,23 +2,10 @@ import pandas as pd
 import re
 import os
 from src import utils
+import tokenization
 
-def whitespace_tokenization(text_column, lowercase):
-    # Takes as input an array/series of texts and tokenize it, return same array/series but tokenized splitting on whitespaces
-    # Remove punctuation and any not alphanumeric charachter
-    # ONLY WORKS ON LATIN ALPHABET
-    if lowercase:
-        tok_column = text_column.squeeze().apply(lambda x: str(x).lower())
-    else:
-        tok_column = text_column.squeeze().astype(str)
 
-    tok_column = tok_column.apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
-    tok_column = tok_column.apply(lambda x: re.sub(r' +', ' ', x))
-    tok_column = tok_column.apply(lambda x: x.split(" "))
-    # tok_column = tok_column.squeeze().apply(lambda x: pd.Series(x.split(" ")))
-    return tok_column
-
-def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_type="whitespace"):
+def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_type):
     # print(stopwords)
     """"""
     # TODO take an array/series of texts and tokenize it, return same array/series but tokenized
@@ -27,14 +14,16 @@ def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_ty
     # TODO we want to add co-occurrences. Should we do that with context windows? e.g. 2 tokens
     # before, 2 tokens after. Could also do co-occurrences of n-grams?
     if tokenization_type == "whitespace":
-        if n_tokens == 1:
+        # if n_tokens == 1:
             
-            tokenized_text_column = whitespace_tokenization(text_column, lowercase)
-        else:
-            raise Exception("Only n_tokens=1 is currently supported")
+            tokenized_text_column = tokenization.whitespace_tokenization(text_column, lowercase)
+        # else:
+        #     raise Exception("Only n_tokens=1 is currently supported")
         
         # if stopwords != None:
         #     raise Exception("Stopword removal is not currently supported")
+    # elif we tokenize with huggingface
+    # elif we tokenize with spacy
     else:
         raise Exception("Only whitespace tokenization is currently supported")
     
@@ -68,6 +57,18 @@ def remove_stopwords(text_column, language):
         text_column = text_column.squeeze().apply(lambda x: remove_elements(x,stopwords))
         
         return(text_column)
+    
+
+def create_tokenized_ngrams_column(tokenized_text_column, n_tokens):
+    """TODO"""
+    return
+
+
+# # this could ideally be called after create_tokenized_ngrams_column if we want
+# # to analyze cooccurrences of bi/trigrams
+# def create_tokenized_cooccurrences_column(tokenized_text_column, context_window):
+#     """TODO"""
+#     return
                                                             
 
 def tokenize_add_tok_column(input_dataframe, col_names_dict, n_tokens, stopwords, lowercase):
