@@ -4,7 +4,7 @@ import sys
 import json
 
 from src import utils
-from src.data_handler import data_dispatcher
+from src.data import data_dispatcher
 
 
 def import_args():
@@ -92,7 +92,7 @@ def main():
     # If the input filepath is local, check if the file exists. If not, exit
     if not args.dataset_filepath.startswith("hf::"):
         if not os.path.isfile(args.dataset_filepath):
-            sys.exit(f"ERROR! The file '{args.dataset_filepath}' does not exist. Exit.")
+            raise ValueError(f"ERROR! The file '{args.dataset_filepath}' does not exist. Exit.")
 
     # Check if column strings are names or indices (for both texts and labels)
     text_cols_type = utils.check_column_type(args.text_cols)
@@ -100,8 +100,8 @@ def main():
 
     # Since the input file/dataset is the same, we require texts and labels columns to be of the same type
     if text_cols_type != label_cols_type:
-        sys.exit(f"ERROR! text_cols are {text_cols_type} while label_cols are {label_cols_type}. "
-            "Please provide all column identifiers as names (as in the header line) or indexes.")
+        raise ValueError(f"ERROR! text_cols are {text_cols_type} while label_cols are {label_cols_type}. "
+                         "Please provide all column identifiers as names (as in the header line) or indices.")
     cols_type = text_cols_type
     print(f"INFO: all column identifiers are treated as column {cols_type}.")
 
@@ -112,7 +112,8 @@ def main():
     dataframe_cols = [col_name for col_name in dataframe.columns]
     for col in args.text_cols+args.label_cols:
         if col not in dataframe_cols:
-            sys.exit(f"ERROR: the '{col}' column is not present in the dataframe.")
+            # sys.exit(f"ERROR: the '{col}' column is not present in the dataframe.")
+            raise ValueError(f"ERROR: the '{col}' column is not present in the dataframe.")
 
     # Create a dictionary containing the specified column strings (values) for texts and labels (keys)
     column_names_dict = {

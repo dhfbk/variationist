@@ -59,7 +59,7 @@ def remove_stopwords(text_column, language):
     # Language need to be ISO 639-1  two-letter codes e.g en, it, fr, de 
     # TODO to be done
     
-    with open(os.path.join('src','data_handler','stopwords', str(language)+'.txt')) as file: 
+    with open(os.path.join('src','data','stopwords', str(language)+'.txt')) as file: 
         stopwords = [line.rstrip() for line in file]
         text_column = text_column.squeeze().apply(lambda x: remove_elements(x,stopwords))
         

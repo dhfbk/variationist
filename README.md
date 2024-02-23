@@ -7,7 +7,7 @@ pip install -r requirements.txt
 ```
 
 
-# Run variation explorer
+# Run variation explorer (this is currently not tested for this branch)
 
 ```
 streamlit run main.py
@@ -16,9 +16,6 @@ streamlit run main.py
 # Run without interface
 
 ```
-python3 main.py --dataset_filepath data/netflix-toy.tsv  --text_cols text --label_cols label --metrics pmi
+python example.py
 ```
-
-```
-python3 main.py --dataset_filepath data/netflix-toy.tsv  --text_cols text --label_cols label --metrics most-frequent
-```
+The `example.py` file contains a sample usage of Variationist. 

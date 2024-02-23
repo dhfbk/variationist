@@ -1,6 +1,6 @@
 import pandas as pd
 from src.methods import most_frequent,pmi
-from src.data_handler import preprocess
+from src.data import preprocess
 
 from src import utils
 
@@ -72,6 +72,7 @@ def process_dataset(input_dataframe, col_names_dict, metrics, n_tokens, stopword
     tokenized texts"""
     # TODO there currently is an error when there are multiple text columns
 
+    print(input_dataframe)
     tokenized_dataframe, tok_columns_dict = preprocess.tokenize_add_tok_column(input_dataframe,
                                                                                col_names_dict,
                                                                                n_tokens,

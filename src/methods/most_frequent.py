@@ -7,7 +7,7 @@ def take(n, iterable):
     return list(islice(iterable, n))
 
 def create_most_frequent_dictionary(label_values_dict, subsets_of_interest):
-    
+    # TODO change the name of this function: it just calculates frequency!
     output_freqs = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
