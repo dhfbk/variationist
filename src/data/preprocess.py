@@ -21,7 +21,11 @@ def whitespace_tokenization(text_column, lowercase):
 def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_type="whitespace"):
     # print(stopwords)
     """"""
-    #TODO take an array/series of texts and tokenize it, return same array/series but tokenized
+    # TODO take an array/series of texts and tokenize it, return same array/series but tokenized
+    # TODO do not check here for n_tokens, just tokenize first and THEN add a component that
+    # will aggregate the tokens to create bi, tri-grams and so on.
+    # TODO we want to add co-occurrences. Should we do that with context windows? e.g. 2 tokens
+    # before, 2 tokens after.
     if tokenization_type == "whitespace":
         if n_tokens == 1:
             

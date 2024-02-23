@@ -48,8 +48,8 @@ class InspectorArgs:
     var_types: Optional[List] = 'nominal' # nominal (default), ordinal, coordinates
     var_semantics: Optional[List] = 'general' # default=General, temporal, spatial
     var_subsets: Optional[List] = None
-    n_tokens: Optional[int] = 1
-    stopwords: Optional[bool] = False
+    n_tokens: Optional[int] = 1 # maximum value for this should be 5, otherwise the computation will explode
+    stopwords: Optional[bool] = False # TODO currently we only support stopwords = en,it. Add support for False, spacy, hf
     lowercase: Optional[bool] = False
     
     def to_dict(self):
