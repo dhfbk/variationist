@@ -2,7 +2,7 @@ import pandas as pd
 import re
 import os
 from src import utils
-import tokenization
+from src.data import tokenization
 
 
 def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_type):
@@ -71,7 +71,7 @@ def create_tokenized_ngrams_column(tokenized_text_column, n_tokens):
 #     return
                                                             
 
-def tokenize_add_tok_column(input_dataframe, col_names_dict, n_tokens, stopwords, lowercase):
+def tokenize_add_tok_column(input_dataframe, col_names_dict, n_tokens, stopwords, lowercase, tokenization_type):
     
     # Tokenize and create new columns with tokenized text, name them "tok_{original_column}"
     # returns also a dictionary mapping text columns to their tokenized counterparts
@@ -79,7 +79,7 @@ def tokenize_add_tok_column(input_dataframe, col_names_dict, n_tokens, stopwords
     for text_column in col_names_dict[utils.TEXT_COLS_KEY]:
         tokenized_col_names[text_column] = f"tok_{text_column}"
         input_dataframe[tokenized_col_names[text_column]] = tokenize_column(
-            input_dataframe[[str(text_column)]], n_tokens, lowercase, stopwords)
+            input_dataframe[[str(text_column)]], n_tokens, lowercase, stopwords, tokenization_type)
     return input_dataframe, tokenized_col_names
 
 

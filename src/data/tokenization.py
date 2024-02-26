@@ -1,3 +1,5 @@
+import re
+
 
 def whitespace_tokenization(text_column, lowercase):
     # Takes as input an array/series of texts and tokenize it, return same array/series but tokenized splitting on whitespaces

@@ -136,7 +136,8 @@ class Inspector:
                                                                    metrics=self.args.metrics,
                                                                    n_tokens=self.args.n_tokens,
                                                                    stopwords=self.args.stopwords,
-                                                                   lowercase=self.args.lowercase)
+                                                                   lowercase=self.args.lowercase,
+                                                                   tokenization_type=self.args.tokenizer)
         # TODO handle series_dict
         self.results_dict = results_dict
     

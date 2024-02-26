@@ -65,7 +65,7 @@ def get_subset_dict(input_dataframe, col_names_dict, tok_columns_dict, label_val
 
 
 
-def process_dataset(input_dataframe, col_names_dict, metrics, n_tokens, stopwords, lowercase):
+def process_dataset(input_dataframe, col_names_dict, metrics, n_tokens, stopwords, lowercase, tokenization_type):
     
     """function that returns a list of pandas series, one for each label value
     for each label the user selected as relevant, containing the corresponding 
@@ -77,7 +77,8 @@ def process_dataset(input_dataframe, col_names_dict, metrics, n_tokens, stopword
                                                                                col_names_dict,
                                                                                n_tokens,
                                                                                stopwords,
-                                                                               lowercase)
+                                                                               lowercase,
+                                                                               tokenization_type)
 
 
     label_values_dict = preprocess.get_label_values(input_dataframe, col_names_dict)
