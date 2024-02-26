@@ -30,6 +30,8 @@ def tokenize_column(text_column, n_tokens, lowercase, stopwords, tokenization_ty
     if stopwords != None:        
         tokenized_text_column = remove_stopwords(tokenized_text_column,stopwords)
     # print(tokenized_text_column)    
+    if n_tokens > 1:
+        tokenized_text_column = create_tokenized_ngrams_column(tokenized_text_column,n_tokens)
     return tokenized_text_column
 
 
@@ -59,9 +61,20 @@ def remove_stopwords(text_column, language):
         return(text_column)
     
 
+def convert_to_ngrams(token_list, n_tokens):
+    # Takes as input a list of tokens and  the length of the ngrams
+    # Returns token_list merged into ngrams
+    new_array = []
+    for i in range(len(token_list) - n_tokens + 1):
+        new_array.append(" ".join(token_list[i: i + n_tokens]))
+    return(new_array)
+
 def create_tokenized_ngrams_column(tokenized_text_column, n_tokens):
-    """TODO"""
-    return
+    # Takes as input an already tokenized array/series of texts and the length of the ngrams
+    # Returns tokenized_text_column with the tokens merged into ngrams
+
+    tokenized_text_column = tokenized_text_column.squeeze().apply(lambda x: convert_to_ngrams(x,n_tokens))
+    return(tokenized_text_column)
 
 
 # # this could ideally be called after create_tokenized_ngrams_column if we want
