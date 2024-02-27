@@ -13,7 +13,9 @@ class Chart:
         self,
         df_data: pd.core.frame.DataFrame,
         chart_metric: str,
+        n_tokens: int,
         filterable: Optional[bool] = True,
+        zoomable: Optional[bool] = True
     ) -> None:
         """
         Initialization function for a building an alt.Chart chart object.
@@ -25,29 +27,24 @@ class Chart:
             given metric that will be used for visualization purposes.
         chart_metric: str
             The metric associated to the "df_data" dataframe and thus to the chart.
+        n_tokens: int
+            The number of tokens used by the metric in the original run.
         filterable: Optional[bool] = True
-            Whether the chart should be searchable by using regexes on ngrams or not.
+            Whether the chart should be filterable by using regexes on ngrams or not.
+        zoomable: Optional[bool] = True
+            Whether the (HTML) chart should be zoomable using the mouse or not.
         """
 
         self.df_data = df_data
         self.chart_metric = chart_metric
+        self.n_tokens = n_tokens
         self.filterable = filterable
+        self.zoomable = zoomable
         self.chart = None
 
-        #####################################################################
-        # WIP-START. @TODO: Generalize chart creation based on input metadata
-        #####################################################################
-
-        # If the chart has to be filterable, define a search component
-        if self.filterable == True:
-            search_input = alt.param(
-                value = "",
-                bind = alt.binding(
-                    input = "search",
-                    placeholder = "insert ngram...",
-                    name = "Filter by ngram ",
-                )
-            )
+        ######################################################
+        # WIP-START. @TODO: Generalize based on input metadata
+        ######################################################
 
         # Create the base chart object which stores the data
         base_chart = alt.Chart(self.df_data).mark_line(point=True, tooltip=True)
@@ -68,26 +65,66 @@ class Chart:
             _tooltip
         )
 
-        # If the chart has to be filterable, add the filtering option
-        if self.filterable == True:
-            base_chart = base_chart.encode(
-                opacity=alt.condition(
-                    alt.expr.test(alt.expr.regexp(search_input, 'i'), alt.datum.ngram),
-                    alt.value(1),
-                    alt.value(0.05)
-                )
-            )
-            base_chart = base_chart.add_params(search_input)
-
         # Set extra properties
-        base_chart = base_chart.properties(width=1200).interactive()
-
-        # Create the final chart
-        self.chart = base_chart
+        base_chart = base_chart.properties(width=1200)
 
         #####################################################################
         # WIP-END.
         #####################################################################
+
+        # If the chart has to be filterable, create and add a search component to it
+        if self.filterable == True:
+            base_chart = self.add_search_component(base_chart)
+
+        # If the chart has to be zoomable, set the property
+        if self.zoomable == True:
+            base_chart = base_chart.interactive()
+
+        # Create the final chart
+        self.chart = base_chart
+
+
+    def add_search_component(
+        self,
+        base_chart: alt.Chart,
+    ) -> alt.Chart:
+        """
+        A function that creates a search component and adds it to the chart.
+
+        Parameters
+        ----------
+        base_chart: alt.Chart
+            The base chart object in which to add the search component.
+
+        Returns
+        -------
+        base_chart: alt.Chart
+            The same base chart objeect with the search component added.
+        """
+
+        # Create the search component
+        search_input = alt.param(
+            value = "",
+            bind = alt.binding(
+                input = "search",
+                placeholder = f"insert {self.n_tokens}-gram...",
+                name = f"Filter by {self.n_tokens}-gram ",
+            )
+        )
+
+        # Set opacity conditions for filtering when using the search component
+        base_chart = base_chart.encode(
+            opacity = alt.condition(
+                alt.expr.test(alt.expr.regexp(search_input, "i"), alt.datum.ngram),
+                alt.value(1),
+                alt.value(0.05)
+            )
+        )
+
+        # Add the search component to the base chart
+        base_chart = base_chart.add_params(search_input)
+
+        return base_chart
 
 
     def save(

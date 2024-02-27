@@ -10,6 +10,7 @@ def visualize(
     input_json: Union[str, dict],
     output_folder: str,
     filterable: Optional[bool] = True,
+    zoomable: Optional[bool] = True,
     ngrams: Optional[list[str]] = None,
     output_formats: Optional[list[str]] = ["html"],
 ) -> None:
@@ -28,6 +29,8 @@ def visualize(
         metadata. If the folder does not exist, it will be automatically created.
     filterable: Optional[bool] = True
         Whether the charts should be searchable by using regexes on ngrams or not.
+    zoomable: Optional[bool] = True
+        Whether the (HTML) chart should be zoomable using the mouse or not.
     ngrams: Optional[list[str]] = None
         A list of n-grams of interest to focus the resulting visualizations on.
         N-grams should match the number of tokens used in the prior computation
@@ -56,7 +59,7 @@ def visualize(
         # @TODO: Orchestrate the creation of charts
 
         # Create the chart object
-        chart = Chart(df_data, metric, filterable)
+        chart = Chart(df_data, metric, metadata["n_tokens"], filterable, zoomable)
 
         # Save the chart to the output folder
         chart.save(output_folder, output_formats)
@@ -157,5 +160,6 @@ if __name__ == "__main__":
         input_json="example-time.json", # or: json.load(open("example-time.json"))
         output_folder="my-charts",
         filterable=True,
+        zoomable=True,
         ngrams=None,
         output_formats=["html"])
