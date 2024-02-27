@@ -10,7 +10,7 @@ from typing import Callable, List, Optional, Tuple, Union, Dict
 import json
 from src.data import preprocess_utils
 from src.data.tokenization import Tokenizer
-from src.methods import pmi, most_frequent
+from src.methods import pmi, most_frequent, metrics
 
 @dataclass
 class InspectorArgs:
@@ -114,25 +114,7 @@ class Inspector:
         # Instantiate the tokenizer
         self.tokenizer = Tokenizer(self.args)
         
-
-    # def import_dataset(self):
-    #     # TODO
-    #     # this should ideally just become a data util function that we call here on "dataset"
-    #     # then we just assume that that function will return us a dataframe we can work with.
-    #     # dataset = data_utils.turn_into_dataframe(dataset)
-    #     # TODO also add the possibility of dataset already being a huggingface dataset or a pandas dataframe
-    #     if type(self.dataset) is str:
-    #         # If the input filepath is local, check if the file exists. If not, exit
-    #         if self.dataset.startswith("hf::"):
-    #             # open dataset with huggingface
-    #             raise NotImplementedError("Variationist does not support huggingface datasets yet.")
-    #         elif os.path.isfile(self.dataset):
-    #             # open with pandas (old function)
-    #             # Read the input file/dataset and store its content in a pandas dataframe
-    #             self.dataframe = utils.convert_file_to_dataframe(self.dataset, cols_type=self.cols_type)
-    #         else:
-    #             raise ValueError(f"ERROR! The file '{self.dataset}' does not exist. Exit.")
-            
+        self.check_columns()
 
 
     def check_columns(self):
@@ -151,14 +133,9 @@ class Inspector:
                                                 self.tokenizer.tokenized_col_dict,
                                                 label_values_dict)
         results_dict = dict()
-            
-        if 'most-frequent' in self.args.metrics:
-            most_frequent_dict = most_frequent.create_most_frequent_dictionary(label_values_dict, subsets_of_interest)
-            results_dict['most-frequent'] = most_frequent_dict
-            
-        if 'pmi' in self.args.metrics:
-            pmi_dict = pmi.create_pmi_dictionary(label_values_dict, subsets_of_interest)
-            results_dict['pmi'] = pmi_dict
+        for metric in self.args.metrics:
+            current_metric = metrics.Metric(metric)
+            results_dict[metric] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
             
         # TODO handle series_dict
         self.results_dict = results_dict

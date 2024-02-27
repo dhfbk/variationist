@@ -9,7 +9,7 @@ inspector_arguments = InspectorArgs(text_names=["1"],
                                     var_names=["0"],
                                     metrics=["pmi", "most-frequent"],
                                     stopwords="en",
-                                    n_tokens = 2,
+                                    n_tokens = 1,
                                     )
 
 dataset = "data/netflix-toy.tsv"
