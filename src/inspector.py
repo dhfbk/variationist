@@ -7,8 +7,10 @@ from datasets import Dataset
 import pandas as pd
 from src import utils
 from typing import Callable, List, Optional, Tuple, Union, Dict
-from src.data import data_dispatcher
 import json
+from src.data import preprocess_utils
+from src.data.tokenization import Tokenizer
+from src.methods import pmi, most_frequent
 
 @dataclass
 class InspectorArgs:
@@ -90,56 +92,78 @@ class Inspector:
         # Check if column strings are names or indices (for both texts and labels)
         text_names_type = utils.check_column_type(args.text_names)
         label_names_type = utils.check_column_type(args.var_names)
+    
         
         # Since the input file/dataset is the same, we require texts and labels columns to be of the same type
         if text_names_type != label_names_type:
             raise ValueError(f"ERROR! text_cols are {text_names_type} while label_cols are {label_names_type}. "
                             "Please provide all column identifiers as names (as in the header line) or indices.")
-        cols_type = text_names_type
-        print(f"INFO: all column identifiers are treated as column {cols_type}.")
+        self.cols_type = text_names_type
+        print(f"INFO: all column identifiers are treated as column {self.cols_type}.")
+        
+        # Read the input file/dataset and store its content in a pandas dataframe
+        self.dataframe = utils.convert_file_to_dataframe(self.dataset, cols_type=self.cols_type)
 
-        # TODO
-        # this should ideally just become a data util function that we call here on "dataset"
-        # then we just assume that that function will return us a dataframe we can work with.
-        # dataset = data_utils.turn_into_dataframe(dataset)
-        # TODO also add the possibility of dataset already being a huggingface dataset or a pandas dataframe
-        if type(dataset) is str:
-            # If the input filepath is local, check if the file exists. If not, exit
-            if dataset.startswith("hf::"):
-                # open dataset with huggingface
-                raise NotImplementedError("Variationist does not support huggingface datasets yet")
-            elif os.path.isfile(dataset):
-                # open with pandas (old function)
-                # Read the input file/dataset and store its content in a pandas dataframe
-                self.dataframe = utils.convert_file_to_dataframe(dataset, cols_type=cols_type)
-            else:
-                raise ValueError(f"ERROR! The file '{dataset}' does not exist. Exit.")
-         # -------- function should end here
-
-        # Check if the specified columns are actually in the dataframe
-        self.dataframe_cols = [col_name for col_name in self.dataframe.columns]
-        for col in args.text_names+args.var_names:
-            if col not in self.dataframe_cols:
-                raise ValueError(f"ERROR: the '{col}' column is not present in the dataframe.")
-
+        
         # Create a dictionary containing the specified column strings (values) for texts and labels (keys)
-        self.column_names_dict = {
+        self.col_names_dict = {
             utils.TEXT_COLS_KEY: args.text_names,
             utils.LABEL_COLS_KEY: args.var_names
         }
 
+        # Instantiate the tokenizer
+        self.tokenizer = Tokenizer(self.args)
+        
+
+    # def import_dataset(self):
+    #     # TODO
+    #     # this should ideally just become a data util function that we call here on "dataset"
+    #     # then we just assume that that function will return us a dataframe we can work with.
+    #     # dataset = data_utils.turn_into_dataframe(dataset)
+    #     # TODO also add the possibility of dataset already being a huggingface dataset or a pandas dataframe
+    #     if type(self.dataset) is str:
+    #         # If the input filepath is local, check if the file exists. If not, exit
+    #         if self.dataset.startswith("hf::"):
+    #             # open dataset with huggingface
+    #             raise NotImplementedError("Variationist does not support huggingface datasets yet.")
+    #         elif os.path.isfile(self.dataset):
+    #             # open with pandas (old function)
+    #             # Read the input file/dataset and store its content in a pandas dataframe
+    #             self.dataframe = utils.convert_file_to_dataframe(self.dataset, cols_type=self.cols_type)
+    #         else:
+    #             raise ValueError(f"ERROR! The file '{self.dataset}' does not exist. Exit.")
+            
+
+
+    def check_columns(self):
+        # Check if the specified columns are actually in the dataframe
+        self.dataframe_cols = [col_name for col_name in self.dataframe.columns]
+        for col in self.args.text_names+self.args.var_names:
+            if col not in self.dataframe_cols:
+                raise ValueError(f"ERROR: the '{col}' column is not present in the dataframe.")
+            
 
     def compute(self):
         """Function that runs the actual computation"""
-        series_dict,results_dict = data_dispatcher.process_dataset(self.dataframe,
-                                                                   self.column_names_dict,
-                                                                   metrics=self.args.metrics,
-                                                                   n_tokens=self.args.n_tokens,
-                                                                   stopwords=self.args.stopwords,
-                                                                   lowercase=self.args.lowercase,
-                                                                   tokenization_type=self.args.tokenizer)
+        # TODO handle metrics in a smarter way.
+        label_values_dict = preprocess_utils.get_label_values(self.dataframe, self.col_names_dict)
+        subsets_of_interest = preprocess_utils.get_subset_dict(self.dataframe, self.col_names_dict,
+                                                self.tokenizer.tokenized_col_dict,
+                                                label_values_dict)
+        results_dict = dict()
+            
+        if 'most-frequent' in self.args.metrics:
+            most_frequent_dict = most_frequent.create_most_frequent_dictionary(label_values_dict, subsets_of_interest)
+            results_dict['most-frequent'] = most_frequent_dict
+            
+        if 'pmi' in self.args.metrics:
+            pmi_dict = pmi.create_pmi_dictionary(label_values_dict, subsets_of_interest)
+            results_dict['pmi'] = pmi_dict
+            
         # TODO handle series_dict
         self.results_dict = results_dict
+        return subsets_of_interest,results_dict
+
     
     def create_output_dict(self):
         """Function to create the output dictionary, containing both metadata and calculated metrics. """
@@ -157,6 +181,7 @@ class Inspector:
         output_file.close()
         
     def inspect(self):
+        self.dataframe = self.tokenizer.tokenize(self.dataframe)
         self.compute()
         self.create_output_dict()
         return self.output_dict
