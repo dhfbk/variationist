@@ -14,8 +14,13 @@ class Metric:
             self.metric_fn = methods.pmi.create_pmi_dictionary
         elif self.metric == "most-frequent":
             self.metric_fn = methods.most_frequent.create_most_frequent_dictionary
+        elif type(self.metric) is Callable:
+                self.metric_fn = self.metric
+        elif type(self.metric) is str:
+                raise NotImplementedError(f"The metric '{self.metric}' is not implemented.")
         else:
-            raise NotImplementedError(f"The metric '{self.metric}' is not implemented.")
+            raise ValueError(f"The specified metric should be a callable function or a string matching an implemented metric. Got a {type(self.metric)} instead")
+        
     
     def calculate_metric(self, label_values_dict, subsets_of_interest):
         """Calls the appropriate metric function."""
