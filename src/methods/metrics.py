@@ -1,10 +1,13 @@
 from src import methods
+from typing import Callable, Union
+
 
 class Metric:
     """
     The Metric class, a generic class that carries out all the metric operations.
     """
-    def __init__(self, metric):
+    def __init__(self, 
+                 metric: Union[str, Callable[[dict, dict], dict]]):
         self.metric = metric
     
         if self.metric == "pmi":
