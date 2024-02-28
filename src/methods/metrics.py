@@ -14,7 +14,7 @@ class Metric:
             self.metric_fn = methods.pmi.create_pmi_dictionary
         elif self.metric == "most-frequent":
             self.metric_fn = methods.most_frequent.create_most_frequent_dictionary
-        elif type(self.metric) is Callable:
+        elif callable(self.metric):
                 self.metric_fn = self.metric
         elif type(self.metric) is str:
                 raise NotImplementedError(f"The metric '{self.metric}' is not implemented.")
