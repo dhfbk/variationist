@@ -3,6 +3,8 @@ import re
 import os
 from src import utils
 from src.data import tokenization_utils
+import itertools
+import sys
 
 
 def remove_elements(token_list, stopwords):
@@ -44,11 +46,30 @@ def create_tokenized_ngrams_column(tokenized_text_column, n_tokens):
     return(tokenized_text_column)
 
 
-# # this could ideally be called after create_tokenized_ngrams_column if we want
-# # to analyze cooccurrences of bi/trigrams
-# def create_tokenized_cooccurrences_column(tokenized_text_column, context_window):
-#     """TODO"""
-#     return
+def extract_combinations(token_list, n_items, context_window):
+    # Takes as input a list of tokens, the number of words that coocur and the context window size 
+    # Returns token_list merged into coocurrences
+
+    if context_window == 0:
+        context_window = len(token_list)
+    new_array = []
+    for i in range(len(token_list) - context_window + 1):
+        for cooc in itertools.combinations(token_list[i: i + context_window], n_items):
+            new_array.append(" ".join(sorted(cooc)))
+    new_array = list(set(new_array))
+    
+    return(new_array)
+    
+
+def create_tokenized_cooccurrences_column(tokenized_text_column, n_items, context_window):
+    # Takes as input an already tokenized array/series of texts, the number of words that coocur and the context window size 
+    # By default cooccurrences are extracted from the entire text
+    # Returns tokenized_text_column with the al the coocurrences of n words occurring in the test
+    if n_items > context_window and context_window!=0:
+        sys.exit(f"ERROR: The size of the context windows cannot be lower than the number of words when extracting the coocurrences!\nExit.")
+
+    tokenized_text_column = tokenized_text_column.squeeze().apply(lambda x: extract_combinations(x,n_items,context_window))
+    return(tokenized_text_column)
                                                             
 
 def get_label_values(input_dataframe, col_names_dict):
