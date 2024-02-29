@@ -79,6 +79,8 @@ def get_label_values(input_dataframe, col_names_dict):
     # Create dictionary with names of label columns and label values
     label_values_dict = {}
     for label in current_labels:
+        # TODO FutureWarning: unique with argument that is not not a Series, Index, ExtensionArray, 
+        # or np.ndarray is deprecated and will raise in a future version.
         label_values_dict[label] = pd.unique(input_dataframe[label].values.tolist()).tolist()
     return label_values_dict
 
