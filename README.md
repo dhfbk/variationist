@@ -9,8 +9,8 @@
 
 ## Installation
 
-[!WARNING]
-The python library is currently work in progress (not available).
+> [!WARNING]
+> The python library is currently work in progress (not available).
 
 🕵️‍♀️ Variationist can be installed as a python package from [PyPI](https://pypi.org/) using the `pip` command as follows:
 
@@ -38,8 +38,8 @@ pip install --user -r requirements.txt              # install the required packa
 
 ### Using the library: minimal example
 
-[!WARNING]
-The example may change and it will be tested when the python library will be available.
+> [!WARNING]
+> The example may change and it will be tested when the python library will be available.
 
 ```python
 from variationist import Inspector, InspectorArgs, Visualizer, VisualizerArgs
@@ -62,8 +62,8 @@ Visualizer(input_json=results, output_folder="charts", visualizer_args).visualiz
 
 ### Using the app
 
-[!CAUTION]
-The app needs to be refactored and will need to include all the new features.
+> [!CAUTION]
+> The app needs to be refactored and will need to include all the new features.
 
 ```
 streamlit run main.py
@@ -79,7 +79,7 @@ The `example.py` file contains a sample usage of Variationist.
 
 ### Documentation
 
-[!WARNING]
-The documentation is currently work in progress (not available).
+> [!WARNING]
+> The documentation is currently work in progress (not available).
 
 The documentation will be available at: [https://variationist.readthedocs.io/en/latest/](https://variationist.readthedocs.io/en/latest/)
