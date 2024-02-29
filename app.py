@@ -12,7 +12,7 @@ from datetime import datetime
 from io import StringIO
 from PIL import Image
 
-from src.visualization import visualizer
+#from src.visualization import visualizer
 
 
 # @TODO: Directly get those from a constants file in the repo

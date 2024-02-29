@@ -55,7 +55,7 @@ class Chart:
         color_dim = alt.Color("ngram", type="nominal")
 
         # Extra attributes
-        _tooltip = alt.Tooltip("ngram", type="nominal")
+        _tooltip = alt.Tooltip("ngram", type="nominal") # it will be overwritten if "filterable" is True
 
         # Encoding data
         base_chart = base_chart.encode(
@@ -117,7 +117,12 @@ class Chart:
             opacity = alt.condition(
                 alt.expr.test(alt.expr.regexp(search_input, "i"), alt.datum.ngram),
                 alt.value(1),
-                alt.value(0.05)
+                alt.value(0)
+            ),
+            tooltip = alt.condition(
+                alt.expr.test(alt.expr.regexp(search_input, "i"), alt.datum.ngram),
+                "ngram",
+                alt.value("")
             )
         )
 
@@ -133,7 +138,8 @@ class Chart:
         output_formats: Optional[list[str]] = ["html"],
     ) -> None:
         """
-        A function that saves the chart to the output folder in various formats.
+        A function that saves the chart to a subfolder (with name matching the metric) 
+        of the output folder in various formats.
 
         Parameters
         ----------
@@ -145,18 +151,18 @@ class Chart:
         """
 
         # If output formats have been specified, save the chart in those formats to 
-        # the user-specified output folder
+        # subfolders (named as the metric) of the user-specified output folder
         if len(output_formats) >= 1:
-            # Set the base filename for the chart
-            BASE_FILENAME = os.path.join(output_folder, "chart-" + self.chart_metric)
+            # Set the full folder name
+            FOLDER_PATH = os.path.join(output_folder, self.chart_metric)
 
             # Create the output folder if it does not exist
-            if not os.path.exists(output_folder):
-                os.makedirs(output_folder)
+            if not os.path.exists(FOLDER_PATH):
+                os.makedirs(FOLDER_PATH)
 
             # Save the chart to an HTML file in the output folder
             if "html" in output_formats:
-                self.chart.save(os.path.join(BASE_FILENAME + ".html"))
+                self.chart.save(os.path.join(FOLDER_PATH, "chart.html"))
 
             # Save the chart to a PDF file in the output folder
             if "pdf" in output_formats:
@@ -164,7 +170,7 @@ class Chart:
                 pdf_data = vlc.vegalite_to_pdf(self.chart.to_json())
 
                 # Write the raw data to the output filepath
-                with open(os.path.join(BASE_FILENAME + ".pdf"), "wb") as f:
+                with open(os.path.join(FOLDER_PATH, "chart.pdf"), "wb") as f:
                     f.write(pdf_data)
 
             # Save the chart to a SVG file in the output folder
@@ -173,7 +179,7 @@ class Chart:
                 svg_data = vlc.vegalite_to_svg(self.chart.to_json())
 
                 # Write the raw data to the output filepath
-                with open(os.path.join(BASE_FILENAME + ".svg"), "wt") as f:
+                with open(os.path.join(FOLDER_PATH, "chart.svg"), "wt") as f:
                     f.write(svg_data)
 
             # Save the chart to a PNG file in the output folder
@@ -182,7 +188,7 @@ class Chart:
                 png_data = vlc.vegalite_to_png(self.chart.to_json())
 
                 # Write the raw data to the output filepath
-                with open(os.path.join(BASE_FILENAME + ".png"), "wb") as f:
+                with open(os.path.join(FOLDER_PATH, "chart.png"), "wb") as f:
                     f.write(png_data)
 
         # Otherwise, raise an error
