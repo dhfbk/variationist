@@ -43,7 +43,8 @@ class Tokenizer:
         # print(tokenized_text_column)    
         if self.args.n_tokens > 1:
             tokenized_text_column = preprocess_utils.create_tokenized_ngrams_column(tokenized_text_column, self.args.n_tokens)
-        if self.args.n_cooc > 1:
+        
+        if self.args.n_cooc > 1 and  self.args.n_tokens <= 1:
             tokenized_text_column = preprocess_utils.create_tokenized_cooccurrences_column(tokenized_text_column, self.args.n_cooc, self.args.window_size)
         return tokenized_text_column
     
