@@ -1,3 +1,4 @@
+import os
 from src.inspector import InspectorArgs, Inspector
 
 # TODO allow the user to input the dataset and the inspector args from command line
@@ -21,4 +22,4 @@ output_dict = my_inspector.inspect()
 
 # print(output_dict)
 
-my_inspector.save_output_to_json()
+my_inspector.save_output_to_json(output_path=os.path.join("data", "output.json"))

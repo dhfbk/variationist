@@ -2,7 +2,7 @@
 The Inspector class, to handle all the operations of Variationist.
 """
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from datasets import Dataset
 import pandas as pd
 from src import utils
@@ -47,8 +47,8 @@ class InspectorArgs:
     metrics: Optional[List] = None
     text_names: Optional[List] = None # explicit column name(s)
     var_names: Optional[List] = None # explicit variable name(s)
-    var_types: Optional[List] = 'nominal' # nominal (default), ordinal, coordinates
-    var_semantics: Optional[List] = 'general' # default=General, temporal, spatial
+    var_types: Optional[List] = field(default_factory=lambda: ['nominal']) # nominal (default), ordinal, coordinates
+    var_semantics: Optional[List] = field(default_factory=lambda: ['general']) # default=General, temporal, spatial
     var_subsets: Optional[List] = None
     n_tokens: Optional[int] = 1 # maximum value for this should be 5, otherwise the computation will explode
     n_cooc: Optional[int] = 1
