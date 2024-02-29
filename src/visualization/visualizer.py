@@ -1,4 +1,5 @@
 import json
+import os
 import pandas as pd
 
 from typing import Any, Optional, Union
@@ -59,7 +60,7 @@ def visualize(
         # @TODO: Orchestrate the creation of charts
 
         # Create the chart object
-        chart = Chart(df_data, metric, metadata["n_tokens"], filterable, zoomable)
+        chart = Chart(df_data, metric, metadata, filterable, zoomable)
 
         # Save the chart to the output folder
         chart.save(output_folder, output_formats)
@@ -157,7 +158,7 @@ def get_df_from_json(
 if __name__ == "__main__":
     # Run the visualization test
     visualize(
-        input_json="example-time.json", # or: json.load(open("example-time.json"))
+        input_json=os.path.join("data", "output.json"), # or: json.load(open("example-time.json"))
         output_folder="my-charts",
         filterable=True,
         zoomable=True,

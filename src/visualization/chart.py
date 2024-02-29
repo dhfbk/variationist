@@ -13,7 +13,7 @@ class Chart:
         self,
         df_data: pd.core.frame.DataFrame,
         chart_metric: str,
-        n_tokens: int,
+        metadata: dict,
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True
     ) -> None:
@@ -27,8 +27,8 @@ class Chart:
             given metric that will be used for visualization purposes.
         chart_metric: str
             The metric associated to the "df_data" dataframe and thus to the chart.
-        n_tokens: int
-            The number of tokens used by the metric in the original run.
+        metadata: dict
+            A dictionary storing the metadata about the prior analysis.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -37,7 +37,10 @@ class Chart:
 
         self.df_data = df_data
         self.chart_metric = chart_metric
-        self.n_tokens = n_tokens
+        self.var_names = metadata["var_names"]
+        self.var_types = metadata["var_types"]
+        self.var_semantics = metadata["var_semantics"]
+        self.n_tokens = metadata["n_tokens"]
         self.filterable = filterable
         self.zoomable = zoomable
         self.chart = None
@@ -50,7 +53,8 @@ class Chart:
         base_chart = alt.Chart(self.df_data).mark_line(point=True, tooltip=True)
 
         # Create dimensions
-        x_dim = alt.X("date", type="temporal")
+        # @TODO: Generalize to multiple variables
+        x_dim = alt.X(self.var_names[0], type=self.var_types[0])
         y_dim = alt.Y("value", type="quantitative") # value: always "quantitative"
         color_dim = alt.Color("ngram", type="nominal")
 
