@@ -3,3 +3,5 @@ leafmap==0.12.1
 transformers==4.24.0
 emoji==2.2.0
 datasets==2.13.1
+altair==5.2.0
+vl-convert-python==1.2.3

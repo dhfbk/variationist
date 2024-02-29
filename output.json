@@ -1,8 +1,0 @@
-{
-    "metadata": {
-        "tokenizer": "whitespace",
-        "language": null,
-        "metrics": [
-            "pmi",
-            "most-frequent",
-            
