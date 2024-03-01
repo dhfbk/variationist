@@ -2,11 +2,48 @@
 
 import csv
 import pandas as pd
+import json
+
+from typing import Union
 
 
 # CONSTANTS
 TEXT_COLS_KEY = "text"
 LABEL_COLS_KEY = "labels"
+
+
+def load_json_data_from_filepath_or_dict(
+    input_json: Union[str, dict],
+) -> dict:
+    """
+    A function that loads the json/dict object from either a user-defined json 
+    filepath or a dict variable (in the latter case, it returns the dict itself).
+
+    Parameters
+    ----------
+    input_json: Union[str, dict]
+        A path to the json file or a json/dict object storing metadata and results 
+        from a prior analysis using Variationist.
+
+    Returns
+    -------
+    json_data: dict
+        A json/dict object storing metadata and results of a prior analysis.
+    """
+
+    # If the input is a json filepath, read it and store it
+    if type(input_json) == str:
+        print(f"Loading json data from the filepath \"{input_json}\"...")
+        json_data = json.load(open(input_json))
+    # If the input is already a json/dict object, use it
+    elif type(input_json) == dict:
+        print(f"Reading json data...")
+        json_data = input_json
+    # Otherwise, raise an error
+    else:
+        raise TypeError(f"ERROR: The input should be a json object or a json filepath.")
+    
+    return json_data
 
 
 def convert_file_to_dataframe(data_filepath, cols_type):
