@@ -116,9 +116,6 @@ class Inspector:
         self.cols_type = text_names_type
         print(f"INFO: all column identifiers are treated as column {self.cols_type}.")
         
-        # Read the input file/dataset and store its content in a pandas dataframe
-        if (type(self.dataset) == str) and (not os.path.isfile(self.dataset)):
-            raise ValueError(f"ERROR: the '{self.dataset}' filepath does not exist.")
         self.dataframe = utils.convert_file_to_dataframe(self.dataset, cols_type=self.cols_type)
         
         # Create a dictionary containing the specified column strings (values) for texts and labels (keys)
