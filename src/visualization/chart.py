@@ -50,13 +50,16 @@ class Chart:
         ######################################################
 
         # Create the base chart object which stores the data
-        base_chart = alt.Chart(self.df_data).mark_line(point=True, tooltip=True)
+        base_chart = alt.Chart(self.df_data).mark_rect()
 
         # Create dimensions
         # @TODO: Generalize to multiple variables
-        x_dim = alt.X(self.var_names[0], type=self.var_types[0])
-        y_dim = alt.Y("value", type="quantitative") # value: always "quantitative"
-        color_dim = alt.Color("ngram", type="nominal")
+        # x_dim = alt.X(self.var_names[0], type=self.var_types[0])
+        # y_dim = alt.Y("value", type="quantitative") # value: always "quantitative"
+        # color_dim = alt.Color("ngram", type="nominal")
+        x_dim = alt.X(self.var_names[0], type=self.var_types[0], axis=alt.Axis(labelAngle=-45))
+        y_dim = alt.Y("ngram", type="nominal")
+        color_dim = alt.Color("value", type="quantitative")
 
         # Extra attributes
         _tooltip = alt.Tooltip("ngram", type="nominal") # it will be overwritten if "filterable" is True
@@ -70,7 +73,8 @@ class Chart:
         )
 
         # Set extra properties
-        base_chart = base_chart.properties(width=1200)
+        # base_chart = base_chart.properties(width=1200)
+        base_chart = base_chart.configure_view(step=15)
 
         #####################################################################
         # WIP-END.

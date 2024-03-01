@@ -3,8 +3,8 @@ import pandas as pd
 
 from typing import Any, Optional, Union
 
-import utils
-from visualization.chart import Chart
+from src import utils
+from src.visualization.chart import Chart
 
 
 # @TODO: Maybe change the "ngrams" name for clarity across the script (it supports cooccs, too!)
@@ -19,6 +19,7 @@ class VisualizerArgs:
         output_formats: Optional[list[str]] = ["html"],
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
+        criterion: Optional[str] = "top-k-per-var",
         ngrams: Optional[list[str]] = None,
     ) -> None:
         """
@@ -36,6 +37,12 @@ class VisualizerArgs:
             Whether the charts should be searchable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
+        criterion: str = "top-k-per-var"
+            The criterion that determines how many n-grams to show. If set to None, it 
+            will show all the tokens in the corpus (it may easily be overwhelming).
+            Choices are: ["top-k-per-var"]. By default, it is "top-k-per-var". Note
+            that the value k is automatically determined based on the total number of 
+            variables, to keep the visualization compact (max 100 ngrams): k=100/|C|
         ngrams: Optional[list[str]] = None
             A list of n-grams of interest to focus the resulting visualizations on.
             N-grams should match the number of tokens used in the prior computation
@@ -47,6 +54,7 @@ class VisualizerArgs:
         self.output_formats = output_formats
         self.filterable = filterable
         self.zoomable = zoomable
+        self.criterion = criterion
         self.ngrams = ngrams
 
 
@@ -86,6 +94,7 @@ class Visualizer:
             self.df_metric_data[metric] = self.get_df_from_json(
                 json_data = json_data["metrics"][metric], 
                 var_names = self.metadata["var_names"],
+                criterion = self.args.criterion,
                 focus_ngrams = self.args.ngrams)
 
 
@@ -93,6 +102,7 @@ class Visualizer:
         self,
         json_data: dict[str, Any],
         var_names: list,
+        criterion: str,
         focus_ngrams: Optional[list[str]] = None,
     ) -> pd.core.frame.DataFrame:
         """
@@ -108,6 +118,12 @@ class Visualizer:
         var_names: list
             A list of variable names (i.e., original column names) to be used for
             giving meaningful names to the long-form dataframe.
+        criterion: str = "top-k-per-var"
+            The criterion that determines how many n-grams to show. If set to None, it 
+            will show all the tokens in the corpus (it may easily be overwhelming).
+            Choices are: ["top-k-per-var"]. By default, it is "top-k-per-var". Note
+            that the value k is automatically determined based on the total number of 
+            variables, to keep the visualization compact (max 100 ngrams): k=100/|C|
         fucus_ngrams: Optional[list[str]] = None
             A list of n-grams of interest to focus the filtering on. N-grams should 
             match the number of tokens used in the prior computation (e.g., if 
@@ -125,15 +141,25 @@ class Visualizer:
         # Get a machine-readable name for the variable(s) under consideration
         variable_key = " ".join(var_names)
 
+        # If a criterion is defined, get a set of ngrams to show
+        top_elements = set()
+        if criterion == "top-k-per-var":
+            k = round(100 / len(json_data.keys()))
+            for variable, raw_items in json_data.items():
+                raw_top_k = sorted(raw_items.items(), key=lambda x:x[1], reverse=True)[:k]
+                ngrams_top_k = [element[0] for element in raw_top_k]
+                top_elements.update(ngrams_top_k)
+
         # Iterate over the json content to store items
         for variable, raw_items in json_data.items():
             for ngram, value in raw_items.items():
                 if (focus_ngrams != None) and (ngram not in focus_ngrams):
                     continue
                 else:
-                    variables.append(variable)
-                    ngrams.append(ngram)
-                    values.append(value)
+                    if ((criterion == "top-k-per-var") and (ngram in top_elements)) or (criterion == None): 
+                        variables.append(variable)
+                        ngrams.append(ngram)
+                        values.append(value)
 
         # Create the long-form dataframe
         df_data = pd.DataFrame({
