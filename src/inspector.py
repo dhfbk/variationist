@@ -36,13 +36,17 @@ class InspectorArgs:
             The list of metrics that should be calculated.
         n_tokens (`Int`):
             The number of tokens that should be considered for the analysis. 1 corresponds to unigrams, 2 corresponds to bigrams, and so on.
+        n_cooc (`Int`):
+            The number of tokens used for calculating non-consecutive co-occurrences. For example, n=2 means we consider as the base units for our analysis any pair of tokens that co-occur in the same sentence. n=3 means we consider triplets of tokens, etc. Defaults to n=1, meaning no co-occurrences are taken into consideration, and we only consider n-grams.
+        cooc_window_size (`Int`):
+            Size of the context window for co-occurrences. For instance, a `cooc_window_size` of 3 means we use a context window of 3 to calculate co-occurrences, meaning that any token that is within 3 tokens before or after a given token is added as a co-occurrence.
         stopwords (`Bool`):
             Whether to remove stopwords from texts before tokenization or not. Will default to False.
         lowercase (`Bool`):
             Whether to lowercase all the texts before tokenization or not. Will default to False.
     """
     
-    tokenizer: Optional[str] = 'whitespace'
+    tokenizer: Optional[Union[str, Callable]] = 'whitespace'
     language: Optional[str] = None
     metrics: Optional[List] = None
     text_names: Optional[List] = None # explicit column name(s)
@@ -52,13 +56,21 @@ class InspectorArgs:
     var_subsets: Optional[List] = None
     n_tokens: Optional[int] = 1 # maximum value for this should be 5, otherwise the computation will explode
     n_cooc: Optional[int] = 1
-    window_size: Optional[int] = 0
+    cooc_window_size: Optional[int] = 0
     stopwords: Optional[bool] = False # TODO currently we only support stopwords = en,it. Add support for False, spacy, hf
     lowercase: Optional[bool] = False
     
     def to_dict(self):
         """Returns the InspectorArgs values inside a dictionary."""
         self_as_dict = asdict(self)
+        # convert any python objects into strings inside the dict
+        # so that it can later be converted to json
+        for i in range(len(self.metrics)):
+            if type(self.metrics[i]) is not str:
+                self_as_dict["metrics"][i] = self.metrics[i].__name__
+        if type(self.tokenizer) is not str:
+            self_as_dict["tokenizer"] = self.tokenizer.__name__
+        print(self_as_dict)
         return self_as_dict
     
 
@@ -86,7 +98,8 @@ class Inspector:
         self.args = args
        
         # Dictionary for the metadata to be printed in the json output
-        metadata_dict = self.args.to_dict()        
+        metadata_dict = self.args.to_dict()
+        print(metadata_dict)
         metadata_dict["dataset"] = self.dataset     
         self.metadata_dict = metadata_dict
         
@@ -138,7 +151,11 @@ class Inspector:
         results_dict = dict()
         for metric in self.args.metrics:
             current_metric = metrics.Metric(metric)
-            results_dict[metric] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
+            if type(metric) is not str:
+                metric_name = metric.__name__
+            else:
+                metric_name = metric
+            results_dict[metric_name] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
             
         # TODO handle series_dict
         self.results_dict = results_dict

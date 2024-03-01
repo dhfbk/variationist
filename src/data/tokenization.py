@@ -25,7 +25,9 @@ class Tokenizer:
         elif self.args.tokenizer.lower() == "spacy":
             self.tok_function = tokenization_utils.spacy_tokenization
         else: # the tokenizer probably is from huggingface. Import and exit if it does not correspond to an actual hf tokenizer.
+            # TODO actually check whether the tokenizer is from hf
             self.tok_function = tokenization_utils.huggingface_tokenization
+        # TODO add the possibility to add a custom tokenizer as a function in inspectorargs.
     
     
     def tokenize_column(self, text_column):
@@ -45,7 +47,7 @@ class Tokenizer:
             tokenized_text_column = preprocess_utils.create_tokenized_ngrams_column(tokenized_text_column, self.args.n_tokens)
         
         if self.args.n_cooc > 1 and  self.args.n_tokens <= 1:
-            tokenized_text_column = preprocess_utils.create_tokenized_cooccurrences_column(tokenized_text_column, self.args.n_cooc, self.args.window_size)
+            tokenized_text_column = preprocess_utils.create_tokenized_cooccurrences_column(tokenized_text_column, self.args.n_cooc, self.args.cooc_window_size)
         return tokenized_text_column
     
         

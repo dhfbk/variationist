@@ -23,21 +23,23 @@ def create_most_frequent_dictionary(label_values_dict, subsets_of_interest):
             
     return output_freqs
 
+# print(create_most_frequent_dictionary.__name__)
 
-inspector_arguments = InspectorArgs(text_names=["1"],
-                                    var_names=["0"],
+inspector_arguments = InspectorArgs(text_names=["title", "description"],
+                                    var_names=["type", "rating"],
                                     metrics=["pmi", "most-frequent", create_most_frequent_dictionary],
                                     stopwords="en",
                                     n_tokens = 1,
+                                    
                                     )
 
-dataset = "data/netflix-toy.tsv"
+dataset = "data/netflix.tsv"
 
 my_inspector = Inspector(dataset, inspector_arguments)
 
-custom_tokenizer = tokenization.Tokenizer(inspector_arguments)
+# custom_tokenizer = tokenization.Tokenizer(inspector_arguments)
 
-Inspector.tokenizer = custom_tokenizer
+# Inspector.tokenizer = custom_tokenizer
 
 output_dict = my_inspector.inspect()
 
