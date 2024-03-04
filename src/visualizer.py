@@ -83,6 +83,7 @@ class Visualizer:
         self.args = args
         self.metadata = dict()
         self.df_metric_data = dict()
+        self.variable_values = dict()
 
         # Load the json object storing metadata and results
         json_data = utils.load_json_data_from_filepath_or_dict(input_json)
@@ -90,6 +91,7 @@ class Visualizer:
         # Get the metadata and per-metric long-form dataframes from the json
         self.metadata = json_data["metadata"]
         for metric in self.metadata["metrics"]:
+            self.variable_values[metric] = list(json_data["metrics"][metric].keys())
             self.df_metric_data[metric] = self.get_df_from_json(
                 json_data = json_data["metrics"][metric], 
                 var_names = self.metadata["var_names"],
@@ -182,7 +184,7 @@ class Visualizer:
                     # Create a bar chart object
                     chart = BarChart(
                         df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                        self.args.top_per_class_ngrams)
+                        self.variable_values[metric], self.args.top_per_class_ngrams)
                 elif var_type == "ordinal":
                     raise NotImplementedError(
                         f"Visualization for variable type {var_type} is not supported yet.")

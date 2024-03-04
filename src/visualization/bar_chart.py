@@ -16,6 +16,7 @@ class BarChart(AltairChart):
         metadata: dict,
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
+        variable_values: list = [],
         top_per_class_ngrams: Optional[int] = None,
     ) -> None:
         """
@@ -34,13 +35,15 @@ class BarChart(AltairChart):
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
+        variable_values: list = []
+            A list of the variable values for the given metric
         top_per_class_ngrams: int = 20
             The maximum number of highest scoring per-class n-grams to show. If set to 
             None, it will show all the ngrams in the corpus (it may easily be 
             overwhelming). By default is 20 to keep the visualization compact.
         """
 
-        super().__init__(df_data, chart_metric, metadata, filterable, zoomable)
+        super().__init__(df_data, chart_metric, metadata, filterable, zoomable, variable_values)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
@@ -89,7 +92,8 @@ class BarChart(AltairChart):
         )
 
         # Set extra properties
-        self.base_chart = self.base_chart.properties(width=100, center=True)
+        chart_width = max(100, 1000 / len(self.variable_values))
+        self.base_chart = self.base_chart.properties(width=chart_width, center=True)
 
         # If the chart has to be filterable, create and add a search component to it
         if self.filterable == True:

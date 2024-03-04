@@ -17,6 +17,7 @@ class AltairChart(Chart):
         metadata: dict,
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
+        variable_values: list = [],
     ) -> None:
         """
         Initialization function for a building an alt.Chart chart object.
@@ -34,9 +35,11 @@ class AltairChart(Chart):
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
+        variable_values: list = []
+            A list of the variable values for the given metric
         """
 
-        super().__init__(df_data, chart_metric, metadata, filterable, zoomable)
+        super().__init__(df_data, chart_metric, metadata, filterable, zoomable, variable_values)
 
         # Create the base chart object which stores the data
         self.base_chart = self.create_base_chart(df_data)
