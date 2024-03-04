@@ -2,6 +2,9 @@ import pandas as pd
 from itertools import islice
 from src.methods import shared_metrics
 import math
+from collections import Counter
+import math
+import numpy as np
 
 def take(n, iterable):
     """Return the first n items of the iterable as a list."""
@@ -13,6 +16,7 @@ def get_total(freqs_merged_dict):
     return(total)
 
 def create_pmi_dictionary(label_values_dict, subsets_of_interest):
+    
     output_pmi = dict()
     freqs_dict = dict()
     freqs_merged_dict = dict()
@@ -34,8 +38,8 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest):
     
     total = get_total(freqs_merged_dict)
     
-    
     for label in freqs_dict:
+        
         label_pmi_dict = dict()
         for w in freqs_dict[label]:
             if freqs_dict[label][w] < 3:
@@ -50,7 +54,112 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest):
 
         converted_dict = dict(sorted_pmiDict)
         output_pmi[label] = converted_dict
-        
-        print("pmi", label, take(10, converted_dict.items())) #print for debug        
-        
     return output_pmi
+
+def pmi (label_values_dict, subsets_of_interest):
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)
+    
+    # Print for debug
+    for label in output_pmi:
+        sorted_mydict = sorted(output_pmi[label].items(), key=lambda x:x[1], reverse=True)
+        converted_dict = dict(sorted_mydict)
+        print("\nPMI", label, take(10, converted_dict.items())) #print for debug
+
+    return output_pmi
+
+def pmi_normalized (label_values_dict, subsets_of_interest):
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)      
+    min_max_list = []
+    for label in output_pmi:
+        min_max_list.append(min(output_pmi[label].values()))
+        min_max_list.append(max(output_pmi[label].values()))
+
+    min_value = min(min_max_list)
+    max_value = max(min_max_list)
+    
+    for label in output_pmi:
+        for w in output_pmi[label]:
+            output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
+    
+    # Print for debug
+    for label in output_pmi:
+        sorted_mydict = sorted(output_pmi[label].items(), key=lambda x:x[1], reverse=True)
+        converted_dict = dict(sorted_mydict)
+        print("\nPMI normalized", label, take(10, converted_dict.items())) #print for debug
+
+    return output_pmi
+
+
+def pmi_positive (label_values_dict, subsets_of_interest):
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)   
+    for label in output_pmi:
+        for w in output_pmi[label]:
+            if output_pmi[label][w] < 0:
+                output_pmi[label][w] = 0        
+
+    # Print for debug
+    for label in output_pmi:
+        sorted_mydict = sorted(output_pmi[label].items(), key=lambda x:x[1], reverse=True)
+        converted_dict = dict(sorted_mydict)
+        print("\nPositive PMI", label, take(10, converted_dict.items())) #print for debug
+
+    return output_pmi
+
+
+def pmi_positive_normalized (label_values_dict, subsets_of_interest):
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)   
+    min_max_list = []
+    for label in output_pmi:
+        for w in output_pmi[label]:
+            if output_pmi[label][w] < 0:
+                output_pmi[label][w] = 0    
+        min_max_list.append(min(output_pmi[label].values()))
+        min_max_list.append(max(output_pmi[label].values()))    
+
+    min_value = min(min_max_list)
+    max_value = max(min_max_list)
+    
+    for label in output_pmi:
+        for w in output_pmi[label]:
+            output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
+
+    # Print for debug
+    for label in output_pmi:
+        sorted_mydict = sorted(output_pmi[label].items(), key=lambda x:x[1], reverse=True)
+        converted_dict = dict(sorted_mydict)
+        print("\nPositive PMI normalized", label, take(10, converted_dict.items())) #print for debug
+
+    return output_pmi
+    #     minmxlist.append(min(output_pmi[label].values()))
+    #     minmxlist.append(max(output_pmi[label].values()))
+
+    # min_value = min(minmxlist)
+    # max_value = max(minmxlist)
+    
+    # for label in freqs_dict:
+    #     for w in output_pmi[label]:
+    #         output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
+    
+
+    # return output_pmi
+                
+
+
+
+    # output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)   
+    # for label in output_pmi:
+    #     for w in output_pmi[label]:
+    #         if output_pmi[label][w] < 0:
+    #             output_pmi[label][w] = 0        
+    #     minmxlist.append(min(output_pmi[label].values()))
+    #     minmxlist.append(max(output_pmi[label].values()))
+
+    # min_value = min(minmxlist)
+    # max_value = max(minmxlist)
+    
+    # for label in freqs_dict:
+    #     for w in output_pmi[label]:
+    #         output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
+    
+
+    # return output_pmi

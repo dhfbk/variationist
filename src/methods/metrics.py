@@ -11,7 +11,13 @@ class Metric:
         self.metric = metric
     
         if self.metric == "pmi":
-            self.metric_fn = methods.pmi.create_pmi_dictionary
+            self.metric_fn = methods.pmi.pmi
+        elif self.metric == "pmi-normalized":
+            self.metric_fn = methods.pmi.pmi_normalized
+        elif self.metric == "pmi-positive":
+            self.metric_fn = methods.pmi.pmi_positive
+        elif self.metric == "pmi-positive-normalized":
+            self.metric_fn = methods.pmi.pmi_positive_normalized
         elif self.metric == "most-frequent":
             self.metric_fn = methods.most_frequent.create_most_frequent_dictionary
         elif callable(self.metric):

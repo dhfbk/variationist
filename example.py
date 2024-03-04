@@ -8,7 +8,12 @@ from src.inspector import InspectorArgs, Inspector
 
 inspector_arguments = InspectorArgs(text_names=["1"],
                                     var_names=["0"],
-                                    metrics=["pmi", "most-frequent"],
+                                    metrics=[
+                                        "pmi",
+                                        "pmi-normalized",
+                                        "pmi-positive",
+                                        "pmi-positive-normalized", 
+                                        "most-frequent"],
                                     stopwords="en",
                                     n_tokens = 1,
                                     n_cooc = 1,
