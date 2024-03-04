@@ -4,10 +4,11 @@ import pandas as pd
 from typing import Any, Optional, Union
 
 from src import utils
-from src.visualization.chart import Chart
+from src.visualization.bar_chart import BarChart
 
 
 # @TODO: Maybe change the "ngrams" name for clarity across the script (it supports cooccs, too!)
+# @TODO: Also redifine/change/remove top_per_class_ngrams
 
 
 class VisualizerArgs:
@@ -19,7 +20,7 @@ class VisualizerArgs:
         output_formats: Optional[list[str]] = ["html"],
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
-        criterion: Optional[str] = "top-k-per-var",
+        top_per_class_ngrams: Optional[int] = 20,
         ngrams: Optional[list[str]] = None,
     ) -> None:
         """
@@ -37,12 +38,10 @@ class VisualizerArgs:
             Whether the charts should be searchable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
-        criterion: str = "top-k-per-var"
-            The criterion that determines how many n-grams to show. If set to None, it 
-            will show all the tokens in the corpus (it may easily be overwhelming).
-            Choices are: ["top-k-per-var"]. By default, it is "top-k-per-var". Note
-            that the value k is automatically determined based on the total number of 
-            variables, to keep the visualization compact (max 100 ngrams): k=100/|C|
+        top_per_class_ngrams: int = 20
+            The maximum number of highest scoring per-class n-grams to show. If set to 
+            None, it will show all the ngrams in the corpus (it may easily be 
+            overwhelming). By default is 20 to keep the visualization compact.
         ngrams: Optional[list[str]] = None
             A list of n-grams of interest to focus the resulting visualizations on.
             N-grams should match the number of tokens used in the prior computation
@@ -54,7 +53,7 @@ class VisualizerArgs:
         self.output_formats = output_formats
         self.filterable = filterable
         self.zoomable = zoomable
-        self.criterion = criterion
+        self.top_per_class_ngrams = top_per_class_ngrams
         self.ngrams = ngrams
 
 
@@ -94,7 +93,7 @@ class Visualizer:
             self.df_metric_data[metric] = self.get_df_from_json(
                 json_data = json_data["metrics"][metric], 
                 var_names = self.metadata["var_names"],
-                criterion = self.args.criterion,
+                top_per_class_ngrams = self.args.top_per_class_ngrams,
                 focus_ngrams = self.args.ngrams)
 
 
@@ -102,7 +101,7 @@ class Visualizer:
         self,
         json_data: dict[str, Any],
         var_names: list,
-        criterion: str,
+        top_per_class_ngrams: int,
         focus_ngrams: Optional[list[str]] = None,
     ) -> pd.core.frame.DataFrame:
         """
@@ -118,12 +117,10 @@ class Visualizer:
         var_names: list
             A list of variable names (i.e., original column names) to be used for
             giving meaningful names to the long-form dataframe.
-        criterion: str = "top-k-per-var"
-            The criterion that determines how many n-grams to show. If set to None, it 
-            will show all the tokens in the corpus (it may easily be overwhelming).
-            Choices are: ["top-k-per-var"]. By default, it is "top-k-per-var". Note
-            that the value k is automatically determined based on the total number of 
-            variables, to keep the visualization compact (max 100 ngrams): k=100/|C|
+        top_per_class_ngrams: int = 20
+            The maximum number of highest scoring per-class n-grams to show. If set to 
+            None, it will show all the ngrams in the corpus (it may easily be 
+            overwhelming). By default is 20 to keep the visualization compact.
         fucus_ngrams: Optional[list[str]] = None
             A list of n-grams of interest to focus the filtering on. N-grams should 
             match the number of tokens used in the prior computation (e.g., if 
@@ -141,22 +138,17 @@ class Visualizer:
         # Get a machine-readable name for the variable(s) under consideration
         variable_key = " ".join(var_names)
 
-        # If a criterion is defined, get a set of ngrams to show
-        top_elements = set()
-        if criterion == "top-k-per-var":
-            k = round(100 / len(json_data.keys()))
-            for variable, raw_items in json_data.items():
-                raw_top_k = sorted(raw_items.items(), key=lambda x:x[1], reverse=True)[:k]
-                ngrams_top_k = [element[0] for element in raw_top_k]
-                top_elements.update(ngrams_top_k)
-
-        # Iterate over the json content to store items
+        # Iterate through variables and ngram-value pairs and keep those of interest
         for variable, raw_items in json_data.items():
+            if self.args.top_per_class_ngrams != None:
+                raw_top_k = sorted(
+                    raw_items.items(), key=lambda x:x[1], reverse=True)[:self.args.top_per_class_ngrams]
+                ngrams_top_k = [element[0] for element in raw_top_k]
             for ngram, value in raw_items.items():
                 if (focus_ngrams != None) and (ngram not in focus_ngrams):
                     continue
                 else:
-                    if ((criterion == "top-k-per-var") and (ngram in top_elements)) or (criterion == None): 
+                    if ((self.args.top_per_class_ngrams != None) and (ngram in ngrams_top_k)) or (self.args.top_per_class_ngrams == None): 
                         variables.append(variable)
                         ngrams.append(ngram)
                         values.append(value)
@@ -182,9 +174,26 @@ class Visualizer:
         # Build a chart object for each computed metric based on variable types and
         # semantics, then save it to the user-specified output folder
         for metric, df_data in self.df_metric_data.items():
+            # @TODO: Differentiate chart creation by metric
 
-            # Create the chart object
-            chart = Chart(df_data, metric, self.metadata, self.args.filterable, self.args.zoomable)
+            if (len(self.metadata["var_types"]) == 1):
+                var_type = self.metadata["var_types"][0]
+                if var_type == "nominal":
+                    # Create a bar chart object
+                    chart = BarChart(
+                        df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
+                        self.args.top_per_class_ngrams)
+                elif var_type == "ordinal":
+                    raise NotImplementedError(
+                        f"Visualization for variable type {var_type} is not supported yet.")
+                elif var_type == "coordinates":
+                    raise NotImplementedError(
+                        f"Visualization for variable type {var_type} is not supported yet.")
+                else:
+                    raise ValueError(f"ERROR. {var_type} is not supported.")
+            else:
+                raise NotImplementedError(
+                        f"Visualization for >=1 variable types is not supported yet.")
 
             # Save the chart to the output folder
             chart.save(self.args.output_folder, self.args.output_formats)
@@ -193,7 +202,7 @@ class Visualizer:
 if __name__ == "__main__":
     # Define the visualizer arguments
     visualizer_args = VisualizerArgs(
-        output_folder="results", output_formats=["html"], filterable=True, zoomable=True, ngrams=None)
+        output_folder="results", output_formats=["html"], filterable=True, zoomable=True, top_per_class_ngrams=20, ngrams=None)
 
     # Create dynamic visualizations of the results
     Visualizer(
