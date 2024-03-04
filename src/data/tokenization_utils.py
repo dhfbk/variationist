@@ -12,7 +12,7 @@ def whitespace_tokenization(text_column, args):
 
     tok_column = tok_column.apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
     tok_column = tok_column.apply(lambda x: re.sub(r' +', ' ', x))
-    tok_column = tok_column.apply(lambda x: x.split(" "))
+    tok_column = tok_column.apply(lambda x: x.strip().split(" "))
     
     # tok_column = tok_column.squeeze().apply(lambda x: pd.Series(x.split(" ")))
     return tok_column
