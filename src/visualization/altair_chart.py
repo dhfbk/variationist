@@ -72,6 +72,7 @@ class AltairChart(Chart):
     def add_search_component(
         self,
         base_chart: alt.Chart,
+        tooltip: list[alt.Tooltip],
     ) -> alt.Chart:
         """
         A function that creates a search component and adds it to the chart.
@@ -80,6 +81,8 @@ class AltairChart(Chart):
         ----------
         base_chart: alt.Chart
             The base chart object in which to add the search component.
+        tooltip: alt.Tooltip
+            A list of tooltip elements to show.
 
         Returns
         -------
@@ -104,11 +107,11 @@ class AltairChart(Chart):
                 alt.value(1),
                 alt.value(0)
             ),
-            #tooltip = alt.condition(
-            #    alt.expr.test(alt.expr.regexp(search_input, "i"), alt.datum.ngram),
-            #    "ngram",
-            #    alt.value("")
-            #)
+            tooltip = alt.condition(
+               alt.expr.test(alt.expr.regexp(search_input, "i"), alt.datum.ngram),
+               "ngram", # @TODO: Make the same information from the main chart class to be shown
+               alt.value("")
+            )
         )
 
         # Add the search component to the base chart

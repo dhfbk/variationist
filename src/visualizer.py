@@ -5,6 +5,7 @@ from typing import Any, Optional, Union
 
 from src import utils
 from src.visualization.bar_chart import BarChart
+from src.visualization.temporal_line_chart import TemporalLineChart
 
 
 # @TODO: Maybe change the "ngrams" name for clarity across the script (it supports cooccs, too!)
@@ -180,14 +181,22 @@ class Visualizer:
 
             if (len(self.metadata["var_types"]) == 1):
                 var_type = self.metadata["var_types"][0]
+                var_semantics = self.metadata["var_semantics"][0]
+
                 if var_type == "nominal":
                     # Create a bar chart object
                     chart = BarChart(
                         df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
                         self.variable_values[metric], self.args.top_per_class_ngrams)
                 elif var_type == "ordinal":
-                    raise NotImplementedError(
-                        f"Visualization for variable type {var_type} is not supported yet.")
+                    if var_semantics == "general":
+                        chart = BarChart(
+                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
+                            self.variable_values[metric], self.args.top_per_class_ngrams)
+                    else:
+                        chart = TemporalLineChart(
+                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
+                            self.variable_values[metric], self.args.top_per_class_ngrams)
                 elif var_type == "coordinates":
                     raise NotImplementedError(
                         f"Visualization for variable type {var_type} is not supported yet.")

@@ -6,7 +6,7 @@ from typing import Optional
 from src.visualization.altair_chart import AltairChart
 
 
-class BarChart(AltairChart):
+class TemporalLineChart(AltairChart):
     """A class for building a BarChart object."""
 
     def __init__(
@@ -51,14 +51,12 @@ class BarChart(AltairChart):
         self.metric_label = chart_metric + " value"
 
         # Set base chart style
-        self.base_chart = self.base_chart.mark_bar(height=15, binSpacing=0.5, cornerRadiusEnd=5)
+        self.base_chart = self.base_chart.mark_line(point=True, strokeDash=[1, 0])
 
         # Set dimensions
-        x_dim = alt.X("value", type="quantitative", title=chart_metric)
-        y_dim = alt.Y("ngram", type="nominal", title="").sort("-x")
-        column_dim = alt.Column(self.var_names[0], type=self.var_types[0], 
-            header=alt.Header(labelFontWeight="bold"))
-        color = alt.Color(self.var_names[0], legend=None) # for aestethics only
+        x_dim = alt.X(self.var_names[0], type=self.var_types[0])
+        y_dim = alt.Y("value", type="quantitative", title=chart_metric)
+        color = alt.Color("ngram", type="nominal", title="", legend=None)
 
         # Set tooltip (it will be overwritten if "filterable" is True)
         tooltip = [
@@ -66,33 +64,16 @@ class BarChart(AltairChart):
             alt.Tooltip("value", type="quantitative", title=self.metric_label)
         ]
 
-        # Filter data to show up to k top ngrams (based on their value for the metric) for each group
-        self.base_chart = self.base_chart.transform_window(
-            rank = "rank(value)",
-            sort = [alt.SortField("value", order="descending"),
-                  alt.SortField("ngram", order="ascending")], # break ties in ranking (@temp)
-            groupby = [self.var_names[0]]
-        ).transform_filter(
-            alt.datum.rank <= self.top_per_class_ngrams
-        )
-
         # Encoding the data
         self.base_chart = self.base_chart.encode(
             x_dim,
             y_dim,
-            column_dim,
             color,
             tooltip
         )
 
-        # Set the independent dimensions
-        self.base_chart = self.base_chart.resolve_scale(
-            x="independent",
-            y="independent"
-        )
-
         # Set extra properties
-        chart_width = max(100, 1000 / len(self.variable_values))
+        chart_width = 1000
         self.base_chart = self.base_chart.properties(width=chart_width, center=True)
 
         # If the chart has to be filterable, create and add a search component to it
