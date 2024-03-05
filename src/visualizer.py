@@ -7,6 +7,7 @@ from src import utils
 from src.visualization.bar_chart import BarChart
 from src.visualization.temporal_line_chart import TemporalLineChart
 from src.visualization.scatter_chart import ScatterChart
+from src.visualization.choropleth_chart import ChoroplethChart
 
 
 # @TODO: Maybe change the "ngrams" name for clarity across the script (it supports cooccs, too!)
@@ -190,10 +191,24 @@ class Visualizer:
                         chart = BarChart(
                             df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
                             self.variable_values[metric], self.args.top_per_class_ngrams)
+                        # Save the chart to the output folder
+                        chart.save(os.path.join(
+                            self.args.output_folder, "bar_chart"), self.args.output_formats)
                     elif var_semantics == "spatial":
-                        # Create a (repeated?) choropleth map chart object
-                        raise NotImplementedError(
-                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported yet.")
+                        # Create a bar chart object
+                        chart = BarChart(
+                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
+                            self.variable_values[metric], self.args.top_per_class_ngrams)
+                        # Save the chart to the output folder
+                        chart.save(os.path.join(
+                            self.args.output_folder, "bar_chart"), self.args.output_formats)
+                        # Create a choropleth map chart object
+                        chart = ChoroplethChart(
+                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
+                            self.variable_values[metric], self.args.top_per_class_ngrams)
+                        # Save the chart to the output folder
+                        chart.save(os.path.join(
+                            self.args.output_folder, "choropleth_chart"), self.args.output_formats)
                     else:
                         # @TODO: Indications of which var_type / var_semantics should be
                         raise ValueError(
@@ -204,11 +219,18 @@ class Visualizer:
                         chart = BarChart(
                             df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
                             self.variable_values[metric], self.args.top_per_class_ngrams)
+                        # Save the chart to the output folder
+                        chart.save(os.path.join(
+                            self.args.output_folder, "bar_chart"), self.args.output_formats)
                     elif var_semantics == "temporal":
+                        # Create a bar chart object
                         # Create a temporal line chart object
                         chart = TemporalLineChart(
                             df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
                             self.variable_values[metric], self.args.top_per_class_ngrams)
+                        # Save the chart to the output folder
+                        chart.save(os.path.join(
+                            self.args.output_folder, "temporal_line_chart"), self.args.output_formats)
                     else:
                         # @TODO: Indications of which var_type / var_semantics should be
                         raise ValueError(
@@ -219,6 +241,9 @@ class Visualizer:
                         chart = ScatterChart(
                             df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
                             self.variable_values[metric], self.args.top_per_class_ngrams)
+                        # Save the chart to the output folder
+                        chart.save(os.path.join(
+                            self.args.output_folder, "scatter_chart"), self.args.output_formats)
                     else:
                         # @TODO: Indications of which var_type / var_semantics should be
                         raise ValueError(
@@ -242,9 +267,6 @@ class Visualizer:
             else:
                 raise NotImplementedError(
                         f"Visualization for >=1 variable types is not supported yet.")
-
-            # Save the chart to the output folder
-            chart.save(self.args.output_folder, self.args.output_formats)
 
 
 if __name__ == "__main__":
