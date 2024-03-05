@@ -3,6 +3,7 @@
 import csv
 import pandas as pd
 import json
+import os
 
 from typing import Union
 
@@ -79,6 +80,9 @@ def convert_file_to_dataframe(data_filepath, cols_type):
             raise Exception(f"ERROR: {data_filepath} seems to refer to a HuggingFace dataset, however " 
                 "there is no specification about the split to use. Please ensure that \"data_filepath\" "
                 "follows the format hf::DATASET_NAME::SPLIT.")
+    
+    elif (type(data_filepath) == str) and (not os.path.isfile(data_filepath)):
+        raise ValueError(f"ERROR: the '{data_filepath}' filepath does not exist.")
 
     elif data_filepath.lower().endswith('.tsv'):
         print(f"INFO: '{data_filepath}' is loaded as a TSV file.")
@@ -100,7 +104,7 @@ def convert_file_to_dataframe(data_filepath, cols_type):
             dataframe.columns = dataframe.columns.astype(str)
             print("INFO: given the provided column indices, we add and use those as the header.")
 
-    else:
+    else:    
         print(f"WARNING. '{data_filepath}' has no '.tsv' or '.csv' extension and will thus be considered\
             as a TSV file by default. If this is not expected, we suggest the user to convert their file\
             to either a '.tsv' or '.csv' format and run Variationist again.")

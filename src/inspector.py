@@ -51,7 +51,7 @@ class InspectorArgs:
     metrics: Optional[List] = None
     text_names: Optional[List] = None # explicit column name(s)
     var_names: Optional[List] = None # explicit variable name(s)
-    var_types: Optional[List] = field(default_factory=lambda: ['nominal']) # nominal (default), ordinal, coordinates
+    var_types: Optional[List] = field(default_factory=lambda: ['nominal']) # nominal (default), ordinal, quantitative, coordinates
     var_semantics: Optional[List] = field(default_factory=lambda: ['general']) # default=General, temporal, spatial
     var_subsets: Optional[List] = None
     n_tokens: Optional[int] = 1 # maximum value for this should be 5, otherwise the computation will explode
@@ -70,11 +70,8 @@ class InspectorArgs:
                 self_as_dict["metrics"][i] = self.metrics[i].__name__
         if type(self.tokenizer) is not str:
             self_as_dict["tokenizer"] = self.tokenizer.__name__
-        print(self_as_dict)
         return self_as_dict
     
-
-
 
 class Inspector:
     """
@@ -152,6 +149,7 @@ class Inspector:
                 metric_name = metric.__name__
             else:
                 metric_name = metric
+            print(f"INFO: Currently calculating metric {metric_name}")
             results_dict[metric_name] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
             
         # TODO handle series_dict

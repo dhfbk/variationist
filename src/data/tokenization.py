@@ -55,7 +55,7 @@ class Tokenizer:
     def tokenize(self, dataframe):
         tokenized_col_dict = {}
         for text_col in self.column_names_dict[utils.TEXT_COLS_KEY]:
-            
+            print(f"INFO: Tokenizing the {text_col} column...")
             tokenized_col_dict[text_col] = f"tok_{text_col}"
             dataframe[tokenized_col_dict[text_col]] = self.tokenize_column(
                 dataframe[[str(text_col)]])

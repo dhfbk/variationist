@@ -8,7 +8,7 @@ from itertools import islice
 
 
 def create_most_frequent_dictionary(label_values_dict, subsets_of_interest):
-    # TODO change the name of this function: it just calculates frequency!
+    # TODO change the name of this function: it calculates frequency!
     output_freqs = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -18,16 +18,14 @@ def create_most_frequent_dictionary(label_values_dict, subsets_of_interest):
             sorted_mydict = sorted(mydict.items(), key=lambda x:x[1], reverse=True)
             converted_dict = dict(sorted_mydict)
             output_freqs[curr_label] = converted_dict
-            
             print("most frequent", curr_label, list(islice(converted_dict.items(), 10))) #print for debug
-            
     return output_freqs
 
 # print(create_most_frequent_dictionary.__name__)
 
 inspector_arguments = InspectorArgs(text_names=["text"],
                                     var_names=["hatespeech", "annotator_gender"],
-                                    metrics=["pmi", "most-frequent", create_most_frequent_dictionary],
+                                    metrics=["pmi", "most-frequent", "pmi-normalized", "pmi-positive-normalized"],
                                     stopwords="en",
                                     n_tokens = 1,
                                     

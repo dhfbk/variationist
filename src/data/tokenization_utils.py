@@ -1,16 +1,20 @@
 import re
 from src import utils
+from tqdm import tqdm
+
 
 def whitespace_tokenization(text_column, args):
     # Takes as input an array/series of texts and tokenize it, return same array/series but tokenized splitting on whitespaces
     # Remove punctuation and any not alphanumeric charachter
     # ONLY WORKS ON LATIN ALPHABET
+    
+    tqdm.pandas()
     if args.lowercase:
         tok_column = text_column.squeeze().apply(lambda x: str(x).lower())
     else:
         tok_column = text_column.squeeze().astype(str)
 
-    tok_column = tok_column.apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
+    tok_column = tok_column.progress_apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
     tok_column = tok_column.apply(lambda x: re.sub(r' +', ' ', x))
     tok_column = tok_column.apply(lambda x: x.strip().split(" "))
     

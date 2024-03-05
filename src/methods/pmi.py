@@ -5,6 +5,7 @@ import math
 from collections import Counter
 import math
 import numpy as np
+from tqdm import tqdm
 
 def take(n, iterable):
     """Return the first n items of the iterable as a list."""
@@ -16,21 +17,24 @@ def get_total(freqs_merged_dict):
     return(total)
 
 def create_pmi_dictionary(label_values_dict, subsets_of_interest):
-    
     output_pmi = dict()
     freqs_dict = dict()
     freqs_merged_dict = dict()
     totals_dict= dict()
     label_count = dict()
     for column in label_values_dict:
+        print(f"INFO: Creating PMI dictionary for {column}:")
         for l in range(len(label_values_dict[column])):
+            print(l)
             curr_label = subsets_of_interest[column][l].name
             mydict = shared_metrics.get_all_frequencies(subsets_of_interest[column][l])
             freqs_dict[curr_label] = mydict
-            for i in mydict:
-                if i not in freqs_merged_dict:
-                    freqs_merged_dict[i] = 0
-                freqs_merged_dict[i] += mydict[i]
+            tok_list = list(mydict.keys())
+            for i in tqdm(range(len(tok_list))):
+                tok = tok_list[i]
+                if tok not in freqs_merged_dict:
+                    freqs_merged_dict[tok] = 0
+                freqs_merged_dict[tok] += mydict[tok]
             for i in subsets_of_interest[column][l]:
                 if curr_label not in label_count:
                     label_count[curr_label] = 0
@@ -39,7 +43,6 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest):
     total = get_total(freqs_merged_dict)
     
     for label in freqs_dict:
-        
         label_pmi_dict = dict()
         for w in freqs_dict[label]:
             if freqs_dict[label][w] < 3:
@@ -56,7 +59,7 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest):
         output_pmi[label] = converted_dict
     return output_pmi
 
-def pmi (label_values_dict, subsets_of_interest):
+def pmi(label_values_dict, subsets_of_interest):
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)
     
     # Print for debug
@@ -67,7 +70,7 @@ def pmi (label_values_dict, subsets_of_interest):
 
     return output_pmi
 
-def pmi_normalized (label_values_dict, subsets_of_interest):
+def pmi_normalized(label_values_dict, subsets_of_interest):
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)      
     min_max_list = []
     for label in output_pmi:
@@ -91,7 +94,7 @@ def pmi_normalized (label_values_dict, subsets_of_interest):
     return output_pmi
 
 
-def pmi_positive (label_values_dict, subsets_of_interest):
+def pmi_positive(label_values_dict, subsets_of_interest):
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)   
     for label in output_pmi:
         for w in output_pmi[label]:
@@ -107,7 +110,7 @@ def pmi_positive (label_values_dict, subsets_of_interest):
     return output_pmi
 
 
-def pmi_positive_normalized (label_values_dict, subsets_of_interest):
+def pmi_positive_normalized(label_values_dict, subsets_of_interest):
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)   
     min_max_list = []
     for label in output_pmi:
