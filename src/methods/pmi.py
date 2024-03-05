@@ -25,8 +25,8 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest):
     for column in label_values_dict:
         print(f"INFO: Creating PMI dictionary for {column}:")
         for l in range(len(label_values_dict[column])):
-            print(l)
             curr_label = subsets_of_interest[column][l].name
+            print(curr_label)
             mydict = shared_metrics.get_all_frequencies(subsets_of_interest[column][l])
             freqs_dict[curr_label] = mydict
             tok_list = list(mydict.keys())
