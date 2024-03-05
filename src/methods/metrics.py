@@ -1,3 +1,4 @@
+from src.methods import lexical_variation
 from src import methods
 from typing import Callable, Union
 
@@ -9,7 +10,7 @@ class Metric:
     def __init__(self, 
                  metric: Union[str, Callable[[dict, dict], dict]]):
         self.metric = metric
-    
+
         if self.metric == "pmi":
             self.metric_fn = methods.pmi.pmi
         elif self.metric == "pmi-normalized":
@@ -18,6 +19,8 @@ class Metric:
             self.metric_fn = methods.pmi.pmi_positive
         elif self.metric == "pmi-positive-normalized":
             self.metric_fn = methods.pmi.pmi_positive_normalized
+        elif  self.metric == "ttr":
+            self.metric_fn = lexical_variation.ttr
         elif self.metric == "most-frequent":
             self.metric_fn = methods.most_frequent.create_most_frequent_dictionary
         elif callable(self.metric):
