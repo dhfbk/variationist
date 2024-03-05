@@ -21,6 +21,12 @@ class Metric:
             self.metric_fn = methods.pmi.pmi_positive_normalized
         elif  self.metric == "ttr":
             self.metric_fn = lexical_variation.ttr
+        elif  self.metric == "rttr":
+            self.metric_fn = lexical_variation.rttr
+        elif  self.metric == "maas":
+            self.metric_fn = lexical_variation.maas
+        elif  self.metric == "lttr":
+            self.metric_fn = lexical_variation.lttr
         elif self.metric == "most-frequent":
             self.metric_fn = methods.most_frequent.create_most_frequent_dictionary
         elif callable(self.metric):

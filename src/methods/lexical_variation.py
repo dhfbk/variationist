@@ -1,4 +1,5 @@
 from src.methods import shared_metrics
+import math
 
 def get_label_total(freqs_dict):
     tot_dict= dict()    
@@ -26,16 +27,66 @@ def get_freqs (label_values_dict,subsets_of_interest):
     
     return freqs_dict
 
+def safe_divide(numerator, denominator):
+		if denominator == 0 or denominator == 0.0:
+			result = 0
+		else: result = numerator/denominator
+		return result
+
 def ttr(label_values_dict, subsets_of_interest):  
 
     freqs_dict = get_freqs(label_values_dict,subsets_of_interest)
-    uniq_words_dict = get_unique_words(freqs_dict)
-    total_dict = get_label_total(freqs_dict)
-
+    types_dict = get_unique_words(freqs_dict)
+    tokens_dict = get_label_total(freqs_dict)
+    
     ttr_dict = dict()
 
     for label in freqs_dict:
-        ttr_dict[label] = uniq_words_dict[label] / total_dict[label]
-
+        ttr_dict[label] = safe_divide(types_dict[label],tokens_dict[label])   
+    
+    print("TTR: ",ttr_dict)
     return ttr_dict
     
+def rttr(label_values_dict, subsets_of_interest):  
+
+    freqs_dict = get_freqs(label_values_dict,subsets_of_interest)
+    types_dict = get_unique_words(freqs_dict)
+    tokens_dict = get_label_total(freqs_dict)
+    
+    rttr_dict = dict()
+
+    for label in freqs_dict:
+        rttr_dict[label] = safe_divide(types_dict[label],math.sqrt(tokens_dict[label]))
+    
+    print("RTTR: ",rttr_dict)
+    return rttr_dict
+
+def maas(label_values_dict, subsets_of_interest):  
+
+    freqs_dict = get_freqs(label_values_dict,subsets_of_interest)
+    types_dict = get_unique_words(freqs_dict)
+    tokens_dict = get_label_total(freqs_dict)
+    
+    maas_dict = dict()
+
+    for label in freqs_dict:
+        maas_dict[label] = safe_divide((math.log10(tokens_dict[label])-math.log10(types_dict[label])), math.pow(math.log10(tokens_dict[label]),2))
+        
+    print("MAAS: ",maas_dict)
+    return maas_dict
+
+
+def lttr(label_values_dict, subsets_of_interest):  
+
+    freqs_dict = get_freqs(label_values_dict,subsets_of_interest)
+    types_dict = get_unique_words(freqs_dict)
+    tokens_dict = get_label_total(freqs_dict)
+    
+    lttr_dict = dict()
+
+    for label in freqs_dict:
+        lttr_dict[label] = safe_divide(math.log10(types_dict[label]), math.log10(tokens_dict[label]))
+    
+    print("LTTR: ",lttr_dict)
+    return lttr_dict
+
