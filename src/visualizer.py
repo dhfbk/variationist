@@ -6,6 +6,7 @@ from typing import Any, Optional, Union
 from src import utils
 from src.visualization.bar_chart import BarChart
 from src.visualization.temporal_line_chart import TemporalLineChart
+from src.visualization.scatter_chart import ScatterChart
 
 
 # @TODO: Maybe change the "ngrams" name for clarity across the script (it supports cooccs, too!)
@@ -214,9 +215,10 @@ class Visualizer:
                             f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
                 elif var_type == "quantitative":
                     if var_semantics == "general":
-                        # Create a scatteplot (?) chart object
-                        raise NotImplementedError(
-                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported yet.")
+                        # Create a scatteplot chart object
+                        chart = ScatterChart(
+                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
+                            self.variable_values[metric], self.args.top_per_class_ngrams)
                     else:
                         # @TODO: Indications of which var_type / var_semantics should be
                         raise ValueError(
