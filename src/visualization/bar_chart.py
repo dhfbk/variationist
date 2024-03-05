@@ -47,8 +47,11 @@ class BarChart(AltairChart):
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
-        self.text_label = (str(self.n_tokens) + "-gram") if self.n_tokens > 1 else "token"
         self.metric_label = chart_metric + " value"
+        if self.n_cooc == 1:
+            self.text_label = (str(self.n_tokens) + "-gram") if self.n_tokens > 1 else "token"
+        else:
+            self.text_label = "tokens"
 
         # Set base chart style
         self.base_chart = self.base_chart.mark_bar(height=15, binSpacing=0.5, cornerRadiusEnd=5)
@@ -92,15 +95,16 @@ class BarChart(AltairChart):
         )
 
         # Set extra properties
-        chart_width = max(100, 1000 / len(self.variable_values))
+        chart_width = max(100, 800 / len(self.variable_values))
         self.base_chart = self.base_chart.properties(width=chart_width, center=True)
 
         # If the chart has to be filterable, create and add a search component to it
         if self.filterable == True:
-            self.base_chart = self.add_search_component(self.base_chart, tooltip)
+            self.base_chart = self.add_search_component(self.base_chart, "value")
 
-        # If the chart has to be zoomable, set the property
+        # If the chart has to be zoomable, set the property (disallowed for bar chart)
         # if self.zoomable == True:
+        #     print(f"INFO: Zoom is disallowed for bar charts.")
         #     self.base_chart = self.base_chart.interactive()
 
         # Create the final chart

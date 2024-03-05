@@ -47,14 +47,17 @@ class TemporalLineChart(AltairChart):
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
-        self.text_label = (str(self.n_tokens) + "-gram") if self.n_tokens > 1 else "token"
         self.metric_label = chart_metric + " value"
+        if self.n_cooc == 1:
+            self.text_label = (str(self.n_tokens) + "-gram") if self.n_tokens > 1 else "token"
+        else:
+            self.text_label = "tokens"
 
         # Set base chart style
         self.base_chart = self.base_chart.mark_line(point=True, strokeDash=[1, 0])
 
         # Set dimensions
-        x_dim = alt.X(self.var_names[0], type=self.var_types[0])
+        x_dim = alt.X(self.var_names[0], type=self.var_semantics[0])
         y_dim = alt.Y("value", type="quantitative", title=chart_metric)
         color = alt.Color("ngram", type="nominal", title="", legend=None)
 
@@ -73,16 +76,16 @@ class TemporalLineChart(AltairChart):
         )
 
         # Set extra properties
-        chart_width = 1000
+        chart_width = 800
         self.base_chart = self.base_chart.properties(width=chart_width, center=True)
 
         # If the chart has to be filterable, create and add a search component to it
         if self.filterable == True:
-            self.base_chart = self.add_search_component(self.base_chart, tooltip)
+            self.base_chart = self.add_search_component(self.base_chart, "ngram")
 
         # If the chart has to be zoomable, set the property
-        # if self.zoomable == True:
-        #     self.base_chart = self.base_chart.interactive()
+        if self.zoomable == True:
+            self.base_chart = self.base_chart.interactive()
 
         # Create the final chart
         self.chart = self.base_chart

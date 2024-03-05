@@ -71,6 +71,7 @@ class PlotlyChart(Chart):
     def add_search_component(
         self,
         base_chart: plotly.graph_objs._figure.Figure,
+        tooltip_field: str,
     ) -> plotly.graph_objs._figure.Figure:
         """
         A function that creates a search component and adds it to the chart.
@@ -79,6 +80,8 @@ class PlotlyChart(Chart):
         ----------
         base_chart: plotly.graph_objs._figure.Figure
             The base chart object in which to add the search component.
+        tooltip_field: str
+            The field to show as a tooltip.
 
         Returns
         -------

@@ -41,6 +41,7 @@ class Chart:
         self.var_types = metadata["var_types"]
         self.var_semantics = metadata["var_semantics"]
         self.n_tokens = metadata["n_tokens"]
+        self.n_cooc = metadata["n_cooc"]
         self.filterable = filterable
         self.zoomable = zoomable
         self.variable_values = variable_values

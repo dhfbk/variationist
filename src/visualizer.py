@@ -184,22 +184,57 @@ class Visualizer:
                 var_semantics = self.metadata["var_semantics"][0]
 
                 if var_type == "nominal":
-                    # Create a bar chart object
-                    chart = BarChart(
-                        df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                        self.variable_values[metric], self.args.top_per_class_ngrams)
-                elif var_type == "ordinal":
                     if var_semantics == "general":
+                        # Create a bar chart object
                         chart = BarChart(
                             df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
                             self.variable_values[metric], self.args.top_per_class_ngrams)
+                    elif var_semantics == "spatial":
+                        # Create a (repeated?) choropleth map chart object
+                        raise NotImplementedError(
+                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported yet.")
                     else:
+                        # @TODO: Indications of which var_type / var_semantics should be
+                        raise ValueError(
+                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
+                elif var_type == "ordinal":
+                    if var_semantics == "general":
+                        # Create a bar chart object
+                        chart = BarChart(
+                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
+                            self.variable_values[metric], self.args.top_per_class_ngrams)
+                    elif var_semantics == "temporal":
+                        # Create a temporal line chart object
                         chart = TemporalLineChart(
                             df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
                             self.variable_values[metric], self.args.top_per_class_ngrams)
+                    else:
+                        # @TODO: Indications of which var_type / var_semantics should be
+                        raise ValueError(
+                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
+                elif var_type == "quantitative":
+                    if var_semantics == "general":
+                        # Create a scatteplot (?) chart object
+                        raise NotImplementedError(
+                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported yet.")
+                    else:
+                        # @TODO: Indications of which var_type / var_semantics should be
+                        raise ValueError(
+                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
                 elif var_type == "coordinates":
-                    raise NotImplementedError(
-                        f"Visualization for variable type {var_type} is not supported yet.")
+                    if var_semantics == "general":
+                        # Create a scatteplot (?) chart object
+                        raise NotImplementedError(
+                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported yet.")
+                    elif var_semantics == "spatial":
+                        # Create a hexbin mapbox (?) chart object
+                        # Create a mapbox density heatmap chart object
+                        raise NotImplementedError(
+                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported yet.")
+                    else:
+                        # @TODO: Indications of which var_type / var_semantics should be
+                        raise ValueError(
+                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
                 else:
                     raise ValueError(f"ERROR. {var_type} is not supported.")
             else:
@@ -211,12 +246,14 @@ class Visualizer:
 
 
 if __name__ == "__main__":
-    # Define the visualizer arguments
-    visualizer_args = VisualizerArgs(
-        output_folder="results", output_formats=["html"], filterable=True, zoomable=True, top_per_class_ngrams=20, ngrams=None)
+    pass
+    
+    # # Define the visualizer arguments
+    # visualizer_args = VisualizerArgs(
+    #     output_folder="results", output_formats=["html"], filterable=True, zoomable=True, top_per_class_ngrams=20, ngrams=None)
 
-    # Create dynamic visualizations of the results
-    Visualizer(
-        input_json=os.path.join("data", "worthit_topic.json"), # or: json.load(open("example-time.json"))
-        args=visualizer_args
-    ).visualize()
+    # # Create dynamic visualizations of the results
+    # Visualizer(
+    #     input_json=os.path.join("data", "worthit_topic.json"), # or: json.load(open("example-time.json"))
+    #     args=visualizer_args
+    # ).visualize()
