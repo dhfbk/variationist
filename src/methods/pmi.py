@@ -71,8 +71,9 @@ def pmi_normalized (label_values_dict, subsets_of_interest):
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)      
     min_max_list = []
     for label in output_pmi:
-        min_max_list.append(min(output_pmi[label].values()))
-        min_max_list.append(max(output_pmi[label].values()))
+        if len(output_pmi[label]) > 0: # if the list is not empty
+            min_max_list.append(min(output_pmi[label].values()))
+            min_max_list.append(max(output_pmi[label].values()))
 
     min_value = min(min_max_list)
     max_value = max(min_max_list)
@@ -112,9 +113,10 @@ def pmi_positive_normalized (label_values_dict, subsets_of_interest):
     for label in output_pmi:
         for w in output_pmi[label]:
             if output_pmi[label][w] < 0:
-                output_pmi[label][w] = 0    
-        min_max_list.append(min(output_pmi[label].values()))
-        min_max_list.append(max(output_pmi[label].values()))    
+                output_pmi[label][w] = 0
+        if len(output_pmi[label]) > 0: # if the list is not empty
+            min_max_list.append(min(output_pmi[label].values()))
+            min_max_list.append(max(output_pmi[label].values()))    
 
     min_value = min(min_max_list)
     max_value = max(min_max_list)
