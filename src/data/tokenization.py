@@ -3,6 +3,7 @@ The Tokenizer class, to handle all the tokenization-related operations of Variat
 """
 from src.data import preprocess_utils, tokenization_utils
 from src import utils
+import sys
 
 
 class Tokenizer:
@@ -24,9 +25,12 @@ class Tokenizer:
             self.tok_function = tokenization_utils.whitespace_tokenization
         elif self.args.tokenizer.lower() == "spacy":
             self.tok_function = tokenization_utils.spacy_tokenization
-        else: # the tokenizer probably is from huggingface. Import and exit if it does not correspond to an actual hf tokenizer.
-            # TODO actually check whether the tokenizer is from hf
+        elif self.args.tokenizer.startswith("hf::"):
             self.tok_function = tokenization_utils.huggingface_tokenization
+        elif callable(self.args.tokenizer):
+            self.tok_function = self.args.tokenizer
+        else:
+            sys.exit(f"The selected tokenizer ({self.args.tokenizer}) does not match any of the available options. If you intend to use a pretrained tokenizer from HuggingFace, please use the format 'hf::TOKENIZER_NAME'. Other available options are 'whitespace', 'spacy', and a callable function.")
         # TODO add the possibility to add a custom tokenizer as a function in inspectorargs.
     
     
@@ -44,9 +48,11 @@ class Tokenizer:
             tokenized_text_column = preprocess_utils.remove_stopwords(tokenized_text_column, self.args.stopwords)
         # print(tokenized_text_column)    
         if self.args.n_tokens > 1:
+            print("INFO: Creating n-grams...")
             tokenized_text_column = preprocess_utils.create_tokenized_ngrams_column(tokenized_text_column, self.args.n_tokens)
         
         if self.args.n_cooc > 1 and  self.args.n_tokens <= 1:
+            print("INFO: Creating co-occurrences...")
             tokenized_text_column = preprocess_utils.create_tokenized_cooccurrences_column(tokenized_text_column, self.args.n_cooc, self.args.cooc_window_size)
         return tokenized_text_column
     

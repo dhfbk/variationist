@@ -1,10 +1,10 @@
 import re
 from src import utils
 from tqdm import tqdm
-
+from transformers import AutoTokenizer
 
 def whitespace_tokenization(text_column, args):
-    # Takes as input an array/series of texts and tokenize it, return same array/series but tokenized splitting on whitespaces
+    """Takes as input an array/series of texts and tokenizes it, returns same array/series but tokenized splitting on whitespace."""
     # Remove punctuation and any not alphanumeric charachter
     # ONLY WORKS ON LATIN ALPHABET
     
@@ -23,9 +23,15 @@ def whitespace_tokenization(text_column, args):
 
 
 def huggingface_tokenization(text_column, args):
-    """TODO"""
-    raise NotImplementedError("We don't support huggingface tokenization yet.")
-    return
+    """Load a HuggingFace AutoTokenizer from the string given by the user."""
+    print(text_column)
+    text_column = text_column.dropna()
+    tokenizer_name = args.tokenizer.strip("hf::")
+    hf_tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+    tqdm.pandas()
+    tok_column = text_column.squeeze().progress_apply(hf_tokenizer.encode, add_special_tokens=False)
+    tok_column = tok_column.squeeze().apply(hf_tokenizer.convert_ids_to_tokens)
+    return tok_column
 
 
 def spacy_tokenization(text_column, args):

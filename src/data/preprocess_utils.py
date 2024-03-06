@@ -5,6 +5,7 @@ from src import utils
 from src.data import tokenization_utils
 import itertools
 import sys
+from tqdm import tqdm
 
 
 def remove_elements(token_list, stopwords):
@@ -41,8 +42,8 @@ def convert_to_ngrams(token_list, n_tokens):
 def create_tokenized_ngrams_column(tokenized_text_column, n_tokens):
     # Takes as input an already tokenized array/series of texts and the length of the ngrams
     # Returns tokenized_text_column with the tokens merged into ngrams
-
-    tokenized_text_column = tokenized_text_column.squeeze().apply(lambda x: convert_to_ngrams(x,n_tokens))
+    tqdm.pandas()
+    tokenized_text_column = tokenized_text_column.squeeze().progress_apply(lambda x: convert_to_ngrams(x,n_tokens))
     return(tokenized_text_column)
 
 
@@ -67,8 +68,9 @@ def create_tokenized_cooccurrences_column(tokenized_text_column, n_items, contex
     # Returns tokenized_text_column with the al the coocurrences of n words occurring in the test
     if n_items > context_window and context_window!=0:
         sys.exit(f"ERROR: The size of the context windows cannot be lower than the number of words when extracting the coocurrences!\nExit.")
+    tqdm.pandas()
 
-    tokenized_text_column = tokenized_text_column.squeeze().apply(lambda x: extract_combinations(x,n_items,context_window))
+    tokenized_text_column = tokenized_text_column.squeeze().progress_apply(lambda x: extract_combinations(x,n_items,context_window))
     return(tokenized_text_column)
                                                             
 

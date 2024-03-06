@@ -25,13 +25,18 @@ def create_most_frequent_dictionary(label_values_dict, subsets_of_interest):
 
 inspector_arguments = InspectorArgs(text_names=["text"],
                                     var_names=["hatespeech", "annotator_gender"],
-                                    metrics=["pmi", "most-frequent", "pmi-normalized", "pmi-positive-normalized"],
+                                    metrics=["most-frequent", "pmi-positive-normalized", "ttr"],
                                     stopwords="en",
                                     n_tokens = 1,
-                                    
+                                    tokenizer = "hf::bert-base-uncased"
+                                    # n_cooc = 3,
+                                    # cooc_window_size = 3                                    
                                     )
 
+
 dataset = "hf::ucberkeley-dlab/measuring-hate-speech::train"
+# dataset = "data/netflix.tsv"
+
 
 my_inspector = Inspector(dataset, inspector_arguments)
 
