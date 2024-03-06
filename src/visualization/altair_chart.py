@@ -154,11 +154,11 @@ class AltairChart(Chart):
 
         # Create the dropdown component
         dropdown = alt.binding_select(
-            options = sorted([""] + dropdown_elements), 
+            options = sorted(["*Select " + self.text_label + "*"] + dropdown_elements), 
             name = f"Filter by {self.text_label} ",
         )
         select = alt.selection_point(
-            value = "",
+            value = f"*Select {self.text_label}*",
             bind = dropdown,
             fields = fields,
         )

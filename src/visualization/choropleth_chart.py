@@ -107,7 +107,7 @@ class ChoroplethChart(AltairChart):
 
         # Set background chart style
         background = alt.Chart(gdf).mark_geoshape(
-            stroke="white", strokeWidth=0.5, fill="lightgray")
+            stroke="white", strokeWidth=0.5, fill="#e1e7e3")
 
         # Set base chart style
         self.base_chart = self.base_chart.mark_geoshape(
@@ -119,7 +119,9 @@ class ChoroplethChart(AltairChart):
             from_ = alt.LookupData(data=gdf, key=shapefile_var_name, fields=["geometry", "type"]))
 
         # Set dimensions
-        color = alt.Color("value", type="quantitative", title=chart_metric)
+        # @TODO: Fix "min" and "NaN" together in the starting legend
+        color = alt.Color("value", type="quantitative", title=chart_metric,
+            scale=alt.Scale(scheme="lighttealblue", domainMin=min(self.df_data["value"])))
 
         # Set tooltip
         tooltip = [
