@@ -1,5 +1,6 @@
 import altair as alt
 import geopandas as gpd
+import os
 import pandas as pd
 
 from typing import Optional
@@ -23,6 +24,8 @@ class ChoroplethChart(AltairChart):
         zoomable: Optional[bool] = True,
         variable_values: list = [],
         top_per_class_ngrams: Optional[int] = None,
+        shapefile_path: Optional[str] = None,
+        shapefile_var_name: Optional[str] = None,
     ) -> None:
         """
         Initialization function for a building a Choropleth object.
@@ -46,6 +49,17 @@ class ChoroplethChart(AltairChart):
             The maximum number of highest scoring per-class n-grams to show. If set to 
             None, it will show all the ngrams in the corpus (it may easily be 
             overwhelming). By default is 20 to keep the visualization compact.
+        shapefile_path: Optional[str] = None
+            A path to the .shp shapefile to be visualized as background map to the chart.
+            Note that auxiliary files to the .shp one (i.e., .dbf, .prg, .shx ones) are 
+            required for chart creation too, but do not need to be specified. They should
+            have the same name as the .shp file but different extension, and be located 
+            in the same folder as the .shp file itself.
+        shapefile_var_name: Optional[str] = None
+            The key field name in the shapefile which contains the names for the areas 
+            which should match the possible values for the variable of interest (e.g., 
+            if the variable of interest is "state", here should go the name of the
+            variable name encoded in the shapefile containing the possible states).
         """
 
         super().__init__(df_data, chart_metric, metadata, filterable, zoomable, variable_values)
@@ -58,34 +72,47 @@ class ChoroplethChart(AltairChart):
         else:
             self.text_label = "tokens"
 
-        # @TODO: Generalize as input field to the class
-        shapefile = "Reg01012022_g_WGS84.shp"
-        area_names_gdf = "DEN_REG"
-        #for col in gdf.columns:
-        #    print(col)
+        # Set extra attributes
+        self.shapefile_path = shapefile_path
+        self.shapefile_var_name = shapefile_var_name
 
-        # Load a shapefile and transform geometries to a standard coordinate reference system
-        gdf = gpd.read_file(shapefile).to_crs("epsg:4286")
+        # Check if the specified filepath "shapefile_path" is defined and exists. If not, warn and exit
+        if shapefile_path is None:
+            raise ValueError(f"ERROR. \"shapefile_path\" must be specified for creating spatial charts.\n")
+        if not os.path.exists(shapefile_path):
+            raise ValueError(f"ERROR. The filepath for the shapefile \"{shapefile_path}\" does not exist.\n")
 
-        # Warn the user if some variable values (area names) do not match the area names in the shapefile
-        missing_areas = []
+        # Load the shapefile and transform geometries to a standard coordinate reference system
+        gdf = gpd.read_file(shapefile_path).to_crs("epsg:4286")
+
+        # Check if the specified column "shapefile_var_name" exists in the geodataframe
+        # If not, warn the user, give them the available options, and exit
+        if shapefile_var_name not in gdf.columns:
+            raise ValueError(f"ERROR. The key \"{shapefile_var_name}\" is not in the shapefile.",
+                f"\"{shapefile_path}\".\nPlease use one among: {', '.join([col for col in gdf.columns])}.")
+
+        # Check if some variable values (area names) do not match the area names in the shapefile
+        # If not, warn the user and give them the available values that can possibly match.
+        variable_values_not_matched = []
+        variable_values_gdf = list(gdf[shapefile_var_name])
         for variable_value in variable_values:
-            if variable_value not in list(gdf[area_names_gdf]):
-                missing_areas.append(variable_value)
-        if len(missing_areas) > 0:
+            if variable_value not in variable_values_gdf:
+                variable_values_not_matched.append(variable_value)
+        if len(variable_values_not_matched) > 0:
             print(f"WARNING. Some area names defined in the dataset do not match the area names",
-                f"defined in the shapefile \"{shapefile}\" and therefore will not be part of the chart.\n",
-                f"\tArea names without a match: {', '.join(missing_areas)}.\n",
-                f"\tArea names from the shapefile: {', '.join(list(gdf[area_names_gdf]))}.\n")
+                f"defined in the shapefile \"{shapefile_path}\" and therefore will not be part of",
+                f"(the chart. Consider renaming the area names without a match.\n",
+                f"\tArea names without a match: {', '.join(variable_values_not_matched)}.\n",
+                f"\tArea names from the shapefile: {', '.join(variable_values_gdf)}.\n")
 
         # Set base chart style
         self.base_chart = self.base_chart.mark_geoshape(
-            fill="lightgray", stroke="white", strokeWidth=0.5)
+            stroke="lightgray", strokeWidth=0.5)
 
         # Collect information from the geopandas dataframe
         self.base_chart = self.base_chart.transform_lookup(
-            lookup="region",
-            from_=alt.LookupData(data=gdf, key="DEN_REG", fields=["geometry", "type"]))
+            lookup = self.var_names[0],
+            from_ = alt.LookupData(data=gdf, key=shapefile_var_name, fields=["geometry", "type"]))
 
         # Set dimensions
         color = alt.Color("value", type="quantitative", title=chart_metric)
@@ -99,8 +126,8 @@ class ChoroplethChart(AltairChart):
 
         # Encoding the data
         self.base_chart = self.base_chart.encode(
-            fill=color,
-            tooltip=tooltip
+           fill=color,
+           tooltip=tooltip
         )
 
         # Set extra properties
@@ -110,8 +137,13 @@ class ChoroplethChart(AltairChart):
         # If the chart has to be filterable, create and add a search component to it
         # @TODO: Fix interaction between tokens and the spatial variable when using the filter
         # @TODO: Also set a default for the base visualization without a filter
-        if self.filterable == True:
-            self.base_chart = self.add_search_component(self.base_chart, "ngram")
+        # if self.filterable == True:
+        #     self.base_chart = self.add_search_component(self.base_chart, "ngram")
+
+        ngram_dropdown = alt.binding_select(options=sorted(list(set(df_data["ngram"]))), name="Select ngram")
+        ngram_select = alt.selection_point(fields=['ngram'], bind=ngram_dropdown)
+        self.base_chart = self.base_chart.add_params(ngram_select)
+        self.base_chart = self.base_chart.transform_filter(ngram_select)
 
         # If the chart has to be zoomable, set the property (not supported for choropleth chart by Altair)
         # if self.zoomable == True:

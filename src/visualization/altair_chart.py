@@ -41,6 +41,8 @@ class AltairChart(Chart):
 
         super().__init__(df_data, chart_metric, metadata, filterable, zoomable, variable_values)
 
+        # alt.data_transformers.enable("vegafusion")
+
         # Create the base chart object which stores the data
         self.base_chart = self.create_base_chart(df_data)
 

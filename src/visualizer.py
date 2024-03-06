@@ -25,6 +25,8 @@ class VisualizerArgs:
         zoomable: Optional[bool] = True,
         top_per_class_ngrams: Optional[int] = 20,
         ngrams: Optional[list[str]] = None,
+        shapefile_path: Optional[str] = None,
+        shapefile_var_name: Optional[str] = None,
     ) -> None:
         """
         A function that initializes the arguments useful for visualizing charts.
@@ -50,6 +52,17 @@ class VisualizerArgs:
             N-grams should match the number of tokens used in the prior computation
             reflected by the "results" variable (e.g., if unigrams were chosen, this
             list should only contain unigrams).
+        shapefile_path: Optional[str] = None
+            A path to the .shp shapefile to be visualized as background map to the chart.
+            Note that auxiliary files to the .shp one (i.e., .dbf, .prg, .shx ones) are 
+            required for chart creation too, but do not need to be specified. They should
+            have the same name as the .shp file but different extension, and be located 
+            in the same folder as the .shp file itself.
+        shapefile_var_name: Optional[str] = None
+            The key field name in the shapefile which contains the names for the areas 
+            which should match the possible values for the variable of interest (e.g., 
+            if the variable of interest is "state", here should go the name of the
+            variable name encoded in the shapefile containing the possible states).
         """
         
         self.output_folder = output_folder
@@ -58,6 +71,8 @@ class VisualizerArgs:
         self.zoomable = zoomable
         self.top_per_class_ngrams = top_per_class_ngrams
         self.ngrams = ngrams
+        self.shapefile_path = shapefile_path
+        self.shapefile_var_name = shapefile_var_name
 
 
 class Visualizer:
@@ -180,6 +195,7 @@ class Visualizer:
         # semantics, then save it to the user-specified output folder
         for metric, df_data in self.df_metric_data.items():
             # @TODO: Differentiate chart creation by metric
+            # @TODO: Add error messages for chart-specific parameters
 
             if (len(self.metadata["var_types"]) == 1):
                 var_type = self.metadata["var_types"][0]
@@ -205,7 +221,8 @@ class Visualizer:
                         # Create a choropleth map chart object
                         chart = ChoroplethChart(
                             df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                            self.variable_values[metric], self.args.top_per_class_ngrams)
+                            self.variable_values[metric], self.args.top_per_class_ngrams,
+                            self.args.shapefile_path, self.args.shapefile_var_name)
                         # Save the chart to the output folder
                         chart.save(os.path.join(
                             self.args.output_folder, "choropleth_chart"), self.args.output_formats)
