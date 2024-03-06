@@ -61,7 +61,7 @@ class BarChart(AltairChart):
         y_dim = alt.Y("ngram", type="nominal", title="").sort("-x")
         column_dim = alt.Column(self.var_names[0], type=self.var_types[0], 
             header=alt.Header(labelFontWeight="bold"))
-        color = alt.Color(self.var_names[0], legend=None) # for aestethics only
+        color = alt.Color(self.var_names[0], self.var_types[0], legend=None) # for aestethics only
 
         # Set tooltip (it will be overwritten if "filterable" is True)
         tooltip = [
@@ -100,7 +100,7 @@ class BarChart(AltairChart):
 
         # If the chart has to be filterable, create and add a search component to it
         if self.filterable == True:
-            self.base_chart = self.add_search_component(self.base_chart, "value")
+            self.base_chart = self.add_search_component(self.base_chart, "value", tooltip, y_dim)
 
         # If the chart has to be zoomable, set the property (disallowed for bar chart)
         # if self.zoomable == True:

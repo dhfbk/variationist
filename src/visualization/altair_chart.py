@@ -75,6 +75,8 @@ class AltairChart(Chart):
         self,
         base_chart: alt.Chart,
         tooltip_field: str,
+        tooltip: list[alt.Tooltip],
+        color: alt.Color,
     ) -> alt.Chart:
         """
         A function that creates a search component and adds it to the chart.
@@ -85,6 +87,10 @@ class AltairChart(Chart):
             The base chart object in which to add the search component.
         tooltip_field: str
             The field to show as a tooltip.
+        tooltip: list[alt.Tooltip]
+            A list of alt.Tooltip objects.
+        color: alt.Color
+            The alt.Color dimension to be shown in the chart.
 
         Returns
         -------
@@ -102,22 +108,23 @@ class AltairChart(Chart):
             )
         )
 
-        # Set opacity conditions for filtering when using the search component
+        # Add the search component to the base chart
+        base_chart = base_chart.add_params(search_input)
+
+        # Set conditions for filtering when using the search component
         base_chart = base_chart.encode(
             opacity = alt.condition(
                 alt.expr.test(alt.expr.regexp(search_input, "i"), alt.datum.ngram),
                 alt.value(1),
                 alt.value(0)
             ),
-            # tooltip = alt.condition(
-            #     alt.expr.test(alt.expr.regexp(search_input, "i"), alt.datum.ngram),
-            #     tooltip_field, # @TODO: Make the same information from the main chart class to be shown
-            #     alt.value("")
-            # )
+            color = alt.condition(
+                alt.expr.test(alt.expr.regexp(search_input, "i"), alt.datum.ngram),
+                color,
+                alt.value("")
+            ),
+            tooltip = tooltip
         )
-
-        # Add the search component to the base chart
-        base_chart = base_chart.add_params(search_input)
 
         return base_chart
 

@@ -160,18 +160,13 @@ class Visualizer:
 
         # Iterate through variables and ngram-value pairs and keep those of interest
         for variable, raw_items in json_data.items():
-            if self.args.top_per_class_ngrams != None:
-                raw_top_k = sorted(
-                    raw_items.items(), key=lambda x:x[1], reverse=True)[:self.args.top_per_class_ngrams]
-                ngrams_top_k = [element[0] for element in raw_top_k]
             for ngram, value in raw_items.items():
                 if (focus_ngrams != None) and (ngram not in focus_ngrams):
                     continue
                 else:
-                    if ((self.args.top_per_class_ngrams != None) and (ngram in ngrams_top_k)) or (self.args.top_per_class_ngrams == None): 
-                        variables.append(variable)
-                        ngrams.append(ngram)
-                        values.append(value)
+                    variables.append(variable)
+                    ngrams.append(ngram)
+                    values.append(value)
 
         # Create the long-form dataframe
         df_data = pd.DataFrame({

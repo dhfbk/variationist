@@ -71,7 +71,7 @@ class ScatterChart(AltairChart):
         self.base_chart = self.base_chart.encode(
             x_dim,
             y_dim,
-            color,
+            # Note: color will be conditionally added by the "add_search_component"
             tooltip
         )
 
@@ -81,7 +81,7 @@ class ScatterChart(AltairChart):
 
         # If the chart has to be filterable, create and add a search component to it
         if self.filterable == True:
-            self.base_chart = self.add_search_component(self.base_chart, "ngram")
+            self.base_chart = self.add_search_component(self.base_chart, "ngram", tooltip, color)
 
         # If the chart has to be zoomable, set the property
         if self.zoomable == True:

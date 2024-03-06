@@ -81,7 +81,7 @@ class TemporalLineChart(AltairChart):
 
         # If the chart has to be filterable, create and add a search component to it
         if self.filterable == True:
-            self.base_chart = self.add_search_component(self.base_chart, "ngram")
+            self.base_chart = self.add_search_component(self.base_chart, "ngram", tooltip, color)
 
         # If the chart has to be zoomable, set the property
         if self.zoomable == True:
