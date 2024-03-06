@@ -105,9 +105,13 @@ class ChoroplethChart(AltairChart):
                 f"\tArea names without a match: {', '.join(variable_values_not_matched)}.\n",
                 f"\tArea names from the shapefile: {', '.join(variable_values_gdf)}.\n")
 
+        # Set background chart style
+        background = alt.Chart(gdf).mark_geoshape(
+            stroke="white", strokeWidth=0.5, fill="lightgray")
+
         # Set base chart style
         self.base_chart = self.base_chart.mark_geoshape(
-            stroke="lightgray", strokeWidth=0.5)
+            stroke="white", strokeWidth=0.5)
 
         # Collect information from the geopandas dataframe
         self.base_chart = self.base_chart.transform_lookup(
@@ -117,7 +121,7 @@ class ChoroplethChart(AltairChart):
         # Set dimensions
         color = alt.Color("value", type="quantitative", title=chart_metric)
 
-        # Set tooltip (it will be overwritten if "filterable" is True)
+        # Set tooltip
         tooltip = [
             alt.Tooltip("ngram", type="nominal", title=self.text_label),
             alt.Tooltip(self.var_names[0], type=self.var_types[0]),
@@ -126,24 +130,20 @@ class ChoroplethChart(AltairChart):
 
         # Encoding the data
         self.base_chart = self.base_chart.encode(
-           fill=color,
-           tooltip=tooltip
+            # Note: fill=color will be conditionally added by the "add_dropdown_component"
+            tooltip = tooltip
         )
 
-        # Set extra properties
+        # Set extra properties for both background and foreground layers
         chart_base_size = 600
+        background = background.properties(width=chart_base_size, height=chart_base_size)
         self.base_chart = self.base_chart.properties(width=chart_base_size, height=chart_base_size)
 
         # If the chart has to be filterable, create and add a search component to it
-        # @TODO: Fix interaction between tokens and the spatial variable when using the filter
-        # @TODO: Also set a default for the base visualization without a filter
-        # if self.filterable == True:
-        #     self.base_chart = self.add_search_component(self.base_chart, "ngram")
-
-        ngram_dropdown = alt.binding_select(options=sorted(list(set(df_data["ngram"]))), name="Select ngram")
-        ngram_select = alt.selection_point(fields=['ngram'], bind=ngram_dropdown)
-        self.base_chart = self.base_chart.add_params(ngram_select)
-        self.base_chart = self.base_chart.transform_filter(ngram_select)
+        # Note: the chart is always filterable for choropleth charts
+        if self.filterable == True:
+            dropdown_elements = list(set(df_data["ngram"]))
+            self.base_chart = self.add_dropdown_component(self.base_chart, tooltip, ["ngram"], dropdown_elements, color)
 
         # If the chart has to be zoomable, set the property (not supported for choropleth chart by Altair)
         # if self.zoomable == True:
@@ -151,5 +151,5 @@ class ChoroplethChart(AltairChart):
         #     self.base_chart = self.base_chart.interactive()
 
         # Create the final chart
-        self.chart = self.base_chart
+        self.chart = background + self.base_chart
 

@@ -122,6 +122,64 @@ class AltairChart(Chart):
         return base_chart
 
 
+    def add_dropdown_component(
+        self,
+        base_chart: alt.Chart,
+        tooltip: list[alt.Tooltip],
+        fields: list[str],
+        dropdown_elements: list[str],
+        color: alt.Color,
+    ) -> alt.Chart:
+        """
+        A function that creates a dropdown component and adds it to the chart.
+
+        Parameters
+        ----------
+        base_chart: alt.Chart
+            The base chart object in which to add the dropdown component.
+        tooltip_field: list[alt.Tooltip]
+            A list of alt.Tooltip objects.
+        fields: list[str]
+            A list of fields whose values are used for populating the dropdown.
+        dropdown_elements: list[str]
+            A list of possible values for the field to put in the dropdown.
+        color: alt.Color
+            The alt.Color dimension to be shown in the chart.
+
+        Returns
+        -------
+        base_chart: alt.Chart
+            The same base chart object with the dropdown component added.
+        """
+
+        # Create the dropdown component
+        dropdown = alt.binding_select(
+            options = sorted([""] + dropdown_elements), 
+            name = f"Filter by {self.text_label} ",
+        )
+        select = alt.selection_point(
+            value = "",
+            bind = dropdown,
+            fields = fields,
+        )
+
+        # Add the search component to the base chart
+        base_chart = base_chart.add_params(select)
+        base_chart = base_chart.transform_filter(select)
+
+        # Encoding the data
+        base_chart = base_chart.encode(
+            fill = alt.condition(
+                select,
+                color,
+                alt.value("")
+            ),
+            tooltip = tooltip
+        )
+
+        return base_chart
+
+
     def save(
         self,
         output_folder: str,
