@@ -10,7 +10,7 @@ def safe_divide(numerator, denominator):
             result = numerator/denominator
         return result
 
-def ttr(label_values_dict, subsets_of_interest):  
+def ttr(label_values_dict, subsets_of_interest, args):  
     values_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -26,7 +26,7 @@ def ttr(label_values_dict, subsets_of_interest):
     print("TTR: ",values_dict)
     return values_dict
     
-def rttr(label_values_dict, subsets_of_interest):  
+def rttr(label_values_dict, subsets_of_interest, args):  
     values_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -42,7 +42,7 @@ def rttr(label_values_dict, subsets_of_interest):
     print("RTTR: ",values_dict)
     return values_dict
 
-def maas(label_values_dict, subsets_of_interest):  
+def maas(label_values_dict, subsets_of_interest, args):  
     values_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -58,7 +58,7 @@ def maas(label_values_dict, subsets_of_interest):
     print("MAAS: ",values_dict)
     return values_dict
 
-def lttr(label_values_dict, subsets_of_interest):  
+def lttr(label_values_dict, subsets_of_interest, args):  
     values_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
