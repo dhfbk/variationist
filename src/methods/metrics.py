@@ -1,4 +1,5 @@
 from src.methods import lexical_variation
+from src.methods import corpus_statistics
 from src import methods
 from typing import Callable, Union
 
@@ -31,6 +32,10 @@ class Metric:
             self.metric_fn = lexical_variation.lttr
         elif self.metric == "most-frequent":
             self.metric_fn = methods.most_frequent.create_most_frequent_dictionary
+        elif self.metric == "basic-stats":
+            self.metric_fn = corpus_statistics.compute_basic_stats
+        
+        
         elif callable(self.metric):
             self.metric_fn = self.metric
         elif type(self.metric) is str:
