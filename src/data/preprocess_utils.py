@@ -47,30 +47,31 @@ def create_tokenized_ngrams_column(tokenized_text_column, n_tokens):
     return(tokenized_text_column)
 
 
-def extract_combinations(token_list, n_items, context_window):
-    # Takes as input a list of tokens, the number of words that coocur and the context window size 
-    # Returns token_list merged into coocurrences
+def extract_combinations(token_list, n_items, context_window, unique_cooc):
+    # Takes as input a list of tokens, the number of words that cooccur and the context window size 
+    # Returns token_list merged into cooccurrences
 
     if context_window == 0:
         context_window = len(token_list)
     new_array = []
     for i in range(len(token_list) - context_window + 1):
         for cooc in itertools.combinations(token_list[i: i + context_window], n_items):
-            new_array.append(" ".join(sorted(cooc)))
+            if (not unique_cooc) or ((unique_cooc) and (len(set(cooc)) == len(cooc))):
+                new_array.append(" ".join(sorted(cooc)))
     new_array = list(set(new_array))
     
     return(new_array)
     
 
-def create_tokenized_cooccurrences_column(tokenized_text_column, n_items, context_window):
-    # Takes as input an already tokenized array/series of texts, the number of words that coocur and the context window size 
+def create_tokenized_cooccurrences_column(tokenized_text_column, n_items, context_window, unique_cooc):
+    # Takes as input an already tokenized array/series of texts, the number of words that cooccur and the context window size 
     # By default cooccurrences are extracted from the entire text
-    # Returns tokenized_text_column with the al the coocurrences of n words occurring in the test
+    # Returns tokenized_text_column with the al the cooccurrences of n words occurring in the test
     if n_items > context_window and context_window!=0:
-        sys.exit(f"ERROR: The size of the context windows cannot be lower than the number of words when extracting the coocurrences!\nExit.")
+        sys.exit(f"ERROR: The size of the context windows cannot be lower than the number of words when extracting the cooccurrences!\nExit.")
     tqdm.pandas()
 
-    tokenized_text_column = tokenized_text_column.squeeze().progress_apply(lambda x: extract_combinations(x,n_items,context_window))
+    tokenized_text_column = tokenized_text_column.squeeze().progress_apply(lambda x: extract_combinations(x,n_items,context_window,unique_cooc))
     return(tokenized_text_column)
                                                             
 

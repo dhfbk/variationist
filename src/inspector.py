@@ -58,6 +58,7 @@ class InspectorArgs:
     var_subsets: Optional[List] = None
     n_tokens: Optional[int] = 1 # maximum value for this should be 5, otherwise the computation will explode
     n_cooc: Optional[int] = 1
+    unique_cooc: Optional[bool] = False
     cooc_window_size: Optional[int] = 0
     freq_cutoff: Optional[int] = 3
     stopwords: Optional[bool] = False # TODO currently we only support stopwords = en,it. Add support for False, spacy, hf

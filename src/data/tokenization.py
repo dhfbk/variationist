@@ -51,9 +51,9 @@ class Tokenizer:
             print("INFO: Creating n-grams...")
             tokenized_text_column = preprocess_utils.create_tokenized_ngrams_column(tokenized_text_column, self.args.n_tokens)
         
-        if self.args.n_cooc > 1 and  self.args.n_tokens <= 1:
+        if self.args.n_cooc > 1 and self.args.n_tokens <= 1:
             print("INFO: Creating co-occurrences...")
-            tokenized_text_column = preprocess_utils.create_tokenized_cooccurrences_column(tokenized_text_column, self.args.n_cooc, self.args.cooc_window_size)
+            tokenized_text_column = preprocess_utils.create_tokenized_cooccurrences_column(tokenized_text_column, self.args.n_cooc, self.args.cooc_window_size, self.args.unique_cooc)
         return tokenized_text_column
     
         
