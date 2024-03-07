@@ -40,6 +40,8 @@ class InspectorArgs:
             The number of tokens used for calculating non-consecutive co-occurrences. For example, n=2 means we consider as the base units for our analysis any pair of tokens that co-occur in the same sentence. n=3 means we consider triplets of tokens, etc. Defaults to n=1, meaning no co-occurrences are taken into consideration, and we only consider n-grams.
         cooc_window_size (`Int`):
             Size of the context window for co-occurrences. For instance, a `cooc_window_size` of 3 means we use a context window of 3 to calculate co-occurrences, meaning that any token that is within 3 tokens before or after a given token is added as a co-occurrence.
+        freq_cutoff (`Int`):
+            The token frequency, expressed as an integer, below which we do not consider the token in the analysis of pmi-based metrics.
         stopwords (`Bool`):
             Whether to remove stopwords from texts before tokenization or not. Will default to False.
         lowercase (`Bool`):
@@ -57,6 +59,7 @@ class InspectorArgs:
     n_tokens: Optional[int] = 1 # maximum value for this should be 5, otherwise the computation will explode
     n_cooc: Optional[int] = 1
     cooc_window_size: Optional[int] = 0
+    freq_cutoff: Optional[int] = 3
     stopwords: Optional[bool] = False # TODO currently we only support stopwords = en,it. Add support for False, spacy, hf
     lowercase: Optional[bool] = False
     
@@ -144,7 +147,7 @@ class Inspector:
                                                 label_values_dict)
         results_dict = dict()
         for metric in self.args.metrics:
-            current_metric = metrics.Metric(metric)
+            current_metric = metrics.Metric(metric, self.args)
             if type(metric) is not str:
                 metric_name = metric.__name__
             else:

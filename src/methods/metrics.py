@@ -8,8 +8,10 @@ class Metric:
     The Metric class, a generic class that carries out all the metric operations.
     """
     def __init__(self, 
-                 metric: Union[str, Callable[[dict, dict], dict]]):
+                 metric: Union[str, Callable[[dict, dict], dict]],
+                 args: int):
         self.metric = metric
+        self.args = args
 
         if self.metric == "pmi":
             self.metric_fn = methods.pmi.pmi
@@ -19,24 +21,24 @@ class Metric:
             self.metric_fn = methods.pmi.pmi_positive
         elif self.metric == "pmi-positive-normalized":
             self.metric_fn = methods.pmi.pmi_positive_normalized
-        elif  self.metric == "ttr":
+        elif self.metric == "ttr":
             self.metric_fn = lexical_variation.ttr
-        elif  self.metric == "rttr":
+        elif self.metric == "rttr":
             self.metric_fn = lexical_variation.rttr
-        elif  self.metric == "maas":
+        elif self.metric == "maas":
             self.metric_fn = lexical_variation.maas
-        elif  self.metric == "lttr":
+        elif self.metric == "lttr":
             self.metric_fn = lexical_variation.lttr
         elif self.metric == "most-frequent":
             self.metric_fn = methods.most_frequent.create_most_frequent_dictionary
         elif callable(self.metric):
-                self.metric_fn = self.metric
+            self.metric_fn = self.metric
         elif type(self.metric) is str:
-                raise NotImplementedError(f"The metric '{self.metric}' is not implemented.")
+            raise NotImplementedError(f"The metric '{self.metric}' is not implemented.")
         else:
             raise ValueError(f"The specified metric should be a callable function or a string matching an implemented metric. Got a {type(self.metric)} instead")
         
     
     def calculate_metric(self, label_values_dict, subsets_of_interest):
         """Calls the appropriate metric function."""
-        return self.metric_fn(label_values_dict, subsets_of_interest)
+        return self.metric_fn(label_values_dict, subsets_of_interest, self.args)
