@@ -64,6 +64,7 @@ class ScatterChart(AltairChart):
         # Set tooltip (it will be overwritten if "filterable" is True)
         tooltip = [
             alt.Tooltip("ngram", type="nominal", title=self.text_label),
+            alt.Tooltip(self.var_names[0], type=self.var_types[0]),
             alt.Tooltip("value", type="quantitative", title=self.metric_label)
         ]
 
@@ -81,7 +82,7 @@ class ScatterChart(AltairChart):
 
         # If the chart has to be filterable, create and add a search component to it
         if self.filterable == True:
-            self.base_chart = self.add_search_component(self.base_chart, "ngram", tooltip, color)
+            self.base_chart = self.add_search_component(self.base_chart, tooltip, color)
 
         # If the chart has to be zoomable, set the property
         if self.zoomable == True:

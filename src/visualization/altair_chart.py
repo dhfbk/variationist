@@ -2,7 +2,7 @@ import altair as alt
 import os
 import pandas as pd
 
-from typing import Optional
+from typing import Union, Optional
 
 from src.visualization.chart import Chart
 
@@ -74,9 +74,8 @@ class AltairChart(Chart):
     def add_search_component(
         self,
         base_chart: alt.Chart,
-        tooltip_field: str,
         tooltip: list[alt.Tooltip],
-        color: alt.Color,
+        dim: Union[alt.Color, alt.Y],
     ) -> alt.Chart:
         """
         A function that creates a search component and adds it to the chart.
@@ -85,12 +84,10 @@ class AltairChart(Chart):
         ----------
         base_chart: alt.Chart
             The base chart object in which to add the search component.
-        tooltip_field: str
-            The field to show as a tooltip.
         tooltip: list[alt.Tooltip]
             A list of alt.Tooltip objects.
-        color: alt.Color
-            The alt.Color dimension to be shown in the chart.
+        dim: Union[alt.Color, alt.Y]
+            The alt.Color or alt.Y dimension to be filtered in the chart.
 
         Returns
         -------
@@ -120,7 +117,7 @@ class AltairChart(Chart):
             ),
             color = alt.condition(
                 alt.expr.test(alt.expr.regexp(search_input, "i"), alt.datum.ngram),
-                color,
+                dim,
                 alt.value("")
             ),
             tooltip = tooltip
@@ -144,14 +141,14 @@ class AltairChart(Chart):
         ----------
         base_chart: alt.Chart
             The base chart object in which to add the dropdown component.
-        tooltip_field: list[alt.Tooltip]
+        tooltip: list[alt.Tooltip]
             A list of alt.Tooltip objects.
         fields: list[str]
             A list of fields whose values are used for populating the dropdown.
         dropdown_elements: list[str]
             A list of possible values for the field to put in the dropdown.
         color: alt.Color
-            The alt.Color dimension to be shown in the chart.
+            The alt.Color dimension to be filtered in the chart.
 
         Returns
         -------
