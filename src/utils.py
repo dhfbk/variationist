@@ -1,6 +1,7 @@
 """A python file containing project-wide constants and functions."""
 
 import csv
+import emoji
 import pandas as pd
 import json
 import os
@@ -142,3 +143,44 @@ def check_column_type(cols):
             break
 
     return cols_type
+
+
+# Partly taken from https://github.com/explosion/spaCy/blob/master/spacy/lang/char_classes.py
+merge_chars = lambda char: list(char.strip().split(" "))
+
+SYMBOLS = (
+    # Punctuation chars
+    ". … , : ; ! ? ¿ ؟ ¡ ( ) [ ] { } < > _ # * @ ° § % "
+    "+ ^ = | \\ / & 。 ？ ！ ， 、 ； ： ～ · । ، ۔ ؛ ٪ "
+    # Other symbols
+    "© ¶ × • ‿ ᴗ ◉ ʘ ◕ ｡ ・ ∀ ™ "
+    # Quote chars
+    "' \" ” “ ` ‘ ´ ’ ‚ , „ » « 「 」 『 』 （ ） 〔 〕 "
+    "【 】 《 》 〈 〉 〈 〉  ⟦ ⟧ "
+    # Hyphen chars
+    "- – — ~ "
+    # Currency chars
+    "$ £ € ¥ ฿ ₽ ﷼ ₴ ₠ ₡ ₢ ₣ ₤ ₥ ₦ ₧ ₨ ₩ ₪ ₫ € ₭ ₮ ₯ ₰ "
+    "₱ ₲ ₳ ₴ ₵ ₶ ₷ ₸ ₹ ₺ ₻ ₼ ₽ ₾ ₿ ¢ "
+    # Empty chars (plus tag latin small letters)
+    "￼ ​ ‍ 󠁧 󠁢 󠁣 󠁤 󠁥 󠁦 󠁧 󠁨 󠁩 󠁪 󠁫 󠁬 󠁭 󠁮 󠁯 󠁰 󠁱 󠁲 󠁳 󠁴 󠁵 󠁶 󠁷 󠁸 󠁹 󠁺 󠁿 "
+    # Remove variant selector (@TODO handle this for emojis in the future)
+    "\ufe0f "
+)
+
+def replace_symbols(text):
+    symbols_list = merge_chars(SYMBOLS)
+    
+    for char in SYMBOLS:
+        if char in text:
+            text = text.replace(char, " ")
+
+    temp_text = ""
+    for char in text:
+        if emoji.is_emoji(char):
+            temp_text += " " + char + " "
+        else:
+            temp_text += char
+
+    return temp_text
+

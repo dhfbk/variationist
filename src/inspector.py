@@ -38,6 +38,8 @@ class InspectorArgs:
             The number of tokens that should be considered for the analysis. 1 corresponds to unigrams, 2 corresponds to bigrams, and so on.
         n_cooc (`Int`):
             The number of tokens used for calculating non-consecutive co-occurrences. For example, n=2 means we consider as the base units for our analysis any pair of tokens that co-occur in the same sentence. n=3 means we consider triplets of tokens, etc. Defaults to n=1, meaning no co-occurrences are taken into consideration, and we only consider n-grams.
+        unique_cooc (`Bool`):
+            Whether to consider unique co-occurrences or not. Default to False (keep duplicate tokens). This does not affect the co-occurrences window size by design (the window size considers the original number of tokens and therefore the original allowed maximum distance between tokens).
         cooc_window_size (`Int`):
             Size of the context window for co-occurrences. For instance, a `cooc_window_size` of 3 means we use a context window of 3 to calculate co-occurrences, meaning that any token that is within 3 tokens before or after a given token is added as a co-occurrence.
         freq_cutoff (`Int`):

@@ -2,11 +2,12 @@ import re
 from src import utils
 from tqdm import tqdm
 from transformers import AutoTokenizer
+from src import utils
 
 def whitespace_tokenization(text_column, args):
-    """Takes as input an array/series of texts and tokenizes it, returns same array/series but tokenized splitting on whitespace."""
-    # Remove punctuation and any not alphanumeric charachter
-    # ONLY WORKS ON LATIN ALPHABET
+    """Takes as input an array/series of texts and tokenizes it, returns same array/series 
+    but tokenized splitting on whitespace."""
+    # Remove punctuation and any not alphanumeric charachter      
     
     tqdm.pandas()
     if args.lowercase:
@@ -14,8 +15,8 @@ def whitespace_tokenization(text_column, args):
     else:
         tok_column = text_column.squeeze().astype(str)
 
-    tok_column = tok_column.progress_apply(lambda x: re.sub(r'[^a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ]', ' ', x))
-    tok_column = tok_column.apply(lambda x: re.sub(r' +', ' ', x))
+    tok_column = tok_column.progress_apply(lambda x: utils.replace_symbols(x))
+    tok_column = tok_column.apply(lambda x: re.sub(r'\s+', ' ', x))
     tok_column = tok_column.apply(lambda x: x.strip().split(" "))
     
     # tok_column = tok_column.squeeze().apply(lambda x: pd.Series(x.split(" ")))
