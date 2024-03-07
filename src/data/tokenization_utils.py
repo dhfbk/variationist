@@ -24,8 +24,8 @@ def whitespace_tokenization(text_column, args):
 
 def huggingface_tokenization(text_column, args):
     """Load a HuggingFace AutoTokenizer from the string given by the user."""
-    print(text_column)
-    text_column = text_column.dropna()
+    # print(text_column)
+    # text_column = text_column.dropna()
     tokenizer_name = args.tokenizer.strip("hf::")
     hf_tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     tqdm.pandas()
@@ -36,5 +36,5 @@ def huggingface_tokenization(text_column, args):
 
 def spacy_tokenization(text_column, args):
     """TODO"""
-    raise NotImplementedError("We don't support spacy tokenization yet.")
+    raise NotImplementedError("We don't support Spacy tokenization yet.")
     return
