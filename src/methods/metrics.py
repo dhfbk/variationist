@@ -22,6 +22,8 @@ class Metric:
             self.metric_fn = methods.pmi.pmi_positive
         elif self.metric == "pmi-positive-normalized":
             self.metric_fn = methods.pmi.pmi_positive_normalized
+        elif self.metric == "pmi-lexical-artifacts":
+            self.metric_fn = methods.pmi.pmi_lexical_artifacts
         elif self.metric == "ttr":
             self.metric_fn = lexical_variation.ttr
         elif self.metric == "rttr":

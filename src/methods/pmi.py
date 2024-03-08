@@ -52,13 +52,6 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest, freq_cutoff):
     for label in freqs_dict:
         label_pmi_dict = dict()
         for w in freqs_dict[label]:
-            #if freqs_dict[label][w] < freq_cutoff:
-            #    continue
-            # pxy = freqs_dict[label][w]/total
-            # px = label_count[label]/total
-            # py = freqs_merged_dict[w]/total
-            # pmi_value = math.log(pxy/(px*py))
-            # label_pmi_dict[w] = pmi_value
             if w in freqs_merged_dict:
                 pxy = freqs_dict[label][w]/total
                 px = label_count[label]/total
@@ -148,38 +141,44 @@ def pmi_positive_normalized(label_values_dict, subsets_of_interest, args):
 
     return output_pmi
 
-    # @TODO: Deleting comments below?
 
-    #     minmxlist.append(min(output_pmi[label].values()))
-    #     minmxlist.append(max(output_pmi[label].values()))
-
-    # min_value = min(minmxlist)
-    # max_value = max(minmxlist)
+def pmi_lexical_artifacts(label_values_dict, subsets_of_interest, args):
     
-    # for label in freqs_dict:
-    #     for w in output_pmi[label]:
-    #         output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, args.freq_cutoff)   
+    freqs_dict = dict()
+    for column in label_values_dict:
+        for l in range(len(label_values_dict[column])):
+            curr_label = subsets_of_interest[column][l].name
+            mydict = shared_metrics.get_all_frequencies(subsets_of_interest[column][l])
+            freqs_dict[curr_label] = mydict
+    adj_dict = dict()
+    for label in output_pmi:
+        adj_dict[label] = dict()
+        for w in output_pmi[label]:
+            adj_dict[label][w] = output_pmi[label][w] * freqs_dict[label][w]
+            
+    output_pmi = adj_dict
     
+    min_max_list = []
+    for label in output_pmi:
+        for w in output_pmi[label]:
+            if output_pmi[label][w] < 0:
+                output_pmi[label][w] = 0
+        if len(output_pmi[label]) > 0: # if the list is not empty
+            min_max_list.append(min(output_pmi[label].values()))
+            min_max_list.append(max(output_pmi[label].values()))    
 
-    # return output_pmi
-                
-
-
-
-    # output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest)   
-    # for label in output_pmi:
-    #     for w in output_pmi[label]:
-    #         if output_pmi[label][w] < 0:
-    #             output_pmi[label][w] = 0        
-    #     minmxlist.append(min(output_pmi[label].values()))
-    #     minmxlist.append(max(output_pmi[label].values()))
-
-    # min_value = min(minmxlist)
-    # max_value = max(minmxlist)
+    min_value = min(min_max_list)
+    max_value = max(min_max_list)
     
-    # for label in freqs_dict:
-    #     for w in output_pmi[label]:
-    #         output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
-    
+    for label in output_pmi:
+        for w in output_pmi[label]:
+            output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
 
-    # return output_pmi
+    # Print for debug
+    for label in output_pmi:
+        sorted_mydict = sorted(output_pmi[label].items(), key=lambda x:x[1], reverse=True)
+        converted_dict = dict(sorted_mydict)
+        print("\nPmi_lexical_artifacts", label, take(10, converted_dict.items())) #print for debug
+
+    return output_pmi
