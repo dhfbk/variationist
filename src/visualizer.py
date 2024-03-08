@@ -57,7 +57,9 @@ class VisualizerArgs:
             Note that auxiliary files to the .shp one (i.e., .dbf, .prg, .shx ones) are 
             required for chart creation too, but do not need to be specified. They should
             have the same name as the .shp file but different extension, and be located 
-            in the same folder as the .shp file itself.
+            in the same folder as the .shp file itself. An example of repository where to
+            find shapefiles is https://geodata.lib.berkeley.edu/, but there exists many
+            other ones and shapefiles provided by national/regional institutions.
         shapefile_var_name: Optional[str] = None
             The key field name in the shapefile which contains the names for the areas 
             which should match the possible values for the variable of interest (e.g., 
