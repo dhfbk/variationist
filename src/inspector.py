@@ -145,9 +145,25 @@ class Inspector:
         """Function that runs the actual computation"""
         # TODO handle metrics in a smarter way.
         label_values_dict = preprocess_utils.get_label_values(self.dataframe, self.col_names_dict)
-        subsets_of_interest = preprocess_utils.get_subset_dict(self.dataframe, self.col_names_dict,
-                                                self.tokenizer.tokenized_col_dict,
-                                                label_values_dict)
+        
+        if len(self.args.var_names) == 1:
+            subsets_of_interest = preprocess_utils.get_subset_dict(self.dataframe,
+                                                    self.tokenizer.tokenized_col_dict,
+                                                    label_values_dict)
+        else:        
+            # if we have more than two variables, we are interested in the intersections between them
+
+            print("INFO: splitting intersections of variables into subsets...")
+            subsets_of_interest = preprocess_utils.get_subset_intersections(self.dataframe,
+                                                    self.tokenizer.tokenized_col_dict,
+                                                    label_values_dict)
+            
+            # print(label_values_dict)
+            label_values_dict = preprocess_utils.update_label_values_dict_with_inters(label_values_dict)
+            print(label_values_dict)
+            
+        
+        
         results_dict = dict()
         for metric in self.args.metrics:
             current_metric = metrics.Metric(metric, self.args)
@@ -155,8 +171,9 @@ class Inspector:
                 metric_name = metric.__name__
             else:
                 metric_name = metric
-            print(f"INFO: Currently calculating metric {metric_name}")
-            results_dict[metric_name] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
+            print(f"INFO: Currently calculating metric {metric_name}...")
+            results_dict[metric_name] = {}
+            results_dict[metric_name][list(label_values_dict.keys())[0]] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
             
         # TODO handle series_dict
         self.results_dict = results_dict
