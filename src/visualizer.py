@@ -262,34 +262,34 @@ class Visualizer:
                             f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
                 elif var_type == "coordinates":
                     if var_semantics == "general":
-                        # Create a scatteplot (?) chart object
-                        raise NotImplementedError(
-                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported yet.")
-                    elif var_semantics == "spatial":
-                        # Create a hexbin mapbox (?) chart object
-                        # Create a mapbox density heatmap chart object
-                        raise NotImplementedError(
-                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported yet.")
+                        # Create a scatteplot chart object
+                        # @TODO: Warn the user that we will be only able to plot a scatteplot chart
+                        chart = ScatterChart(
+                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
+                            self.variable_values[metric], self.args.top_per_class_ngrams)
+                        # Save the chart to the output folder
+                        chart.save(os.path.join(
+                            self.args.output_folder, "scatter_chart"), self.args.output_formats)
                     else:
                         # @TODO: Indications of which var_type / var_semantics should be
                         raise ValueError(
                             f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
                 else:
                     raise ValueError(f"ERROR. {var_type} is not supported.")
+            
+            elif (len(self.metadata["var_types"]) == 2):
+                var_types = self.metadata["var_types"]
+                var_semantics = self.metadata["var_semantics"]
+
+                # @TODO: Spatial
+                # Create a point map chart object
+                # Create a hexbin mapbox (?) chart object
+                # Create a mapbox density heatmap chart object
+
+                raise NotImplementedError(
+                    f"Visualization for 2 variable types is not supported yet.")
+
             else:
                 raise NotImplementedError(
-                        f"Visualization for >=1 variable types is not supported yet.")
+                    f"Visualization for >=2 variable types is not supported yet.")
 
-
-if __name__ == "__main__":
-    pass
-    
-    # # Define the visualizer arguments
-    # visualizer_args = VisualizerArgs(
-    #     output_folder="results", output_formats=["html"], filterable=True, zoomable=True, top_per_class_ngrams=20, ngrams=None)
-
-    # # Create dynamic visualizations of the results
-    # Visualizer(
-    #     input_json=os.path.join("data", "worthit_topic.json"), # or: json.load(open("example-time.json"))
-    #     args=visualizer_args
-    # ).visualize()

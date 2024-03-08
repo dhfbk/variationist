@@ -56,15 +56,18 @@ class ScatterChart(AltairChart):
         # Set base chart style
         self.base_chart = self.base_chart.mark_line(point=True, strokeDash=[1, 0])
 
+        # A single variable with coordinate semantics should be mapped to a quantitative type
+        var_type = "quantitative" if self.var_types[0] == "coordinates" else self.var_types[0]
+
         # Set dimensions
-        x_dim = alt.X(self.var_names[0], type=self.var_types[0])
+        x_dim = alt.X(self.var_names[0], type=var_type)
         y_dim = alt.Y("value", type="quantitative", title=chart_metric)
         color = alt.Color("ngram", type="nominal", title="", legend=None)
 
         # Set tooltip (it will be overwritten if "filterable" is True)
         tooltip = [
             alt.Tooltip("ngram", type="nominal", title=self.text_label),
-            alt.Tooltip(self.var_names[0], type=self.var_types[0]),
+            alt.Tooltip(self.var_names[0], type=var_type),
             alt.Tooltip("value", type="quantitative", title=self.metric_label)
         ]
 
