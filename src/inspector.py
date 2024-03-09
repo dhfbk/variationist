@@ -23,9 +23,9 @@ class InspectorArgs:
         var_names (`List[str]`):
             The list of variable names to use for the analysis. Each string in var_names should correspond to a dataset column.
         var_types (`List[str]`):
-            The list of variable types corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `nominal` (default), `ordinal`, and `coordinates`.
+            The list of variable types corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `nominal` (default), `ordinal`, `quantitative`, and `coordinates`.
         var_semantics (`List[str]`):
-            The list of variable semantics corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `general`(default), `temporal`, and `spatial`.
+            The list of variable semantics corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `general` (default), `temporal`, and `spatial`.
         var_subsets (`Tuple[List]`):
             Subsets to use for the analysis. To be used when the combinations of all variables are too many and we want to focus on analyzing a subset against another subset, specifying values for multiple variables. Should follow the format `(['var_a_value_1', 'var_b_value_1'], ['var_a_value_2', 'var_b_value_2'])`.
         tokenizer ([`PreTrainedTokenizerBase`], *optional*, defaults to `whitespace`): #TODO
@@ -55,8 +55,8 @@ class InspectorArgs:
     metrics: Optional[List] = None
     text_names: Optional[List] = None # explicit column name(s)
     var_names: Optional[List] = None # explicit variable name(s)
-    var_types: Optional[List] = field(default_factory=lambda: ['nominal']) # nominal (default), ordinal, quantitative, coordinates
-    var_semantics: Optional[List] = field(default_factory=lambda: ['general']) # default=General, temporal, spatial
+    var_types: Optional[List] = None # nominal (default), ordinal, quantitative, coordinates
+    var_semantics: Optional[List] = None # default=General, temporal, spatial
     var_subsets: Optional[List] = None
     n_tokens: Optional[int] = 1 # maximum value for this should be 5, otherwise the computation will explode
     n_cooc: Optional[int] = 1
@@ -99,13 +99,29 @@ class Inspector:
         
         self.dataset = dataset
         self.args = args
-       
+
+        # Set defaults for variable types and semantics in case they are not defined
+        if self.args.var_types == None:
+            default_type = "nominal"
+            self.args.var_types = [default_type] * len(self.args.var_names)
+            print(f"INFO: No values have been set for var_types. Defaults to {default_type}.")
+        if self.args.var_semantics == None:
+            default_semantics = "general"
+            self.args.var_semantics = [default_semantics] * len(self.args.var_names)
+            print(f"INFO: No values have been set for var_semantics. Defaults to {default_semantics}.")
+
         # Dictionary for the metadata to be printed in the json output
         metadata_dict = self.args.to_dict()
         print(metadata_dict)
         metadata_dict["dataset"] = self.dataset     
         self.metadata_dict = metadata_dict
         
+        # Check if variable definitions match in length
+        if any(len(args.var_names) != len(l) for l in [args.var_types, args.var_semantics]):
+            raise ValueError(f"ERROR! All variables in {args.var_names} should have an associated "
+                            f"variable type and semantics, but now only var_types: {args.var_types} "
+                            f"and var_semantics: {args.var_semantics} are provided. Please provide "
+                            f"an ordered list of types and semantics that match variable names.")
         
         # Check if column strings are names or indices (for both texts and labels)
         text_names_type = utils.check_column_type(args.text_names)
