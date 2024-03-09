@@ -9,6 +9,7 @@ from src.visualization.temporal_line_chart import TemporalLineChart
 from src.visualization.scatter_chart import ScatterChart
 from src.visualization.choropleth_chart import ChoroplethChart
 from src.visualization.scatter_geo_chart import ScatterGeoChart
+# from src.visualization.density_geo_chart import DensityGeoChart
 
 
 # @TODO: Maybe change the "ngrams" name for clarity across the script (it supports cooccs, too!)
@@ -300,9 +301,9 @@ class Visualizer:
 
                 if (var_types[0] == "coordinates") and (var_types[1] == "coordinates"):
                     if (var_semantics[0] == "spatial") and (var_semantics[1] == "spatial"):
-                        # Create a scatter geo chart object
                         print(f"INFO: {self.variable_names[0]} and {self.variable_names[1]} will be considered as the "
                             f"latitude and longitude, respectively.")
+                        # Create a scatter geo chart object
                         chart = ScatterGeoChart(
                             df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
                             self.variable_values[metric], self.args.top_per_class_ngrams,
@@ -310,6 +311,14 @@ class Visualizer:
                         # Save the chart to the output folder
                         chart.save(os.path.join(
                             self.args.output_folder, "scatter_geo_chart"), self.args.output_formats)
+                        # Create a density geo chart object
+                        # @TODO: It works on very basic scenarios, envisioned for version 0.2.0
+                        # chart = DensityGeoChart(
+                        #     df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
+                        #     self.variable_values[metric], self.args.top_per_class_ngrams)
+                        # # Save the chart to the output folder
+                        # chart.save(os.path.join(
+                        #     self.args.output_folder, "density_geo_chart"), self.args.output_formats)
 
                         # @TODO: create a hexbin mapbox chart object in case of binning
                     
