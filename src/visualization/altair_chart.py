@@ -1,6 +1,7 @@
 import altair as alt
 import os
 import pandas as pd
+import vl_convert as vlc
 
 from typing import Union, Optional
 
@@ -218,30 +219,42 @@ class AltairChart(Chart):
 
             # Save the chart to a PDF file in the output folder
             if "pdf" in output_formats:
-                # Get the raw data from the chart (it requires "vl_convert" to be installed)
-                pdf_data = vlc.vegalite_to_pdf(self.chart.to_json())
+                try:
+                    # Get the raw data from the chart (it requires "vl_convert" to be installed)
+                    pdf_data = vlc.vegalite_to_pdf(self.chart.to_json())
 
-                # Write the raw data to the output filepath
-                with open(os.path.join(FOLDER_PATH, "chart.pdf"), "wb") as f:
-                    f.write(pdf_data)
+                    # Write the raw data to the output filepath
+                    with open(os.path.join(FOLDER_PATH, "chart.pdf"), "wb") as f:
+                        f.write(pdf_data)
+                except Exception:
+                    print("The dataset is too big to be serialized as PDF efficiently. Please "
+                        "use the interactive HTML.")
 
             # Save the chart to a SVG file in the output folder
             if "svg" in output_formats:
-                # Get the raw data from the chart (it requires "vl_convert" to be installed)
-                svg_data = vlc.vegalite_to_svg(self.chart.to_json())
+                try:
+                    # Get the raw data from the chart (it requires "vl_convert" to be installed)
+                    svg_data = vlc.vegalite_to_svg(self.chart.to_json())
 
-                # Write the raw data to the output filepath
-                with open(os.path.join(FOLDER_PATH, "chart.svg"), "wt") as f:
-                    f.write(svg_data)
+                    # Write the raw data to the output filepath
+                    with open(os.path.join(FOLDER_PATH, "chart.svg"), "wt") as f:
+                        f.write(svg_data)
+                except Exception:
+                    print("The dataset is too big to be serialized as SVG efficiently. Please "
+                        "use the interactive HTML.")
 
             # Save the chart to a PNG file in the output folder
             if "png" in output_formats:
-                # Get the raw data from the chart (it requires "vl_convert" to be installed)
-                png_data = vlc.vegalite_to_png(self.chart.to_json())
+                try:
+                    # Get the raw data from the chart (it requires "vl_convert" to be installed)
+                    png_data = vlc.vegalite_to_png(self.chart.to_json())
 
-                # Write the raw data to the output filepath
-                with open(os.path.join(FOLDER_PATH, "chart.png"), "wb") as f:
-                    f.write(png_data)
+                    # Write the raw data to the output filepath
+                    with open(os.path.join(FOLDER_PATH, "chart.png"), "wb") as f:
+                        f.write(png_data)
+                except Exception:
+                    print("The dataset is too big to be serialized as PNG efficiently. Please "
+                        "use the interactive HTML.")
 
         # Otherwise, raise an error
         else:
