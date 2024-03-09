@@ -103,18 +103,29 @@ class Visualizer:
         self.args = args
         self.metadata = dict()
         self.df_metric_data = dict()
+        self.variable_names = dict()
         self.variable_values = dict()
 
         # Load the json object storing metadata and results
         json_data = utils.load_json_data_from_filepath_or_dict(input_json)
 
-        # Get the metadata and per-metric long-form dataframes from the json
+        # Get the metadata and variable names from the json
         self.metadata = json_data["metadata"]
+        self.variable_names = self.metadata["var_names"]
+
+        # Get per-metric long-form dataframes from the json
         for metric in self.metadata["metrics"]:
-            self.variable_values[metric] = list(json_data["metrics"][metric].keys())
+            # Store the concatenated string useful for multiple variables
+            var_names_concat = utils.MULTI_VAR_SEP.join(self.variable_names)
+
+            # Retrieve the possible values for the variable (combination) and the given metric
+            self.variable_values[metric] = list(
+                json_data["metrics"][metric][var_names_concat].keys())
+
+            # Get the long-form dataframe
             self.df_metric_data[metric] = self.get_df_from_json(
                 json_data = json_data["metrics"][metric], 
-                var_names = self.metadata["var_names"],
+                var_names_concat = var_names_concat,
                 top_per_class_ngrams = self.args.top_per_class_ngrams,
                 focus_ngrams = self.args.ngrams)
 
@@ -122,7 +133,7 @@ class Visualizer:
     def get_df_from_json(
         self,
         json_data: dict[str, Any],
-        var_names: list,
+        var_names_concat: str,
         top_per_class_ngrams: int,
         focus_ngrams: Optional[list[str]] = None,
     ) -> pd.core.frame.DataFrame:
@@ -136,8 +147,9 @@ class Visualizer:
         json_data: dict[str, Any]
             The json object storing the results from a prior analysis in the form:
             {varA: {ngram1: value1, ngram2: value2, ...}, varB: {...}, ...}
-        var_names: list
-            A list of variable names (i.e., original column names) to be used for
+        var_names_concat: str
+            A string denoting the ordered concatenation of variable names (i.e., 
+            original column names), separated by utils.MULTI_VAR_SEP, to be used for 
             giving meaningful names to the long-form dataframe.
         top_per_class_ngrams: int = 20
             The maximum number of highest scoring per-class n-grams to show. If set to 
@@ -155,27 +167,29 @@ class Visualizer:
         """
 
         # Initialize the lists for variables, ngrams, and values
-        variables, ngrams, values = [], [], []
+        variables, ngrams, values = dict(), [], []
 
-        # Get a machine-readable name for the variable(s) under consideration
-        variable_key = " ".join(var_names)
+        # Get the individual variables and initialize each of them
+        var_names = var_names_concat.split(utils.MULTI_VAR_SEP)
+        for var_name in var_names:
+            variables[var_name] = []
 
-        # Iterate through variables and ngram-value pairs and keep those of interest
-        for variable, raw_items in json_data.items():
+        # Iterate through variable values and ngram-value pairs and keep those of interest
+        for variable, raw_items in json_data[var_names_concat].items():
             for ngram, value in raw_items.items():
                 if (focus_ngrams != None) and (ngram not in focus_ngrams):
                     continue
                 else:
-                    variables.append(variable)
+                    for i in range(len(var_names)):
+                        variables[var_names[i]].append(variable.split(utils.MULTI_VAR_SEP)[i])
                     ngrams.append(ngram)
                     values.append(value)
 
         # Create the long-form dataframe
-        df_data = pd.DataFrame({
-            variable_key: variables,
-            "ngram": ngrams,
-            "value": values
-        })
+        dict_data = variables
+        dict_data["ngram"] = ngrams
+        dict_data["value"] = values
+        df_data = pd.DataFrame(dict_data)
         
         return df_data
 

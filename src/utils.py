@@ -12,6 +12,7 @@ from typing import Union
 # CONSTANTS
 TEXT_COLS_KEY = "text"
 LABEL_COLS_KEY = "labels"
+MULTI_VAR_SEP = "::"
 
 
 def load_json_data_from_filepath_or_dict(
