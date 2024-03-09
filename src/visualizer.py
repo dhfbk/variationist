@@ -8,6 +8,7 @@ from src.visualization.bar_chart import BarChart
 from src.visualization.temporal_line_chart import TemporalLineChart
 from src.visualization.scatter_chart import ScatterChart
 from src.visualization.choropleth_chart import ChoroplethChart
+from src.visualization.scatter_geo_chart import ScatterGeoChart
 
 
 # @TODO: Maybe change the "ngrams" name for clarity across the script (it supports cooccs, too!)
@@ -297,15 +298,30 @@ class Visualizer:
                 var_types = self.metadata["var_types"]
                 var_semantics = self.metadata["var_semantics"]
 
-                # @TODO: Spatial
-                # Create a point map chart object
-                # Create a hexbin mapbox (?) chart object
-                # Create a mapbox density heatmap chart object
+                if (var_types[0] == "coordinates") and (var_types[1] == "coordinates"):
+                    if (var_semantics[0] == "spatial") and (var_semantics[1] == "spatial"):
+                        # Create a scatter geo chart object
+                        print(f"INFO: {self.variable_names[0]} and {self.variable_names[1]} will be considered as the "
+                            f"latitude and longitude, respectively.")
+                        chart = ScatterGeoChart(
+                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
+                            self.variable_values[metric], self.args.top_per_class_ngrams,
+                            self.args.shapefile_path)
+                        # Save the chart to the output folder
+                        chart.save(os.path.join(
+                            self.args.output_folder, "scatter_geo_chart"), self.args.output_formats)
 
-                raise NotImplementedError(
-                    f"Visualization for 2 variable types is not supported yet.")
+                        # @TODO: create a hexbin mapbox chart object in case of binning
+                    
+                    else:
+                        raise NotImplementedError(
+                            f"Visualization for variable types {var_types} ({var_semantics}) is not supported yet.")
+
+                else:
+                    raise NotImplementedError(
+                        f"Visualization for variable types {var_types} ({var_semantics}) is not supported yet.")
 
             else:
                 raise NotImplementedError(
-                    f"Visualization for >=2 variable types is not supported yet.")
+                    f"Visualization for >=3 variable types is not supported yet.")
 

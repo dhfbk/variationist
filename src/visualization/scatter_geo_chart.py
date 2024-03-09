@@ -12,8 +12,8 @@ from src.visualization.altair_chart import AltairChart
 gpd.options.io_engine = "pyogrio"
 
 
-class ChoroplethChart(AltairChart):
-    """A class for building a ChoroplethChart object."""
+class ScatterGeoChart(AltairChart):
+    """A class for building a ScatterGeoChart object."""
 
     def __init__(
         self,
@@ -25,10 +25,9 @@ class ChoroplethChart(AltairChart):
         variable_values: list = [],
         top_per_class_ngrams: Optional[int] = None,
         shapefile_path: Optional[str] = None,
-        shapefile_var_name: Optional[str] = None,
     ) -> None:
         """
-        Initialization function for a building a ChoroplethChart object.
+        Initialization function for a building a ScatterGeoChart object.
 
         Parameters
         ----------
@@ -57,11 +56,6 @@ class ChoroplethChart(AltairChart):
             in the same folder as the .shp file itself. An example of repository where to
             find shapefiles is https://geodata.lib.berkeley.edu/, but there exists many
             other ones and shapefiles provided by national/regional institutions.
-        shapefile_var_name: Optional[str] = None
-            The key field name in the shapefile which contains the names for the areas 
-            which should match the possible values for the variable of interest (e.g., 
-            if the variable of interest is "state", here should go the name of the
-            variable name encoded in the shapefile containing the possible states).
         """
 
         super().__init__(df_data, chart_metric, metadata, filterable, zoomable, variable_values)
@@ -76,7 +70,6 @@ class ChoroplethChart(AltairChart):
 
         # Set extra attributes
         self.shapefile_path = shapefile_path
-        self.shapefile_var_name = shapefile_var_name
 
         # Check if the specified filepath "shapefile_path" is defined and exists. If not, warn and exit
         if shapefile_path is None:
@@ -87,54 +80,34 @@ class ChoroplethChart(AltairChart):
         # Load the shapefile and transform geometries to a standard coordinate reference system
         gdf = gpd.read_file(shapefile_path).to_crs("epsg:4286")
 
-        # Check if the specified column "shapefile_var_name" exists in the geodataframe
-        # If not, warn the user, give them the available options, and exit
-        if shapefile_var_name not in gdf.columns:
-            raise ValueError(f"ERROR. The key \"{shapefile_var_name}\" is not in the shapefile.",
-                f"\"{shapefile_path}\".\nPlease use one among: {', '.join([col for col in gdf.columns])}.")
-
-        # Check if some variable values (area names) do not match the area names in the shapefile
-        # If not, warn the user and give them the available values that can possibly match.
-        variable_values_not_matched = []
-        variable_values_gdf = list(gdf[shapefile_var_name])
-        for variable_value in variable_values:
-            if variable_value not in variable_values_gdf:
-                variable_values_not_matched.append(variable_value)
-        if len(variable_values_not_matched) > 0:
-            print(f"WARNING. Some area names defined in the dataset do not match the area names",
-                f"defined in the shapefile \"{shapefile_path}\" and therefore will not be part of",
-                f"the chart. Consider renaming the area names without a match.\n",
-                f"\tArea names without a match: {', '.join(variable_values_not_matched)}.\n",
-                f"\tArea names from the shapefile: {', '.join(variable_values_gdf)}.\n")
-
         # Set background chart style
         background = alt.Chart(gdf).mark_geoshape(
             stroke="white", strokeWidth=0.5, fill="#e1e7e3")
 
         # Set base chart style
-        self.base_chart = self.base_chart.mark_geoshape(
-            stroke="white", strokeWidth=0.5)
-
-        # Collect information from the geopandas dataframe
-        self.base_chart = self.base_chart.transform_lookup(
-            lookup = self.var_names[0],
-            from_ = alt.LookupData(data=gdf, key=shapefile_var_name, fields=["geometry", "type"]))
+        self.base_chart = self.base_chart.mark_point(
+            size=75, strokeWidth=0.5)
 
         # Set dimensions
         # @TODO: Fix "min" and "NaN" together in the starting legend
+        lat_dim = alt.Latitude(self.var_names[0], type="quantitative")
+        lon_dim = alt.Longitude(self.var_names[1], type="quantitative")
         color = alt.Color("value", type="quantitative", title=chart_metric,
             scale=alt.Scale(scheme="lighttealblue", domainMin=min(self.df_data["value"])))
 
         # Set tooltip
         tooltip = [
             alt.Tooltip("ngram", type="nominal", title=self.text_label),
-            alt.Tooltip(self.var_names[0], type=self.var_types[0]),
+            alt.Tooltip(self.var_names[0], type="quantitative"),
+            alt.Tooltip(self.var_names[1], type="quantitative"),
             alt.Tooltip("value", type="quantitative", title=self.metric_label)
         ]
 
         # Encoding the data
         self.base_chart = self.base_chart.encode(
             # Note: fill=color will be conditionally added by the "add_dropdown_component"
+            lat_dim,
+            lon_dim,
             tooltip = tooltip
         )
 
@@ -144,14 +117,14 @@ class ChoroplethChart(AltairChart):
         self.base_chart = self.base_chart.properties(width=chart_base_size, height=chart_base_size)
 
         # If the chart has to be filterable, create and add a search component to it
-        # Note: the chart is always filterable for choropleth charts
+        # Note: the chart is always filterable for scatter geo charts
         if self.filterable == True:
             dropdown_elements = list(set(df_data["ngram"]))
             self.base_chart = self.add_dropdown_component(self.base_chart, tooltip, ["ngram"], dropdown_elements, color)
 
-        # If the chart has to be zoomable, set the property (not supported for choropleth chart by Altair)
+        # If the chart has to be zoomable, set the property (not supported for scatter geo chart by Altair)
         # if self.zoomable == True:
-        #     print(f"INFO: Zoom is not supported for choropleth charts by Altair.")
+        #     print(f"INFO: Zoom is not supported for scatter geo charts by Altair.")
         #     self.base_chart = self.base_chart.interactive()
 
         # Create the final chart
