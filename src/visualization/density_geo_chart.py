@@ -21,6 +21,7 @@ class DensityGeoChart(PlotlyChart):
         chart_metric: str,
         metadata: dict,
         extra_args: dict = {},
+        chart_dims: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
@@ -40,6 +41,8 @@ class DensityGeoChart(PlotlyChart):
             A dictionary storing the metadata about the prior analysis.
         extra_args: dict = {}
             A dictionary storing the extra arguments for this chart type. Default = {}.
+        chart_dims: dict
+            The mapping dictionary for the variables for the given chart.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -63,18 +66,23 @@ class DensityGeoChart(PlotlyChart):
         else:
             self.text_label = "tokens"
 
+        # Get relevant dimensions
+        lat_name, lat_type = self.get_dim("lat", chart_dims)
+        lon_name, lon_type = self.get_dim("lon", chart_dims)
+        color_name, color_type = self.get_dim("color", chart_dims)
+
         # Get the centroids for centering the world map
-        centroid_lat = (df_data[self.var_names[0]].astype(float).max() + df_data[self.var_names[0]].astype(float).min()) / 2
-        centroid_lon = (df_data[self.var_names[1]].astype(float).max() + df_data[self.var_names[1]].astype(float).min()) / 2
+        centroid_lat = (df_data[lat_name].astype(float).max() + df_data[lat_name].astype(float).min()) / 2
+        centroid_lon = (df_data[lon_name].astype(float).max() + df_data[lon_name].astype(float).min()) / 2
 
         # Set base chart style, dimensions, tooltip, encoding, and extra properties
         self.base_chart = px.density_mapbox(
             df_data, 
 
             # Set dimensions
-            lat = self.var_names[0],
-            lon = self.var_names[1],
-            z = "value",
+            lat = lat_name,
+            lon = lon_name,
+            z = color_name,
 
             # Set base chart style
             radius = 10,
@@ -86,10 +94,10 @@ class DensityGeoChart(PlotlyChart):
 
             # Set tooltip
             hover_data = {
-                self.var_names[0]: True,
-                self.var_names[1]: True,
+                lat_name: True,
+                lon_name: True,
                 "ngram": True,
-                "value": ':.0f'
+                color_name: ':.0f'
             }
         )
 

@@ -14,34 +14,36 @@ VAR_CHARTS_MAP = {
         "coordinates": {
             "general": {
                 ScatterChart: {
-                    "x": 0,
-                    "y": "value",
+                    "x": (0, "quantitative"),
+                    "y": ("value", "quantitative"),
                     "dropdown": [],
-                    "search": ["ngram"]
+                    "search": [("ngram", "nominal")]
                 },
             },
         },
         "nominal": {
             "general": {
                 BarChart: {
-                    "x": "value",
-                    "y": "ngram",
-                    "column": 0,
+                    "x": ("value", "quantitative"),
+                    "y": ("ngram", "nominal"),
+                    "column": (0, "nominal"),
+                    "color": (0, "nominal"),
                     "dropdown": [],
-                    "search": ["ngram"]
+                    "search": [("ngram", "nominal")]
                 },
             },
             "spatial": {
                 BarChart: {
-                    "x": "value",
-                    "y": "ngram",
-                    "column": 0,
+                    "x": ("value", "quantitative"),
+                    "y": ("ngram", "nominal"),
+                    "column": (0, "nominal"),
+                    "color": (0, "nominal"),
                     "dropdown": [],
-                    "search": ["ngram"]
+                    "search": [("ngram", "nominal")]
                 },
                 ChoroplethChart: {
-                    "color": 0,
-                    "dropdown": ["ngram"],
+                    "color": (0, "nominal"),
+                    "dropdown": [("ngram", "nominal")],
                     "search": []
                 },
             },
@@ -49,29 +51,30 @@ VAR_CHARTS_MAP = {
         "ordinal": {
             "general": {
                 BarChart: {
-                    "x": "value",
-                    "y": "ngram",
-                    "column": 0,
+                    "x": ("value", "quantitative"),
+                    "y": ("ngram", "nominal"),
+                    "column": (0, "nominal"),
+                    "color": (0, "nominal"),
                     "dropdown": [],
-                    "search": ["ngram"]
+                    "search": [("ngram", "nominal")]
                 },
             },
             "temporal": {
                 TemporalLineChart: {
-                    "x": 0,
-                    "y": "value",
+                    "x": (0, "temporal"),
+                    "y": ("value", "quantitative"),
                     "dropdown": [],
-                    "search": ["ngram"]
+                    "search": [("ngram", "nominal")]
                 },
             },
         },
         "quantitative": {
             "general": {
                 ScatterChart: {
-                    "x": 0,
-                    "y": "value",
+                    "x": (0, "quantitative"),
+                    "y": ("value", "quantitative"),
                     "dropdown": [],
-                    "search": ["ngram"]
+                    "search": [("ngram", "nominal")]
                 },
             },
         },
@@ -88,12 +91,19 @@ VAR_CHARTS_MAP = {
             },
             "spatial-spatial": {
                 ScatterGeoChart: {
-                    "lat": 0,
-                    "lon": 1,
-                    "color": "value",
+                    "lat": (0, "quantitative"),
+                    "lon": (1, "quantitative"),
+                    "color": ("value", "quantitative"),
                     "dropdown": [],
-                    "search": ["ngram"]
+                    "search": [("ngram", "nominal")]
                 },
+                # DensityGeoChart: {
+                #     "lat": (0, "quantitative"),
+                #     "lon": (1, "quantitative"),
+                #     "color": ("value", "quantitative"),
+                #     "dropdown": [],
+                #     "search": [("ngram", "nominal")]
+                # },
             },
         },
         "coordinates-nominal": { # lexicographically-ordered, also below if same var_types

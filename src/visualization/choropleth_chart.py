@@ -21,6 +21,7 @@ class ChoroplethChart(AltairChart):
         chart_metric: str,
         metadata: dict,
         extra_args: dict = {},
+        chart_dims: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
@@ -40,6 +41,8 @@ class ChoroplethChart(AltairChart):
             A dictionary storing the metadata about the prior analysis.
         extra_args: dict = {}
             A dictionary storing the extra arguments for this chart type. Default = {}.
+        chart_dims: dict
+            The mapping dictionary for the variables for the given chart.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -105,9 +108,12 @@ class ChoroplethChart(AltairChart):
         self.base_chart = self.base_chart.mark_geoshape(
             stroke="white", strokeWidth=0.5)
 
+        # Get relevant dimensions
+        color_name, color_type = self.get_dim("color", chart_dims)
+
         # Collect information from the geopandas dataframe
         self.base_chart = self.base_chart.transform_lookup(
-            lookup = self.var_names[0],
+            lookup = color_name,
             from_ = alt.LookupData(data=gdf, key=self.shapefile_var_name, fields=["geometry", "type"]))
 
         # Set dimensions
@@ -118,7 +124,7 @@ class ChoroplethChart(AltairChart):
         # Set tooltip
         tooltip = [
             alt.Tooltip("ngram", type="nominal", title=self.text_label),
-            alt.Tooltip(self.var_names[0], type=self.var_types[0]),
+            alt.Tooltip(color_name, type=color_type),
             alt.Tooltip("value", type="quantitative", title=self.metric_label)
         ]
 

@@ -215,8 +215,6 @@ class Visualizer:
         var_types = self.metadata["var_types"]
         var_semantics = self.metadata["var_semantics"]
 
-        # @TODO: Handle metrics, too
-
         # Double check the lengths of var_types and var_semantics (they must be the same)
         assert len(var_types) == len(var_semantics)
 
@@ -280,8 +278,8 @@ class Visualizer:
         # semantics, then save them to the user-specified output folder
         for metric, df_data in self.df_metric_data.items():
             # @TODO: Differentiate chart creation by metric
-            # @TODO: Add error messages for chart-specific parameters
 
+            # @TODO:
             # var_granularities = self.metadata["var_granularities"]
             # var_bins = self.metadata["var_bins"]
 
@@ -293,7 +291,7 @@ class Visualizer:
                 # Create the chart object
                 print(f"INFO: Creating a {ChartClass.__name__} object...")
                 chart = ChartClass(
-                    df_data, metric, self.metadata, extra_args, self.args.filterable, self.args.zoomable,
+                    df_data, metric, self.metadata, extra_args, chart_info, self.args.filterable, self.args.zoomable,
                     self.variable_values[metric], self.args.top_per_class_ngrams)
                 
                 # Save the chart to the output folder

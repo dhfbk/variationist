@@ -213,6 +213,44 @@ class AltairChart(Chart):
         return base_chart
 
 
+    def get_dim(
+        self,
+        dim: Union[int, str],
+        chart_dims: dict,
+    ) -> (str, str):
+        """
+        A function that returns the name and (altair) type of a variable given a
+        chart dimension and the previously stored variable names, types, and semantics.
+
+        Parameters
+        ----------
+        dim: Union[int, str]
+            The dimension of interest (e.g., "x", "y", "lat", "lon", "color", etc).
+        chart_dims: dict
+            The mapping dictionary for the variables for the given chart.
+
+        Returns
+        -------
+        var_name: str
+            The variable name referring to the dimension of interest.
+        var_type_: str
+            The (altair) variable type referring to the dimension of interest.
+        """
+
+        # Simultaneously order the lists referring to the variables
+        var_types_ord, var_semantics_ord, var_names_ord = zip(
+            *sorted(zip(self.var_types, self.var_semantics, self.var_names)))
+
+        # Get the ordered list of variable names
+        var_names = list(var_names_ord)
+
+        # Get the variable name (from string or its index) and the (altair) type for plotting
+        var_name = chart_dims[dim][0] if (type(chart_dims[dim][0])==str) else var_names[chart_dims[dim][0]]
+        var_type_ = chart_dims[dim][1]
+        
+        return var_name, var_type_
+
+
     def save(
         self,
         output_folder: str,

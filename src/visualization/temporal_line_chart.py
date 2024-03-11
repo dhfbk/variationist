@@ -15,6 +15,7 @@ class TemporalLineChart(AltairChart):
         chart_metric: str,
         metadata: dict,
         extra_args: dict = {},
+        chart_dims: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
@@ -34,6 +35,8 @@ class TemporalLineChart(AltairChart):
             A dictionary storing the metadata about the prior analysis.
         extra_args: dict = {}
             A dictionary storing the extra arguments for this chart type. Default = {}.
+        chart_dims: dict
+            The mapping dictionary for the variables for the given chart.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -60,16 +63,20 @@ class TemporalLineChart(AltairChart):
         # Set base chart style
         self.base_chart = self.base_chart.mark_line(point=True, strokeDash=[1, 0])
 
+        # Get relevant dimensions
+        x_name, x_type = self.get_dim("x", chart_dims)
+        y_name, y_type = self.get_dim("y", chart_dims)
+
         # Set dimensions
-        x_dim = alt.X(self.var_names[0], type=self.var_semantics[0])
-        y_dim = alt.Y("value", type="quantitative", title=chart_metric)
+        x_dim = alt.X(x_name, type=x_type)
+        y_dim = alt.Y(y_name, type=y_type, title=chart_metric)
         color = alt.Color("ngram", type="nominal", title="", legend=None)
 
         # Set tooltip (it will be overwritten if "filterable" is True)
         tooltip = [
             alt.Tooltip("ngram", type="nominal", title=self.text_label),
-            alt.Tooltip(self.var_names[0], type=self.var_semantics[0]),
-            alt.Tooltip("value", type="quantitative", title=self.metric_label)
+            alt.Tooltip(x_name, type=x_type),
+            alt.Tooltip(y_name, type=y_type, title=self.metric_label)
         ]
 
         # Encoding the data

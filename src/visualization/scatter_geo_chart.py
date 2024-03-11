@@ -21,6 +21,7 @@ class ScatterGeoChart(AltairChart):
         chart_metric: str,
         metadata: dict,
         extra_args: dict = {},
+        chart_dims: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
@@ -41,6 +42,8 @@ class ScatterGeoChart(AltairChart):
             A dictionary storing the metadata about the prior analysis.
         extra_args: dict = {}
             A dictionary storing the extra arguments for this chart type. Default = {}.
+        chart_dims: dict
+            The mapping dictionary for the variables for the given chart.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -61,7 +64,8 @@ class ScatterGeoChart(AltairChart):
             other ones and shapefiles provided by national/regional institutions.
         """
 
-        super().__init__(df_data, chart_metric, metadata, filterable, zoomable, variable_values)
+        super().__init__(
+            df_data, chart_metric, metadata, extra_args, filterable, zoomable, variable_values)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
@@ -91,19 +95,24 @@ class ScatterGeoChart(AltairChart):
         self.base_chart = self.base_chart.mark_point(
             size=75, strokeWidth=0.5)
 
+        # Get relevant dimensions
+        lat_name, lat_type = self.get_dim("lat", chart_dims)
+        lon_name, lon_type = self.get_dim("lon", chart_dims)
+        color_name, color_type = self.get_dim("color", chart_dims)
+
         # Set dimensions
         # @TODO: Fix "min" and "NaN" together in the starting legend
-        lat_dim = alt.Latitude(self.var_names[0], type="quantitative")
-        lon_dim = alt.Longitude(self.var_names[1], type="quantitative")
-        color = alt.Color("value", type="quantitative", title=chart_metric,
-            scale=alt.Scale(scheme="lighttealblue", domainMin=min(self.df_data["value"])))
+        lat_dim = alt.Latitude(lat_name, type=lat_type)
+        lon_dim = alt.Longitude(lon_name, type=lon_type)
+        color = alt.Color(color_name, type=color_type, title=chart_metric,
+            scale=alt.Scale(scheme="lighttealblue", domainMin=min(self.df_data[color_name])))
 
         # Set tooltip
         tooltip = [
             alt.Tooltip("ngram", type="nominal", title=self.text_label),
-            alt.Tooltip(self.var_names[0], type="quantitative"),
-            alt.Tooltip(self.var_names[1], type="quantitative"),
-            alt.Tooltip("value", type="quantitative", title=self.metric_label)
+            alt.Tooltip(lat_name, type=lat_type),
+            alt.Tooltip(lon_name, type=lon_type),
+            alt.Tooltip(color_name, type=color_type, title=self.metric_label)
         ]
 
         # Encoding the data

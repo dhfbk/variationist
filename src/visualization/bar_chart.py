@@ -15,6 +15,7 @@ class BarChart(AltairChart):
         chart_metric: str,
         metadata: dict,
         extra_args: dict = {},
+        chart_dims: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
@@ -34,6 +35,8 @@ class BarChart(AltairChart):
             A dictionary storing the metadata about the prior analysis.
         extra_args: dict = {}
             A dictionary storing the extra arguments for this chart type. Default = {}.
+        chart_dims: dict
+            The mapping dictionary for the variables for the given chart.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -61,25 +64,31 @@ class BarChart(AltairChart):
         # Set base chart style
         self.base_chart = self.base_chart.mark_bar(height=15, binSpacing=0.5, cornerRadiusEnd=5)
 
+        # Get relevant dimensions
+        x_name, x_type = self.get_dim("x", chart_dims)
+        y_name, y_type = self.get_dim("y", chart_dims)
+        column_name, column_type = self.get_dim("column", chart_dims)
+        color_name, color_type = self.get_dim("color", chart_dims)
+
         # Set dimensions
-        x_dim = alt.X("value", type="quantitative", title=chart_metric)
-        y_dim = alt.Y("ngram", type="nominal", title="").sort("-x")
-        column_dim = alt.Column(self.var_names[0], type=self.var_types[0], 
+        x_dim = alt.X(x_name, type=x_type, title=chart_metric)
+        y_dim = alt.Y(y_name, type=y_type, title="").sort("-x")
+        column_dim = alt.Column(column_name, type=column_type, 
             header=alt.Header(labelFontWeight="bold"))
-        color = alt.Color(self.var_names[0], self.var_types[0], legend=None) # for aestethics only
+        color = alt.Color(color_name, color_type, legend=None) # for aestethics only
 
         # Set tooltip (it will be overwritten if "filterable" is True)
         tooltip = [
-            alt.Tooltip("ngram", type="nominal", title=self.text_label),
-            alt.Tooltip("value", type="quantitative", title=self.metric_label)
+            alt.Tooltip(y_name, type=y_type, title=self.text_label),
+            alt.Tooltip(x_name, type=x_type, title=self.metric_label)
         ]
 
         # Filter data to show up to k top ngrams (based on their value for the metric) for each group
         self.base_chart = self.base_chart.transform_window(
-            rank = "rank(value)",
-            sort = [alt.SortField("value", order="descending"),
-                  alt.SortField("ngram", order="ascending")], # break ties in ranking (@temp)
-            groupby = [self.var_names[0]]
+            rank = "rank(" + x_name + ")",
+            sort = [alt.SortField(x_name, order="descending"),
+                  alt.SortField(y_name, order="ascending")], # break ties in ranking (@temp)
+            groupby = [column_name]
         ).transform_filter(
             alt.datum.rank <= self.top_per_class_ngrams
         )
