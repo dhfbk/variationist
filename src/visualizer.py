@@ -4,12 +4,7 @@ import pandas as pd
 from typing import Any, Optional, Union
 
 from src import utils
-from src.visualization.bar_chart import BarChart
-from src.visualization.temporal_line_chart import TemporalLineChart
-from src.visualization.scatter_chart import ScatterChart
-from src.visualization.choropleth_chart import ChoroplethChart
-from src.visualization.scatter_geo_chart import ScatterGeoChart
-# from src.visualization.density_geo_chart import DensityGeoChart
+from src.visualization import chart_utils
 
 
 # @TODO: Maybe change the "ngrams" name for clarity across the script (it supports cooccs, too!)
@@ -140,7 +135,7 @@ class Visualizer:
         focus_ngrams: Optional[list[str]] = None,
     ) -> pd.core.frame.DataFrame:
         """
-        A method that returns a long-form dataframe from a json which 
+        A function that returns a long-form dataframe from a json which 
         stores the information about a prior analysis using Variationist.
         Optionally, it takes a list of ngrams to focus the filtering on.
 
@@ -183,7 +178,7 @@ class Visualizer:
                     continue
                 else:
                     for i in range(len(var_names)):
-                        variables[var_names[i]].append(variable.split(utils.MULTI_VAR_SEP)[i])
+                        variables[var_names[i]].append(str(variable).split(utils.MULTI_VAR_SEP)[i])
                     ngrams.append(ngram)
                     values.append(value)
 
@@ -196,6 +191,76 @@ class Visualizer:
         return df_data
 
 
+    def get_charts_metadata(
+        self,
+        metric: str,
+    ) -> dict[str, Any]:
+        """
+        A function that returns a dictionary containing information on which and how to 
+        create charts given prior analysis' var_types and var_semantics metadata.
+
+        Parameters
+        ----------
+        metric: str
+            The metric associated to the "df_data" dataframe and thus to the charts.
+
+        Returns
+        -------
+        charts_metadata: dict[str, Any]
+            A dictionary containing the chart types and information on how to create them.
+        """
+
+        # Get lists of attributes for variables
+        var_names = self.metadata["var_names"]
+        var_types = self.metadata["var_types"]
+        var_semantics = self.metadata["var_semantics"]
+
+        # @TODO: Handle metrics, too
+
+        # Double check the lengths of var_types and var_semantics (they must be the same)
+        assert len(var_types) == len(var_semantics)
+
+        # Check if there are variables and those are at maximum three
+        if (1 <= len(var_types) <= 3):
+            # Get the key for dimensions (the amount of dimensions equals to #variables+2)
+            dims_key = str(len(var_types) + 2) + "-dims"
+
+            # If there is only a variable, there is no need to order/join names, just take the values
+            if len(var_types) == 1:
+                var_types_key = var_types[0]
+                var_semantics_key = var_semantics[0]
+            # Otherwise, we need to create an ordered concatenation of variables for searching
+            else:
+                var_types_ord, var_semantics_ord = zip(*sorted(zip(var_types, var_semantics)))
+                var_types_key = '-'.join([var_type for var_type in var_types_ord])
+                var_semantics_key = '-'.join([var_semantics for var_semantics in var_semantics_ord])
+            
+            # Check if the variable type(s) are supported
+            if var_types_key in chart_utils.VAR_CHARTS_MAP[dims_key]:
+                # Check if the combination of the variable type(s) and semantics are supported
+                # If yes, take the dictionary with chart building information
+                if var_semantics_key in chart_utils.VAR_CHARTS_MAP[dims_key][var_types_key]:
+                    charts_metadata = chart_utils.VAR_CHARTS_MAP[dims_key][var_types_key][var_semantics_key]
+                # Otherwise, raise an error
+                else:
+                    raise ValueError(
+                        f"Visualization for \"{var_types_key}\" variable type(s) and \"{var_semantics_key}\" "
+                        f"variable semantics is currently not supported. If you have any idea to effectively "
+                        f"visualize such combination of types and semantics, we would be happy if you let us "
+                        f"know by opening an issue at: https://github.com/dhfbk/variationist/issues.")
+            # Otherwise, raise an error
+            else:
+                raise ValueError(
+                    f"Visualization for \"{var_type_key}\" variable type(s) is not supported.")
+
+        # Otherwise, raise an error
+        else:
+            raise ValueError(
+                f"Visualization for {len(var_types)} variable types is not supported yet.")
+        
+        return charts_metadata
+
+
     def visualize(
         self,
     ) -> None:
@@ -204,133 +269,34 @@ class Visualizer:
         and metadata from a prior analysis using Variationist.
         """
 
-        # Build a chart object for each computed metric based on variable types and
-        # semantics, then save it to the user-specified output folder
+        # Create a dictionary of chart-specific arguments
+        extra_args = {}
+        if self.args.shapefile_path != None:
+            extra_args["shapefile_path"] = self.args.shapefile_path
+        if self.args.shapefile_var_name != None:
+            extra_args["shapefile_var_name"] = self.args.shapefile_var_name
+
+        # Build chart objects for each computed metric based on variable types and
+        # semantics, then save them to the user-specified output folder
         for metric, df_data in self.df_metric_data.items():
             # @TODO: Differentiate chart creation by metric
             # @TODO: Add error messages for chart-specific parameters
 
-            if (len(self.metadata["var_types"]) == 1):
-                var_type = self.metadata["var_types"][0]
-                var_semantics = self.metadata["var_semantics"][0]
+            # var_granularities = self.metadata["var_granularities"]
+            # var_bins = self.metadata["var_bins"]
 
-                if var_type == "nominal":
-                    if var_semantics == "general":
-                        # Create a bar chart object
-                        chart = BarChart(
-                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                            self.variable_values[metric], self.args.top_per_class_ngrams)
-                        # Save the chart to the output folder
-                        chart.save(os.path.join(
-                            self.args.output_folder, "bar_chart"), self.args.output_formats)
-                    elif var_semantics == "spatial":
-                        # Create a bar chart object
-                        chart = BarChart(
-                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                            self.variable_values[metric], self.args.top_per_class_ngrams)
-                        # Save the chart to the output folder
-                        chart.save(os.path.join(
-                            self.args.output_folder, "bar_chart"), self.args.output_formats)
-                        # Create a choropleth map chart object
-                        chart = ChoroplethChart(
-                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                            self.variable_values[metric], self.args.top_per_class_ngrams,
-                            self.args.shapefile_path, self.args.shapefile_var_name)
-                        # Save the chart to the output folder
-                        chart.save(os.path.join(
-                            self.args.output_folder, "choropleth_chart"), self.args.output_formats)
-                    else:
-                        # @TODO: Indications of which var_type / var_semantics should be
-                        raise ValueError(
-                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
-                elif var_type == "ordinal":
-                    if var_semantics == "general":
-                        # Create a bar chart object
-                        chart = BarChart(
-                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                            self.variable_values[metric], self.args.top_per_class_ngrams)
-                        # Save the chart to the output folder
-                        chart.save(os.path.join(
-                            self.args.output_folder, "bar_chart"), self.args.output_formats)
-                    elif var_semantics == "temporal":
-                        # Create a bar chart object
-                        # Create a temporal line chart object
-                        chart = TemporalLineChart(
-                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                            self.variable_values[metric], self.args.top_per_class_ngrams)
-                        # Save the chart to the output folder
-                        chart.save(os.path.join(
-                            self.args.output_folder, "temporal_line_chart"), self.args.output_formats)
-                    else:
-                        # @TODO: Indications of which var_type / var_semantics should be
-                        raise ValueError(
-                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
-                elif var_type == "quantitative":
-                    if var_semantics == "general":
-                        # Create a scatteplot chart object
-                        chart = ScatterChart(
-                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                            self.variable_values[metric], self.args.top_per_class_ngrams)
-                        # Save the chart to the output folder
-                        chart.save(os.path.join(
-                            self.args.output_folder, "scatter_chart"), self.args.output_formats)
-                    else:
-                        # @TODO: Indications of which var_type / var_semantics should be
-                        raise ValueError(
-                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
-                elif var_type == "coordinates":
-                    if var_semantics == "general":
-                        # Create a scatteplot chart object
-                        # @TODO: Warn the user that we will be only able to plot a scatteplot chart
-                        chart = ScatterChart(
-                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                            self.variable_values[metric], self.args.top_per_class_ngrams)
-                        # Save the chart to the output folder
-                        chart.save(os.path.join(
-                            self.args.output_folder, "scatter_chart"), self.args.output_formats)
-                    else:
-                        # @TODO: Indications of which var_type / var_semantics should be
-                        raise ValueError(
-                            f"Visualization for variable type {var_type} ({var_semantics}) is not supported.")
-                else:
-                    raise ValueError(f"ERROR. {var_type} is not supported.")
-            
-            elif (len(self.metadata["var_types"]) == 2):
-                var_types = self.metadata["var_types"]
-                var_semantics = self.metadata["var_semantics"]
+            # Get dictionary containing information on which and how to create charts
+            charts_metadata = self.get_charts_metadata(metric)
 
-                if (var_types[0] == "coordinates") and (var_types[1] == "coordinates"):
-                    if (var_semantics[0] == "spatial") and (var_semantics[1] == "spatial"):
-                        print(f"INFO: {self.variable_names[0]} and {self.variable_names[1]} will be considered as the "
-                            f"latitude and longitude, respectively.")
-                        # Create a scatter geo chart object
-                        chart = ScatterGeoChart(
-                            df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                            self.variable_values[metric], self.args.top_per_class_ngrams,
-                            self.args.shapefile_path)
-                        # Save the chart to the output folder
-                        chart.save(os.path.join(
-                            self.args.output_folder, "scatter_geo_chart"), self.args.output_formats)
-                        # Create a density geo chart object
-                        # @TODO: It works on very basic scenarios, envisioned for version 0.2.0
-                        # chart = DensityGeoChart(
-                        #     df_data, metric, self.metadata, self.args.filterable, self.args.zoomable,
-                        #     self.variable_values[metric], self.args.top_per_class_ngrams)
-                        # # Save the chart to the output folder
-                        # chart.save(os.path.join(
-                        #     self.args.output_folder, "density_geo_chart"), self.args.output_formats)
-
-                        # @TODO: create a hexbin mapbox chart object in case of binning
-                    
-                    else:
-                        raise NotImplementedError(
-                            f"Visualization for variable types {var_types} ({var_semantics}) is not supported yet.")
-
-                else:
-                    raise NotImplementedError(
-                        f"Visualization for variable types {var_types} ({var_semantics}) is not supported yet.")
-
-            else:
-                raise NotImplementedError(
-                    f"Visualization for >=3 variable types is not supported yet.")
+            # Iterate over the results and create and save charts based on these information
+            for ChartClass, chart_info in charts_metadata.items():
+                # Create the chart object
+                print(f"INFO: Creating a {ChartClass.__name__} object...")
+                chart = ChartClass(
+                    df_data, metric, self.metadata, extra_args, self.args.filterable, self.args.zoomable,
+                    self.variable_values[metric], self.args.top_per_class_ngrams)
+                
+                # Save the chart to the output folder
+                output_filepath = os.path.join(self.args.output_folder, metric)
+                chart.save(output_filepath, ChartClass.__name__, self.args.output_formats)
 

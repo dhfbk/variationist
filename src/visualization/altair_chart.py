@@ -16,6 +16,7 @@ class AltairChart(Chart):
         df_data: pd.core.frame.DataFrame,
         chart_metric: str,
         metadata: dict,
+        extra_args: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
@@ -32,6 +33,8 @@ class AltairChart(Chart):
             The metric associated to the "df_data" dataframe and thus to the chart.
         metadata: dict
             A dictionary storing the metadata about the prior analysis.
+        extra_args: dict = {}
+            A dictionary storing the extra arguments for this chart type. Default = {}.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -40,7 +43,8 @@ class AltairChart(Chart):
             A list of the variable values for the given metric
         """
 
-        super().__init__(df_data, chart_metric, metadata, filterable, zoomable, variable_values)
+        super().__init__(
+            df_data, chart_metric, metadata, extra_args, filterable, zoomable, variable_values)
 
         # alt.data_transformers.enable("vegafusion")
 
@@ -182,12 +186,37 @@ class AltairChart(Chart):
             tooltip = tooltip
         )
 
+        # dropdown2 = alt.binding_select(
+        #     options = sorted(["*Select " + "date" + "*"] + ["2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12"]), 
+        #     name = f"Filter by date ",
+        # )
+        # select2 = alt.selection_point(
+        #     value = f"*Select date*",
+        #     bind = dropdown2,
+        #     fields = ["date"],
+        # )
+
+        # # Add the search component to the base chart
+        # base_chart = base_chart.add_params(select2)
+        # base_chart = base_chart.transform_filter(select2)
+
+        # # Encoding the data
+        # base_chart = base_chart.encode(
+        #     fill = alt.condition(
+        #         select | select2,
+        #         color,
+        #         alt.value("")
+        #     ),
+        #     tooltip = tooltip
+        # )
+
         return base_chart
 
 
     def save(
         self,
         output_folder: str,
+        chart_name: str,
         output_formats: Optional[list[str]] = ["html"],
     ) -> None:
         """
@@ -198,6 +227,8 @@ class AltairChart(Chart):
         ----------
         output_folder: str
             A path to the output folder in which to save the chart.
+        chart_name: str
+            A name representing the chart object to be saved.
         output_formats: Optional[list[str]] = ["html"]
             A list of output formats for the charts. By default, only the interactive
             HTML chart is saved, i.e., ["html"]. Extra choices: ["pdf", "svg", "png"].
@@ -206,16 +237,16 @@ class AltairChart(Chart):
         # If output formats have been specified, save the chart in those formats to 
         # subfolders (named as the metric) of the user-specified output folder
         if len(output_formats) >= 1:
-            # Set the full folder name
-            FOLDER_PATH = os.path.join(output_folder, self.chart_metric)
 
             # Create the output folder if it does not exist
-            if not os.path.exists(FOLDER_PATH):
-                os.makedirs(FOLDER_PATH)
+            if not os.path.exists(output_folder):
+                os.makedirs(output_folder)
 
             # Save the chart to an HTML file in the output folder
             if "html" in output_formats:
-                self.chart.save(os.path.join(FOLDER_PATH, "chart.html"))
+                output_filepath = os.path.join(output_folder, chart_name + ".html")
+                print(f"INFO: Saving it to the filepath: \"{output_filepath}\".")
+                self.chart.save(output_filepath)
 
             # Save the chart to a PDF file in the output folder
             if "pdf" in output_formats:
@@ -224,7 +255,9 @@ class AltairChart(Chart):
                     pdf_data = vlc.vegalite_to_pdf(self.chart.to_json())
 
                     # Write the raw data to the output filepath
-                    with open(os.path.join(FOLDER_PATH, "chart.pdf"), "wb") as f:
+                    output_filepath = os.path.join(output_folder, chart_name + ".pdf")
+                    print(f"INFO: Saving it to the filepath: \"{output_filepath}\".")
+                    with open(output_filepath, "wb") as f:
                         f.write(pdf_data)
                 except Exception:
                     print("The dataset is too big to be serialized as PDF efficiently. Please "
@@ -237,7 +270,9 @@ class AltairChart(Chart):
                     svg_data = vlc.vegalite_to_svg(self.chart.to_json())
 
                     # Write the raw data to the output filepath
-                    with open(os.path.join(FOLDER_PATH, "chart.svg"), "wt") as f:
+                    output_filepath = os.path.join(output_folder, chart_name + ".svg")
+                    print(f"INFO: Saving it to the filepath: \"{output_filepath}\".")
+                    with open(output_filepath, "wt") as f:
                         f.write(svg_data)
                 except Exception:
                     print("The dataset is too big to be serialized as SVG efficiently. Please "
@@ -250,7 +285,9 @@ class AltairChart(Chart):
                     png_data = vlc.vegalite_to_png(self.chart.to_json())
 
                     # Write the raw data to the output filepath
-                    with open(os.path.join(FOLDER_PATH, "chart.png"), "wb") as f:
+                    output_filepath = os.path.join(output_folder, chart_name + ".png")
+                    print(f"INFO: Saving it to the filepath: \"{output_filepath}\".")
+                    with open(output_filepath, "wb") as f:
                         f.write(png_data)
                 except Exception:
                     print("The dataset is too big to be serialized as PNG efficiently. Please "

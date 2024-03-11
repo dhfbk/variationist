@@ -20,12 +20,11 @@ class ChoroplethChart(AltairChart):
         df_data: pd.core.frame.DataFrame,
         chart_metric: str,
         metadata: dict,
+        extra_args: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
         top_per_class_ngrams: Optional[int] = None,
-        shapefile_path: Optional[str] = None,
-        shapefile_var_name: Optional[str] = None,
     ) -> None:
         """
         Initialization function for a building a ChoroplethChart object.
@@ -39,6 +38,8 @@ class ChoroplethChart(AltairChart):
             The metric associated to the "df_data" dataframe and thus to the chart.
         metadata: dict
             A dictionary storing the metadata about the prior analysis.
+        extra_args: dict = {}
+            A dictionary storing the extra arguments for this chart type. Default = {}.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -49,24 +50,13 @@ class ChoroplethChart(AltairChart):
             The maximum number of highest scoring per-class n-grams to show. If set to 
             None, it will show all the ngrams in the corpus (it may easily be 
             overwhelming). By default is 20 to keep the visualization compact.
-        shapefile_path: Optional[str] = None
-            A path to the .shp shapefile to be visualized as background map to the chart.
-            Note that auxiliary files to the .shp one (i.e., .dbf, .prg, .shx ones) are 
-            required for chart creation too, but do not need to be specified. They should
-            have the same name as the .shp file but different extension, and be located 
-            in the same folder as the .shp file itself. An example of repository where to
-            find shapefiles is https://geodata.lib.berkeley.edu/, but there exists many
-            other ones and shapefiles provided by national/regional institutions.
-        shapefile_var_name: Optional[str] = None
-            The key field name in the shapefile which contains the names for the areas 
-            which should match the possible values for the variable of interest (e.g., 
-            if the variable of interest is "state", here should go the name of the
-            variable name encoded in the shapefile containing the possible states).
         """
 
-        super().__init__(df_data, chart_metric, metadata, filterable, zoomable, variable_values)
+        super().__init__(
+            df_data, chart_metric, metadata, extra_args, filterable, zoomable, variable_values)
 
         # Set attributes
+        self.variable_values = variable_values
         self.top_per_class_ngrams = top_per_class_ngrams
         self.metric_label = chart_metric + " value"
         if self.n_cooc == 1:
@@ -75,34 +65,34 @@ class ChoroplethChart(AltairChart):
             self.text_label = "tokens"
 
         # Set extra attributes
-        self.shapefile_path = shapefile_path
-        self.shapefile_var_name = shapefile_var_name
+        self.shapefile_path = extra_args["shapefile_path"]
+        self.shapefile_var_name = extra_args["shapefile_var_name"]
 
         # Check if the specified filepath "shapefile_path" is defined and exists. If not, warn and exit
-        if shapefile_path is None:
+        if self.shapefile_path is None:
             raise ValueError(f"ERROR. \"shapefile_path\" must be specified for creating spatial charts.\n")
-        if not os.path.exists(shapefile_path):
-            raise ValueError(f"ERROR. The filepath for the shapefile \"{shapefile_path}\" does not exist.\n")
+        if not os.path.exists(self.shapefile_path):
+            raise ValueError(f"ERROR. The filepath for the shapefile \"{self.shapefile_path}\" does not exist.\n")
 
         # Load the shapefile and transform geometries to a standard coordinate reference system
-        gdf = gpd.read_file(shapefile_path).to_crs("epsg:4286")
+        gdf = gpd.read_file(self.shapefile_path).to_crs("epsg:4286")
 
         # Check if the specified column "shapefile_var_name" exists in the geodataframe
         # If not, warn the user, give them the available options, and exit
-        if shapefile_var_name not in gdf.columns:
-            raise ValueError(f"ERROR. The key \"{shapefile_var_name}\" is not in the shapefile.",
-                f"\"{shapefile_path}\".\nPlease use one among: {', '.join([col for col in gdf.columns])}.")
+        if self.shapefile_var_name not in gdf.columns:
+            raise ValueError(f"ERROR. The key \"{self.shapefile_var_name}\" is not in the shapefile.",
+                f"\"{self.shapefile_path}\".\nPlease use one among: {', '.join([col for col in gdf.columns])}.")
 
         # Check if some variable values (area names) do not match the area names in the shapefile
         # If not, warn the user and give them the available values that can possibly match.
         variable_values_not_matched = []
-        variable_values_gdf = list(gdf[shapefile_var_name])
+        variable_values_gdf = list(gdf[self.shapefile_var_name])
         for variable_value in variable_values:
             if variable_value not in variable_values_gdf:
                 variable_values_not_matched.append(variable_value)
         if len(variable_values_not_matched) > 0:
             print(f"WARNING. Some area names defined in the dataset do not match the area names",
-                f"defined in the shapefile \"{shapefile_path}\" and therefore will not be part of",
+                f"defined in the shapefile \"{self.shapefile_path}\" and therefore will not be part of",
                 f"the chart. Consider renaming the area names without a match.\n",
                 f"\tArea names without a match: {', '.join(variable_values_not_matched)}.\n",
                 f"\tArea names from the shapefile: {', '.join(variable_values_gdf)}.\n")
@@ -118,7 +108,7 @@ class ChoroplethChart(AltairChart):
         # Collect information from the geopandas dataframe
         self.base_chart = self.base_chart.transform_lookup(
             lookup = self.var_names[0],
-            from_ = alt.LookupData(data=gdf, key=shapefile_var_name, fields=["geometry", "type"]))
+            from_ = alt.LookupData(data=gdf, key=self.shapefile_var_name, fields=["geometry", "type"]))
 
         # Set dimensions
         # @TODO: Fix "min" and "NaN" together in the starting legend

@@ -11,6 +11,7 @@ class Chart:
         df_data: pd.core.frame.DataFrame,
         chart_metric: str,
         metadata: dict,
+        extra_args: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
@@ -27,6 +28,8 @@ class Chart:
             The metric associated to the "df_data" dataframe and thus to the chart.
         metadata: dict
             A dictionary storing the metadata about the prior analysis.
+        extra_args: dict = {}
+            A dictionary storing the extra arguments for this chart type. Default = {}.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -42,6 +45,7 @@ class Chart:
         self.var_semantics = metadata["var_semantics"]
         self.n_tokens = metadata["n_tokens"]
         self.n_cooc = metadata["n_cooc"]
+        self.extra_args = {}
         self.filterable = filterable
         self.zoomable = zoomable
         self.variable_values = variable_values

@@ -16,6 +16,7 @@ class PlotlyChart(Chart):
         df_data: pd.core.frame.DataFrame,
         chart_metric: str,
         metadata: dict,
+        extra_args: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
@@ -32,6 +33,8 @@ class PlotlyChart(Chart):
             The metric associated to the "df_data" dataframe and thus to the chart.
         metadata: dict
             A dictionary storing the metadata about the prior analysis.
+        extra_args: dict = {}
+            A dictionary storing the extra arguments for this chart type. Default = {}.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -135,6 +138,7 @@ class PlotlyChart(Chart):
     def save(
         self,
         output_folder: str,
+        chart_name: str,
         output_formats: Optional[list[str]] = ["html"],
     ) -> None:
         """
@@ -145,6 +149,8 @@ class PlotlyChart(Chart):
         ----------
         output_folder: str
             A path to the output folder in which to save the chart.
+        chart_name: str
+            A name representing the chart object to be saved.
         output_formats: Optional[list[str]] = ["html"]
             A list of output formats for the charts. By default, only the interactive
             HTML chart is saved, i.e., ["html"]. Extra choices: ["pdf", "svg", "png"].
@@ -153,31 +159,37 @@ class PlotlyChart(Chart):
         # If output formats have been specified, save the chart in those formats to 
         # subfolders (named as the metric) of the user-specified output folder
         if len(output_formats) >= 1:
-            # Set the full folder name
-            FOLDER_PATH = os.path.join(output_folder, self.chart_metric)
 
             # Create the output folder if it does not exist
-            if not os.path.exists(FOLDER_PATH):
-                os.makedirs(FOLDER_PATH)
+            if not os.path.exists(output_folder):
+                os.makedirs(output_folder)
 
             # Save the chart to an HTML file in the output folder
             if "html" in output_formats:
-                self.base_chart.write_html(os.path.join(FOLDER_PATH, "chart.html"))
+                output_filepath = os.path.join(output_folder, chart_name + ".html")
+                print(f"INFO: Saving it to the filepath: \"{output_filepath}\".")
+                self.base_chart.write_html(output_filepath)
 
             # Save the chart to a PDF file in the output folder
             if "pdf" in output_formats:
                 # Write the raw data to the output filepath
-                self.base_chart.write_image(os.path.join(FOLDER_PATH, "chart.pdf"))
+                output_filepath = os.path.join(output_folder, chart_name + ".pdf")
+                print(f"INFO: Saving it to the filepath: \"{output_filepath}\".")
+                self.base_chart.write_image(output_filepath)
 
             # Save the chart to a SVG file in the output folder
             if "svg" in output_formats:
                 # Write the raw data to the output filepath
-                self.base_chart.write_image(os.path.join(FOLDER_PATH, "chart.svg"))
+                output_filepath = os.path.join(output_folder, chart_name + ".svg")
+                print(f"INFO: Saving it to the filepath: \"{output_filepath}\".")
+                self.base_chart.write_image(output_filepath)
 
             # Save the chart to a PNG file in the output folder
             if "png" in output_formats:
                 # Write the raw data to the output filepath
-                self.base_chart.write_image(os.path.join(FOLDER_PATH, "chart.png"))
+                output_filepath = os.path.join(output_folder, chart_name + ".png")
+                print(f"INFO: Saving it to the filepath: \"{output_filepath}\".")
+                self.base_chart.write_image(output_filepath)
 
         # Otherwise, raise an error
         else:

@@ -20,6 +20,7 @@ class DensityGeoChart(PlotlyChart):
         df_data: pd.core.frame.DataFrame,
         chart_metric: str,
         metadata: dict,
+        extra_args: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
@@ -37,6 +38,8 @@ class DensityGeoChart(PlotlyChart):
             The metric associated to the "df_data" dataframe and thus to the chart.
         metadata: dict
             A dictionary storing the metadata about the prior analysis.
+        extra_args: dict = {}
+            A dictionary storing the extra arguments for this chart type. Default = {}.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -49,7 +52,8 @@ class DensityGeoChart(PlotlyChart):
             overwhelming). By default is 20 to keep the visualization compact.
         """
 
-        super().__init__(df_data, chart_metric, metadata, filterable, zoomable, variable_values)
+        super().__init__(
+            df_data, chart_metric, metadata, extra_args, filterable, zoomable, variable_values)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams

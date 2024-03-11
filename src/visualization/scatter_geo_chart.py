@@ -20,6 +20,7 @@ class ScatterGeoChart(AltairChart):
         df_data: pd.core.frame.DataFrame,
         chart_metric: str,
         metadata: dict,
+        extra_args: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         variable_values: list = [],
@@ -38,6 +39,8 @@ class ScatterGeoChart(AltairChart):
             The metric associated to the "df_data" dataframe and thus to the chart.
         metadata: dict
             A dictionary storing the metadata about the prior analysis.
+        extra_args: dict = {}
+            A dictionary storing the extra arguments for this chart type. Default = {}.
         filterable: Optional[bool] = True
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
@@ -69,16 +72,16 @@ class ScatterGeoChart(AltairChart):
             self.text_label = "tokens"
 
         # Set extra attributes
-        self.shapefile_path = shapefile_path
+        self.shapefile_path = extra_args["shapefile_path"]
 
         # Check if the specified filepath "shapefile_path" is defined and exists. If not, warn and exit
-        if shapefile_path is None:
+        if self.shapefile_path is None:
             raise ValueError(f"ERROR. \"shapefile_path\" must be specified for creating spatial charts.\n")
-        if not os.path.exists(shapefile_path):
-            raise ValueError(f"ERROR. The filepath for the shapefile \"{shapefile_path}\" does not exist.\n")
+        if not os.path.exists(self.shapefile_path):
+            raise ValueError(f"ERROR. The filepath for the shapefile \"{self.shapefile_path}\" does not exist.\n")
 
         # Load the shapefile and transform geometries to a standard coordinate reference system
-        gdf = gpd.read_file(shapefile_path).to_crs("epsg:4286")
+        gdf = gpd.read_file(self.shapefile_path).to_crs("epsg:4286")
 
         # Set background chart style
         background = alt.Chart(gdf).mark_geoshape(
