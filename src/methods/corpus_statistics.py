@@ -15,10 +15,18 @@ def average_text_lengt(label_values_dict, subsets_of_interest):
             values_list = []
             curr_label = subsets_of_interest[column][l].name
             for text in subsets_of_interest[column][l]:
+                if len(text) == 0:
+                    continue
                 values_list.append(len(text))
             values_dict[curr_label] = dict()
-            values_dict[curr_label]["mean"] = mean(values_list)
-            values_dict[curr_label]["stdev"] = stdev(values_list)
+            if len(values_list) == 0:
+                values_dict[curr_label]["mean"] = 0
+            else:
+                values_dict[curr_label]["mean"] = mean(values_list)
+            if len(values_list) < 2:
+                values_dict[curr_label]["stdev"] = 0
+            else:
+                values_dict[curr_label]["stdev"] = stdev(values_list)
     return values_dict
 
 def num_words(label_values_dict, subsets_of_interest): 
@@ -28,6 +36,8 @@ def num_words(label_values_dict, subsets_of_interest):
             curr_label = subsets_of_interest[column][l].name
             n_word_dict[curr_label] = 0
             for text in subsets_of_interest[column][l]:
+                if len(text) == 0:
+                    continue
                 n_word_dict[curr_label] = n_word_dict[curr_label]+(len(text))
     return n_word_dict
 
@@ -38,6 +48,8 @@ def vocab_size(label_values_dict, subsets_of_interest):
             curr_label = subsets_of_interest[column][l].name
             vocab_dict[curr_label] = set()
             for text in subsets_of_interest[column][l]:
+                if len(text) == 0:
+                    continue
                 vocab_dict[curr_label].update(text)
             vocab_dict[curr_label] = len(vocab_dict[curr_label])
     return vocab_dict
@@ -51,6 +63,8 @@ def number_of_duplicates(label_values_dict, subsets_of_interest):
             duplicates = 0
             curr_label = subsets_of_interest[column][l].name
             for text in subsets_of_interest[column][l]:
+                if len(text) == 0:
+                    continue
                 if " ".join(text) in text_dic:
                     duplicates += 1
                 text_dic[" ".join(text)] = ""
@@ -64,10 +78,7 @@ def compute_basic_stats(label_values_dict, subsets_of_interest, args):
     stats_dict["number-of-words"] = num_words(label_values_dict, subsets_of_interest)
     stats_dict["vocabulary-size"] = vocab_size(label_values_dict, subsets_of_interest)
     stats_dict["number-of-duplicates"] = number_of_duplicates(label_values_dict, subsets_of_interest)
-    print(stats_dict)
+    # print(stats_dict)
     return stats_dict
 
 
-
-# TODO
-# Add more basic stats (e.g.,  , outlier texts (e.g., those too short)
