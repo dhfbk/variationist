@@ -6,6 +6,7 @@ from src.data import tokenization_utils
 import itertools
 import sys
 from tqdm import tqdm
+import stopwordsiso as stopwords
 
 
 def remove_elements(token_list, stopwords):
@@ -14,7 +15,7 @@ def remove_elements(token_list, stopwords):
     # Returns token_list without stopwords
     new_array = []
     for element in token_list:
-        if element not in stopwords:
+        if element.lower() not in stopwords:
             new_array.append(element)
     return new_array
 
@@ -22,10 +23,9 @@ def remove_elements(token_list, stopwords):
 def remove_stopwords(text_column, language):
     # Takes as input an already tokenized array/series of texts and a language and return it without stopwords
     # Language need to be ISO 639-1  two-letter codes e.g en, it, fr, de 
-    with open(os.path.join('src','data','stopwords', str(language)+'.txt')) as file: 
-        stopwords = [line.rstrip() for line in file]
-        text_column = text_column.squeeze().apply(lambda x: remove_elements(x,stopwords))
-        return(text_column)
+    lang_stopwords = stopwords.stopwords(language)
+    text_column = text_column.squeeze().apply(lambda x: remove_elements(x,lang_stopwords))
+    return(text_column)
     
 
 def convert_to_ngrams(token_list, n_tokens):
