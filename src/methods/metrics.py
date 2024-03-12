@@ -22,8 +22,14 @@ class Metric:
             self.metric_fn = methods.pmi.pmi_positive
         elif self.metric == "pmi-positive-normalized":
             self.metric_fn = methods.pmi.pmi_positive_normalized
-        elif self.metric == "pmi-lexical-artifacts":
-            self.metric_fn = methods.pmi.pmi_lexical_artifacts
+        elif self.metric == "pmi-weighted":
+            self.metric_fn = methods.pmi.pmi_weighted
+        elif self.metric == "pmi-normalized-weighted":
+            self.metric_fn = methods.pmi.pmi_normalized_weighted
+        elif self.metric == "pmi-positive-weighted":
+            self.metric_fn = methods.pmi.pmi_positive_weighted
+        elif self.metric == "pmi-positive-normalized-weighted":
+            self.metric_fn = methods.pmi.pmi_positive_normalized_weighted
         elif self.metric == "ttr":
             self.metric_fn = lexical_variation.ttr
         elif self.metric == "rttr":
