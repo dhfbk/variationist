@@ -1,8 +1,9 @@
 from src.visualization.bar_chart import BarChart
-from src.visualization.temporal_line_chart import TemporalLineChart
-from src.visualization.scatter_chart import ScatterChart
 from src.visualization.choropleth_chart import ChoroplethChart
+from src.visualization.heatmap_chart import HeatmapChart
+from src.visualization.scatter_chart import ScatterChart
 from src.visualization.scatter_geo_chart import ScatterGeoChart
+from src.visualization.temporal_line_chart import TemporalLineChart
 # from src.visualization.density_geo_chart import DensityGeoChart
 
 
@@ -83,13 +84,13 @@ VAR_CHARTS_MAP = {
         "coordinates-coordinates": {
             "general-general": {
                 ScatterChart: {
-                    "lat": (0, "quantitative"),
-                    "lon": (1, "quantitative"),
+                    "x": (0, "quantitative"),
+                    "y": (1, "quantitative"),
                     "color": ("value", "quantitative"),
                     "dropdown": [],
                     "search": [("ngram", "nominal")]
                 },
-            },
+            }, # @TODO
             "spatial-spatial": {
                 ScatterGeoChart: {
                     "lat": (0, "quantitative"),
@@ -107,55 +108,85 @@ VAR_CHARTS_MAP = {
                 # },
             },
         },
-        "coordinates-nominal": { # lexicographically-ordered, also below if same var_types
-            # "general-general": [], # @TODO: [scatter] coord (x), score (y), nominal (color), ngram (filter)
+        "coordinates-nominal": {
+            "general-general": {
+                ScatterChart: {
+                    "x": (0, "quantitative"),
+                    "y": ("value", "quantitative"),
+                    "color": (1, "nominal"),
+                    "dropdown": [],
+                    "search": [("ngram", "nominal")]
+                }, # @TODO: [scatter] coord (x), score (y), nominal (color), ngram (filter)
+            },
         },
-        "coordinates-ordinal": { # lexicographically-ordered, also below if same var_types
+        "coordinates-ordinal": {
             # "general-general": [], # @TODO: [scatter] coord (x), score (y), ordinal (color), ngram (filter)
             # "general-temporal": [], # @TODO: [line] time (x), coord (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
         },
-        "coordinates-quantitative": { # lexicographically-ordered, also below if same var_types
+        "coordinates-quantitative": {
             # "general-general": [], # @TODO: [scatter] coord (x), quant (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
         },
-        "nominal-nominal": { # lexicographically-ordered, also below if same var_types
-            # "general-general": [], # @TODO: [heatmap] nom (x), nom (y), score (color), ngram (filter)
+        "nominal-nominal": {
+            "general-general": {
+                HeatmapChart: {
+                    "x": (0, "nominal"),
+                    "y": (1, "nominal"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
+                },
+            },
             # "general-spatial": [], # @TODO: [chroplet] spatial (xy), score (color), general (filter), ngram (filter)
         },
-        "nominal-ordinal": { # lexicographically-ordered, also below if same var_types
-            # "general-general": [], # @TODO: [heatmap] nom (x), nom (y), score (color), ngram (filter)
+        "nominal-ordinal": {
+            "general-general": {
+                HeatmapChart: {
+                    "x": (0, "nominal"),
+                    "y": (1, "ordinal"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
+                },
+            },
             # "general-temporal": [], # @TODO: [line] time (x), score (y), nom (shape), ngram (filter)
-            # "spatial-general": [], # @TODO: [chroplet] spatial (xy), score (color), general (filter), ngram (filter)
-            "spatial-temporal": {
+            "spatial-general": {
                 ChoroplethChart: {
                     "color": (0, "nominal"),
                     "dropdown": [("ngram", "nominal"), (1, "ordinal")],
                     "search": []
                 },
-            }, # @TODO: [chroplet] spatial (xy), score (color), temporal (filter), ngram (filter)
+            },
+            "spatial-temporal": {
+                ChoroplethChart: {
+                    "color": (0, "nominal"),
+                    "dropdown": [("ngram", "nominal"), (1, "temporal")],
+                    "search": []
+                },
+            },
         },
-        "nominal-quantitative": { # lexicographically-ordered, also below if same var_types
+        "nominal-quantitative": {
             # "general-general": [], # @TODO: [scatter] quant (x), score (y), nom (color), ngram (filter) + @FUTURE: heatmap or similar?
             # "spatial-general": [], # @TODO: [chroplet] spatial (xy), score (color), ~quant (filter), ngram (filter)
         },
-        "ordinal-ordinal": { # lexicographically-ordered, also below if same var_types
+        "ordinal-ordinal": {
             # "general-general": [], # @TODO: [heatmap] ord (x), ord (y), score (color), ngram (filter)
             # "general-temporal": [], # @TODO: [line] time (x), score (y), ord (~shape), ngram (filter)
         },
-        "ordinal-quantitative": { # lexicographically-ordered, also below if same var_types
+        "ordinal-quantitative": {
             # "general-general": [], # @TODO: [scatter] quant (x), score (y), ordinal (color), ngram (filter)
             # "temporal-general": [], # @TODO: [line] time (x), quant (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
         },
-        "quantitative-quantitative": { # lexicographically-ordered, also below if same var_types
+        "quantitative-quantitative": {
             # "general-general": [], # @TODO: [scatter] quant (x), quant (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
         },
     },
     "5-dims": {
-        "coordinates-coordinates-nominal": { # lexicographically-ordered, also below if same var_types
+        "coordinates-coordinates-nominal": {
             # "general-general-general": [], # @TODO: [scatter] coord (x), coord (y), nom (filter), ngram (filter) + @FUTURE: add density plot
             # "general-general-spatial": [], # @TODO: [scatter] coord (x), coord (y), nom (filter), ngram (filter) + @FUTURE: add density plot
             # "spatial-spatial-general": [], # @TODO: [scatter] coord (x), coord (y), nom (filter), ngram (filter) + @FUTURE: add density plot
         },
-        "coordinates-coordinates-ordinal": { # lexicographically-ordered, also below if same var_types
+        "coordinates-coordinates-ordinal": {
             # "general-general-general": [], # @TODO: [scatter] coord (x), coord (y), ordinal (filter), ngram (filter) + @FUTURE: add density plot
             "general-general-temporal": {
                 ScatterGeoChart: {
