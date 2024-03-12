@@ -24,7 +24,6 @@ class DensityGeoChart(PlotlyChart):
         chart_dims: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
-        variable_values: list = [],
         top_per_class_ngrams: Optional[int] = None,
     ) -> None:
         """
@@ -47,8 +46,6 @@ class DensityGeoChart(PlotlyChart):
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
-        variable_values: list = []
-            A list of the variable values for the given metric
         top_per_class_ngrams: int = 20
             The maximum number of highest scoring per-class n-grams to show. If set to 
             None, it will show all the ngrams in the corpus (it may easily be 
@@ -56,7 +53,7 @@ class DensityGeoChart(PlotlyChart):
         """
 
         super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable, variable_values)
+            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
@@ -101,10 +98,15 @@ class DensityGeoChart(PlotlyChart):
             }
         )
 
-        # If the chart has to be filterable, create and add a search component to it
+        # If the chart has to be filterable, create and add search/dropdown components to it
         if self.filterable == True:
-            dropdown_elements = list(set(df_data["ngram"]))
-            self.base_chart = self.add_dropdown_component(self.base_chart, dropdown_elements)
+            dropdown_keys = []
+            dropdown_values = []
+            for i in range(len(chart_dims["dropdown"])):
+                dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
+            for dropdown_key in dropdown_keys:
+                dropdown_values.append(list(set(df_data[dropdown_key])))
+            self.base_chart = self.add_dropdown_components(self.base_chart, dropdown_values)
 
         # If the chart has to be zoomable, set the property (supported by default by Plotly)
         # if self.zoomable == True:

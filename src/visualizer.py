@@ -292,7 +292,7 @@ class Visualizer:
                 print(f"INFO: Creating a {ChartClass.__name__} object...")
                 chart = ChartClass(
                     df_data, metric, self.metadata, extra_args, chart_info, self.args.filterable, self.args.zoomable,
-                    self.variable_values[metric], self.args.top_per_class_ngrams)
+                    self.args.top_per_class_ngrams)
                 
                 # Save the chart to the output folder
                 output_filepath = os.path.join(self.args.output_folder, metric)

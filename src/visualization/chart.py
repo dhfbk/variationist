@@ -14,7 +14,6 @@ class Chart:
         extra_args: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
-        variable_values: list = [],
     ) -> None:
         """
         Initialization function for a building a chart object.
@@ -34,8 +33,6 @@ class Chart:
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
-        variable_values: list = []
-            A list of the variable values for the given metric
         """
 
         self.df_data = df_data
@@ -48,6 +45,5 @@ class Chart:
         self.extra_args = {}
         self.filterable = filterable
         self.zoomable = zoomable
-        self.variable_values = variable_values
         self.chart = None
 

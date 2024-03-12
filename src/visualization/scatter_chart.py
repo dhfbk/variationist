@@ -18,7 +18,6 @@ class ScatterChart(AltairChart):
         chart_dims: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
-        variable_values: list = [],
         top_per_class_ngrams: Optional[int] = None,
     ) -> None:
         """
@@ -41,8 +40,6 @@ class ScatterChart(AltairChart):
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
-        variable_values: list = []
-            A list of the variable values for the given metric
         top_per_class_ngrams: int = 20
             The maximum number of highest scoring per-class n-grams to show. If set to 
             None, it will show all the ngrams in the corpus (it may easily be 
@@ -50,7 +47,7 @@ class ScatterChart(AltairChart):
         """
 
         super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable, variable_values)
+            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams

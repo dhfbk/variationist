@@ -1,4 +1,6 @@
 import altair as alt
+import functools
+import operator
 import os
 import pandas as pd
 import vl_convert as vlc
@@ -19,7 +21,6 @@ class AltairChart(Chart):
         extra_args: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
-        variable_values: list = [],
     ) -> None:
         """
         Initialization function for a building an alt.Chart chart object.
@@ -39,12 +40,10 @@ class AltairChart(Chart):
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
-        variable_values: list = []
-            A list of the variable values for the given metric
         """
 
         super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable, variable_values)
+            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
 
         # alt.data_transformers.enable("vegafusion")
 
@@ -131,84 +130,71 @@ class AltairChart(Chart):
         return base_chart
 
 
-    def add_dropdown_component(
+    def add_dropdown_components(
         self,
         base_chart: alt.Chart,
         tooltip: list[alt.Tooltip],
-        fields: list[str],
-        dropdown_elements: list[str],
+        dropdown_keys: list[str],
+        dropdown_elements: list[list[str]],
         color: alt.Color,
     ) -> alt.Chart:
         """
-        A function that creates a dropdown component and adds it to the chart.
+        A function that creates dropdown components and adds them to the chart.
 
         Parameters
         ----------
         base_chart: alt.Chart
-            The base chart object in which to add the dropdown component.
+            The base chart object in which to add the dropdown components.
         tooltip: list[alt.Tooltip]
             A list of alt.Tooltip objects.
-        fields: list[str]
-            A list of fields whose values are used for populating the dropdown.
-        dropdown_elements: list[str]
-            A list of possible values for the field to put in the dropdown.
+        dropdown_keys: list[str]
+            A list of keys corresponding to each dropdown.
+        dropdown_values: list[str[str]]
+            A list of lists, each containing the values for each dropdown (1:1 with dropdown_keys).
         color: alt.Color
             The alt.Color dimension to be filtered in the chart.
 
         Returns
         -------
         base_chart: alt.Chart
-            The same base chart object with the dropdown component added.
+            The same base chart object with the dropdown components added.
         """
 
-        # Create the dropdown component
-        dropdown = alt.binding_select(
-            options = sorted(["*Select " + self.text_label + "*"] + dropdown_elements), 
-            name = f"Filter by {self.text_label} ",
-        )
-        select = alt.selection_point(
-            value = f"*Select {self.text_label}*",
-            bind = dropdown,
-            fields = fields,
-        )
+        # Create a list to store the dropdown objects
+        dropdowns = []
 
-        # Add the search component to the base chart
-        base_chart = base_chart.add_params(select)
-        base_chart = base_chart.transform_filter(select)
+        # Iterate over the dropdown keys to create a dropdown component with the given values
+        for i in range(len(dropdown_keys)):
+            # Get the label referring to the dropdown
+            dropdown_label = self.text_label if (dropdown_keys[i] == "ngram") else dropdown_keys[i]
 
-        # Encoding the data
+            # Create the dropdown component
+            dropdown = alt.binding_select(
+                options = sorted(["*Select " + dropdown_label + "*"] + dropdown_elements[i]), 
+                name = f"Filter by {dropdown_label} ",
+            )
+            select = alt.selection_point(
+                value = f"*Select {dropdown_label}*",
+                bind = dropdown,
+                fields = [dropdown_keys[i]],
+            )
+
+            # Add the dropdown component to the base chart
+            base_chart = base_chart.add_params(select)
+            base_chart = base_chart.transform_filter(select)
+
+            # Add it to the list of dropdown component
+            dropdowns.append(select)
+
+        # Encoding the data by considering all the dropdown components
         base_chart = base_chart.encode(
             fill = alt.condition(
-                select,
+                functools.reduce(operator.or_, dropdowns),
                 color,
                 alt.value("")
             ),
             tooltip = tooltip
         )
-
-        # dropdown2 = alt.binding_select(
-        #     options = sorted(["*Select " + "date" + "*"] + ["2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12"]), 
-        #     name = f"Filter by date ",
-        # )
-        # select2 = alt.selection_point(
-        #     value = f"*Select date*",
-        #     bind = dropdown2,
-        #     fields = ["date"],
-        # )
-
-        # # Add the search component to the base chart
-        # base_chart = base_chart.add_params(select2)
-        # base_chart = base_chart.transform_filter(select2)
-
-        # # Encoding the data
-        # base_chart = base_chart.encode(
-        #     fill = alt.condition(
-        #         select | select2,
-        #         color,
-        #         alt.value("")
-        #     ),
-        #     tooltip = tooltip
-        # )
 
         return base_chart
 

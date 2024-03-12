@@ -24,7 +24,6 @@ class ScatterGeoChart(AltairChart):
         chart_dims: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
-        variable_values: list = [],
         top_per_class_ngrams: Optional[int] = None,
         shapefile_path: Optional[str] = None,
     ) -> None:
@@ -48,8 +47,6 @@ class ScatterGeoChart(AltairChart):
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
-        variable_values: list = []
-            A list of the variable values for the given metric
         top_per_class_ngrams: int = 20
             The maximum number of highest scoring per-class n-grams to show. If set to 
             None, it will show all the ngrams in the corpus (it may easily be 
@@ -65,7 +62,7 @@ class ScatterGeoChart(AltairChart):
         """
 
         super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable, variable_values)
+            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
@@ -128,11 +125,16 @@ class ScatterGeoChart(AltairChart):
         background = background.properties(width=chart_base_size, height=chart_base_size)
         self.base_chart = self.base_chart.properties(width=chart_base_size, height=chart_base_size)
 
-        # If the chart has to be filterable, create and add a search component to it
+        # If the chart has to be filterable, create and add search/dropdown components to it
         # Note: the chart is always filterable for scatter geo charts
         if self.filterable == True:
-            dropdown_elements = list(set(df_data["ngram"]))
-            self.base_chart = self.add_dropdown_component(self.base_chart, tooltip, ["ngram"], dropdown_elements, color)
+            dropdown_keys = []
+            dropdown_values = []
+            for i in range(len(chart_dims["dropdown"])):
+                dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
+            for dropdown_key in dropdown_keys:
+                dropdown_values.append(list(set(df_data[dropdown_key])))
+            self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color)
 
         # If the chart has to be zoomable, set the property (not supported for scatter geo chart by Altair)
         # if self.zoomable == True:

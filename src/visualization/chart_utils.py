@@ -83,10 +83,11 @@ VAR_CHARTS_MAP = {
         "coordinates-coordinates": {
             "general-general": {
                 ScatterChart: {
-                    "x": 0,
-                    "y": "value",
+                    "lat": (0, "quantitative"),
+                    "lon": (1, "quantitative"),
+                    "color": ("value", "quantitative"),
                     "dropdown": [],
-                    "search": ["ngram"]
+                    "search": [("ngram", "nominal")]
                 },
             },
             "spatial-spatial": {
@@ -94,8 +95,8 @@ VAR_CHARTS_MAP = {
                     "lat": (0, "quantitative"),
                     "lon": (1, "quantitative"),
                     "color": ("value", "quantitative"),
-                    "dropdown": [],
-                    "search": [("ngram", "nominal")]
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
                 },
                 # DensityGeoChart: {
                 #     "lat": (0, "quantitative"),
@@ -126,8 +127,8 @@ VAR_CHARTS_MAP = {
             # "spatial-general": [], # @TODO: [chroplet] spatial (xy), score (color), general (filter), ngram (filter)
             "spatial-temporal": {
                 ChoroplethChart: {
-                    "color": 0,
-                    "dropdown": ["ngram", "temporal"],
+                    "color": (0, "nominal"),
+                    "dropdown": [("ngram", "nominal"), (1, "ordinal")],
                     "search": []
                 },
             }, # @TODO: [chroplet] spatial (xy), score (color), temporal (filter), ngram (filter)
@@ -158,11 +159,11 @@ VAR_CHARTS_MAP = {
             # "general-general-general": [], # @TODO: [scatter] coord (x), coord (y), ordinal (filter), ngram (filter) + @FUTURE: add density plot
             "general-general-temporal": {
                 ScatterGeoChart: {
-                    "lat": 0,
-                    "lon": 1,
-                    "color": "value",
+                    "lat": (0, "quantitative"),
+                    "lon": (1, "quantitative"),
+                    "color": ("value", "quantitative"),
                     "dropdown": [],
-                    "search": ["ngram", 2]
+                    "search": [("ngram", "nominal"), (2, "ordinal")]
                 }
             }, # @TODO: [scatter] coord (x), coord (y), ordinal (filter), ngram (filter) + @FUTURE: add density plot
             # "spatial-spatial-general": [], # @TODO: [scatter] coord (x), coord (y), ordinal (filter), ngram (filter) + @FUTURE: add density plot

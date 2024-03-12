@@ -24,7 +24,6 @@ class ChoroplethChart(AltairChart):
         chart_dims: dict = {},
         filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
-        variable_values: list = [],
         top_per_class_ngrams: Optional[int] = None,
     ) -> None:
         """
@@ -47,8 +46,6 @@ class ChoroplethChart(AltairChart):
             Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
-        variable_values: list = []
-            A list of the variable values for the given metric
         top_per_class_ngrams: int = 20
             The maximum number of highest scoring per-class n-grams to show. If set to 
             None, it will show all the ngrams in the corpus (it may easily be 
@@ -56,10 +53,9 @@ class ChoroplethChart(AltairChart):
         """
 
         super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable, variable_values)
+            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
 
         # Set attributes
-        self.variable_values = variable_values
         self.top_per_class_ngrams = top_per_class_ngrams
         self.metric_label = chart_metric + " value"
         if self.n_cooc == 1:
@@ -70,6 +66,9 @@ class ChoroplethChart(AltairChart):
         # Set extra attributes
         self.shapefile_path = extra_args["shapefile_path"]
         self.shapefile_var_name = extra_args["shapefile_var_name"]
+
+        # Get relevant dimensions
+        color_name, color_type = self.get_dim("color", chart_dims)
 
         # Check if the specified filepath "shapefile_path" is defined and exists. If not, warn and exit
         if self.shapefile_path is None:
@@ -88,6 +87,7 @@ class ChoroplethChart(AltairChart):
 
         # Check if some variable values (area names) do not match the area names in the shapefile
         # If not, warn the user and give them the available values that can possibly match.
+        variable_values = list(df_data[color_name].unique())
         variable_values_not_matched = []
         variable_values_gdf = list(gdf[self.shapefile_var_name])
         for variable_value in variable_values:
@@ -107,9 +107,6 @@ class ChoroplethChart(AltairChart):
         # Set base chart style
         self.base_chart = self.base_chart.mark_geoshape(
             stroke="white", strokeWidth=0.5)
-
-        # Get relevant dimensions
-        color_name, color_type = self.get_dim("color", chart_dims)
 
         # Collect information from the geopandas dataframe
         self.base_chart = self.base_chart.transform_lookup(
@@ -139,11 +136,16 @@ class ChoroplethChart(AltairChart):
         background = background.properties(width=chart_base_size, height=chart_base_size)
         self.base_chart = self.base_chart.properties(width=chart_base_size, height=chart_base_size)
 
-        # If the chart has to be filterable, create and add a search component to it
+        # If the chart has to be filterable, create and add search/dropdown components to it
         # Note: the chart is always filterable for choropleth charts
         if self.filterable == True:
-            dropdown_elements = list(set(df_data["ngram"]))
-            self.base_chart = self.add_dropdown_component(self.base_chart, tooltip, ["ngram"], dropdown_elements, color)
+            dropdown_keys = []
+            dropdown_values = []
+            for i in range(len(chart_dims["dropdown"])):
+                dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
+            for dropdown_key in dropdown_keys:
+                dropdown_values.append(list(set(df_data[dropdown_key])))
+            self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color)
 
         # If the chart has to be zoomable, set the property (not supported for choropleth chart by Altair)
         # if self.zoomable == True:
