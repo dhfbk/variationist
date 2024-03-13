@@ -4,6 +4,7 @@ pandas==2.2.1
 # Computation
 transformers==4.38.1
 datasets==2.17.1
+stopwordsiso==0.6.1
 emoji==2.10.1                 # for handling emojis in whitespace tokenizer
 
 # Visualization
