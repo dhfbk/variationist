@@ -1,6 +1,7 @@
 import pandas as pd
 from itertools import islice
 from src.methods import shared_metrics
+from src.methods import lexical_artifacts
 import math
 from collections import Counter
 import math
@@ -236,3 +237,37 @@ def pmi_positive_normalized_weighted(label_values_dict, subsets_of_interest, arg
 
     return output_pmi
 
+
+def pmi_lexical_artifact(label_values_dict, subsets_of_interest, args):
+        texts_list = []
+        labels_list = []
+        for column in label_values_dict:
+            
+            for l in range(len(label_values_dict[column])):
+                curr_label = subsets_of_interest[column][l].name
+                
+                for text in subsets_of_interest[column][l]:
+                    texts_list.append(" ".join(text))
+                    labels_list.append(str(curr_label))
+                    
+            uniqe_labels = list(dict.fromkeys(labels_list))   
+
+            lexical_artifact_dict = dict()
+            for label in uniqe_labels:
+                lexical_artifact_dict[label] = dict()
+                values_df = lexical_artifacts.compute(
+                    texts= texts_list, 
+                    labels= labels_list, 
+                    label_of_interest= label, 
+                ) 
+                
+                top_k = len(values_df)          
+                
+                for token, row in values_df.head(top_k).iterrows():
+                    lexical_artifact_dict[label][token] = row[values_df.columns[0]]
+                
+            
+            return lexical_artifact_dict
+                
+           
+            

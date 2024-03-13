@@ -10,6 +10,8 @@ from typing import List
 from src.methods import utils
 
 
+
+
 def compute_pmi(
     w_count: Counter, 
     l_count: Counter, 
@@ -185,7 +187,7 @@ def compute(
     method: str = "pmi", 
     special_tokens: List[str] = [],
     add_emojis: bool = True, 
-    stopwords: str = "en",
+    stopwords: str = "",
     pretrained_tokenizer: str = "bert-base-uncased", 
 ) -> pd.core.frame.DataFrame:
     """

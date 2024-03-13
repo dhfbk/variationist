@@ -30,6 +30,8 @@ class Metric:
             self.metric_fn = methods.pmi.pmi_positive_weighted
         elif self.metric == "pmi-positive-normalized-weighted":
             self.metric_fn = methods.pmi.pmi_positive_normalized_weighted
+        elif self.metric == "pmi-lexical-artifact":
+            self.metric_fn = methods.pmi.pmi_lexical_artifact
         elif self.metric == "ttr":
             self.metric_fn = lexical_variation.ttr
         elif self.metric == "rttr":
