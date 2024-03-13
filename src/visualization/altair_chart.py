@@ -137,6 +137,7 @@ class AltairChart(Chart):
         dropdown_keys: list[str],
         dropdown_elements: list[list[str]],
         color: alt.Color,
+        operation: str,
     ) -> alt.Chart:
         """
         A function that creates dropdown components and adds them to the chart.
@@ -153,6 +154,8 @@ class AltairChart(Chart):
             A list of lists, each containing the values for each dropdown (1:1 with dropdown_keys).
         color: alt.Color
             The alt.Color dimension to be filtered in the chart.
+        operation: str
+            Whether the operation based on color is "fill" or "color".
 
         Returns
         -------
@@ -186,15 +189,27 @@ class AltairChart(Chart):
             # Add it to the list of dropdown component
             dropdowns.append(select)
 
-        # Encoding the data by considering all the dropdown components
-        base_chart = base_chart.encode(
-            fill = alt.condition(
-                functools.reduce(operator.or_, dropdowns),
-                color,
-                alt.value("")
-            ),
-            tooltip = tooltip
-        )
+        # Encoding the data by considering all the dropdown components and the operation
+        if operation == "fill":
+            base_chart = base_chart.encode(
+                fill = alt.condition(
+                    functools.reduce(operator.and_, dropdowns),
+                    color,
+                    alt.value("")
+                ),
+                tooltip = tooltip
+            )
+        elif operation == "color":
+            base_chart = base_chart.encode(
+                color = alt.condition(
+                    functools.reduce(operator.and_, dropdowns),
+                    color,
+                    alt.value("")
+                ),
+                tooltip = tooltip
+            )
+        else:
+            raise ValueError(f"The operation \"{operation}\" is not envisioned.")
 
         return base_chart
 

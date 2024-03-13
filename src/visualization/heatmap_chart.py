@@ -104,7 +104,7 @@ class HeatmapChart(AltairChart):
                 dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
             for dropdown_key in dropdown_keys:
                 dropdown_values.append(list(set(df_data[dropdown_key])))
-            self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color)
+            self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "fill")
 
         # If the chart has to be zoomable, set the property
         if self.zoomable == True:

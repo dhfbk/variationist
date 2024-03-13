@@ -113,14 +113,24 @@ VAR_CHARTS_MAP = {
                 ScatterChart: {
                     "x": (0, "quantitative"),
                     "y": ("value", "quantitative"),
-                    "color": (1, "nominal"),
-                    "dropdown": [],
-                    "search": [("ngram", "nominal")]
-                }, # @TODO: [scatter] coord (x), score (y), nominal (color), ngram (filter)
+                    "color": ("ngram", "nominal"),
+                    "extra": (1, "nominal"),
+                    "dropdown": [("ngram", "nominal"), (1, "nominal")],
+                    "search": []
+                },
             },
         },
         "coordinates-ordinal": {
-            # "general-general": [], # @TODO: [scatter] coord (x), score (y), ordinal (color), ngram (filter)
+            "general-general": {
+                ScatterChart: {
+                    "x": (0, "quantitative"),
+                    "y": ("value", "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "extra": (1, "nominal"),
+                    "dropdown": [("ngram", "nominal"), (1, "nominal")],
+                    "search": []
+                },
+            },
             # "general-temporal": [], # @TODO: [line] time (x), coord (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
         },
         "coordinates-quantitative": {
@@ -165,7 +175,16 @@ VAR_CHARTS_MAP = {
             },
         },
         "nominal-quantitative": {
-            # "general-general": [], # @TODO: [scatter] quant (x), score (y), nom (color), ngram (filter) + @FUTURE: heatmap or similar?
+            "general-general": {
+                ScatterChart: {
+                    "x": (1, "quantitative"),
+                    "y": ("value", "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "extra": (0, "nominal"),
+                    "dropdown": [("ngram", "nominal"), (0, "nominal")],
+                    "search": []
+                },
+            },
             # "spatial-general": [], # @TODO: [chroplet] spatial (xy), score (color), ~quant (filter), ngram (filter)
         },
         "ordinal-ordinal": {
@@ -181,7 +200,16 @@ VAR_CHARTS_MAP = {
             # "general-temporal": [], # @TODO: [line] time (x), score (y), ord (~shape), ngram (filter)
         },
         "ordinal-quantitative": {
-            # "general-general": [], # @TODO: [scatter] quant (x), score (y), ordinal (color), ngram (filter)
+            "general-general": {
+                ScatterChart: {
+                    "x": (1, "quantitative"),
+                    "y": ("value", "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "extra": (0, "nominal"),
+                    "dropdown": [("ngram", "nominal"), (0, "nominal")],
+                    "search": []
+                },
+            },
             # "temporal-general": [], # @TODO: [line] time (x), quant (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
         },
         "quantitative-quantitative": {
