@@ -5,7 +5,6 @@ import emoji
 import pandas as pd
 import json
 import os
-
 from typing import Union
 
 
@@ -76,7 +75,7 @@ def convert_file_to_dataframe(data_filepath, cols_type):
         string_parts = data_filepath.split("::")
         if len(string_parts) == 3:
             prefix, dataset_name, split = string_parts
-            print(f"INFO: '{data_filepath}' is loaded as a HuggingFace dataset (\"{split}\" split).")
+            print(f"INFO: 'Loading {data_filepath}' as a HuggingFace dataset (\"{split}\" split).")
             dataframe = pd.DataFrame(load_dataset(dataset_name)[split])
         else:
             raise Exception(f"ERROR: {data_filepath} seems to refer to a HuggingFace dataset, however " 

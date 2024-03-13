@@ -198,20 +198,23 @@ class Inspector:
             curr_sem = self.args.var_semantics[i]
             curr_var_column = self.dataframe[curr_var_name]
             if curr_bins != 0:
-                if type(curr_bins) is int:
-                    if curr_sem == "temporal":
-                        curr_var_column = pd.to_datetime(curr_var_column)
-                        print(self.dataframe)
+                if curr_type != "nominal":
+                    if type(curr_bins) is int:
+                        if curr_sem == "temporal":
+                            curr_var_column = pd.to_datetime(curr_var_column)
+                            print(self.dataframe)
+                            print(self.dataframe.info())
+                        print(f"INFO: For the variable {curr_var_name}, bins were defined. It will therefore be split into {curr_bins} equal bins.")
+                        self.dataframe[curr_var_name] = preprocess_utils.discretize_bins_col(curr_var_column,
+                                                                                            curr_type,
+                                                                                            curr_sem,
+                                                                                            curr_bins
+                                                                                            )
                         print(self.dataframe.info())
-                    print(f"INFO: For the variable {curr_var_name}, bins were defined. It will therefore be split into {curr_bins} equal bins.")
-                    self.dataframe[curr_var_name] = preprocess_utils.discretize_bins_col(curr_var_column,
-                                                                                        curr_type,
-                                                                                        curr_sem,
-                                                                                        curr_bins
-                                                                                        )
-                    print(self.dataframe.info())
+                    else:
+                        sys.exit(f"ERROR: var_bins was defined, but not correctly. We expected a list of integer values for each variable (with 0 for variables where no binning is desired), but instead for the variable {curr_var_name} the input was of type {type(curr_bins).__name__}.")
                 else:
-                    sys.exit(f"ERROR: var_bins was defined, but not correctly. We expected a list of integer values for each variable (with 0 for variables where no binning is desired), but instead for the variable {curr_var_name} the input was of type {type(curr_bins).__name__}.")
+                    sys.exit(f"ERROR: var_bins was defined for variable {curr_var_name}, whose type is 'nominal'. However, nominal values cannot be divided into bins. If the {curr_var_name} variable is numeric, please specify another var_type for it. If it is an actual nominal variable, its var_bins value should be 0.")
             # elif curr_gran is not None and curr_bins == 0:
             #     print(f"INFO: For the variable {curr_var_name}, granularity was defined.")  #TODO finish this info string with the values for granularity etc.
             #     # this case should be divided among temporal, spatial, and generic.
