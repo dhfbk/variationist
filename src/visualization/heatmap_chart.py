@@ -89,8 +89,11 @@ class HeatmapChart(AltairChart):
         )
 
         # Set extra properties
-        chart_width = 800
-        self.base_chart = self.base_chart.properties(width=chart_width, center=True)
+        num_labels_x = len(list(df_data[x_name].unique()))
+        num_labels_y = len(list(df_data[y_name].unique()))
+        chart_width = min(num_labels_x * 50, 800)
+        chart_height = min(num_labels_y * 50, 600)
+        self.base_chart = self.base_chart.properties(width=chart_width, height=chart_height, center=True)
 
         # If the chart has to be filterable, create and add search/dropdown components to it
         # Note: the chart is always filterable for choropleth charts

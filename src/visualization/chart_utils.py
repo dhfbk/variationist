@@ -169,7 +169,15 @@ VAR_CHARTS_MAP = {
             # "spatial-general": [], # @TODO: [chroplet] spatial (xy), score (color), ~quant (filter), ngram (filter)
         },
         "ordinal-ordinal": {
-            # "general-general": [], # @TODO: [heatmap] ord (x), ord (y), score (color), ngram (filter)
+            "general-general": {
+                HeatmapChart: {
+                    "x": (0, "ordinal"),
+                    "y": (1, "ordinal"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
+                },
+            },
             # "general-temporal": [], # @TODO: [line] time (x), score (y), ord (~shape), ngram (filter)
         },
         "ordinal-quantitative": {
