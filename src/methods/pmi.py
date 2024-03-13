@@ -64,8 +64,8 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest, weighted, freq
                 pxy = freqs_dict[label][w]/total
                 px = label_count[label]/total
                 py = freqs_merged_dict[w]/total
-                # pmi_value = math.log(pxy/(px*py))
-                pmi_value = math.log(safe_divide(pxy,(px*py)))
+                # pmi_value = math.log2(pxy/(px*py))
+                pmi_value = math.log2(safe_divide(pxy,(px*py)))
                 if weighted:
                     pmi_value = pmi_value*freqs_dict[label][w]
                 label_pmi_dict[w] = pmi_value
@@ -128,22 +128,35 @@ def pmi_positive(label_values_dict, subsets_of_interest, args):
     return output_pmi
 
 def pmi_positive_normalized(label_values_dict, subsets_of_interest, args):
-    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)   
-    min_max_list = []
-    for label in output_pmi:
-        for w in output_pmi[label]:
-            if output_pmi[label][w] < 0:
-                output_pmi[label][w] = 0
-        if len(output_pmi[label]) > 0: # if the list is not empty
-            min_max_list.append(min(output_pmi[label].values()))
-            min_max_list.append(max(output_pmi[label].values()))    
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff) 
 
-    min_value = min(min_max_list)
-    max_value = max(min_max_list)
-    
     for label in output_pmi:
-        for w in output_pmi[label]:
-            output_pmi[label][w] = safe_divide((output_pmi[label][w] - min_value) , (max_value - min_value))
+        if len(output_pmi[label]) > 0: # if the list is not empty
+            min_max_list = []
+            min_max_list.append(min(output_pmi[label].values()))
+            min_max_list.append(max(output_pmi[label].values()))
+            min_value = min(min_max_list)
+            max_value = max(min_max_list)
+            for w in output_pmi[label]:
+                output_pmi[label][w] = safe_divide((output_pmi[label][w]-min_value), (max_value-min_value))
+                if output_pmi[label][w] < 0:
+                    output_pmi[label][w] = 0
+
+    # min_max_list = []
+    # for label in output_pmi:
+    #     for w in output_pmi[label]:
+    #         if output_pmi[label][w] < 0:
+    #             output_pmi[label][w] = 0
+    #     if len(output_pmi[label]) > 0: # if the list is not empty
+    #         min_max_list.append(min(output_pmi[label].values()))
+    #         min_max_list.append(max(output_pmi[label].values()))    
+
+    # min_value = min(min_max_list)
+    # max_value = max(min_max_list)
+    
+    # for label in output_pmi:
+    #     for w in output_pmi[label]:
+    #         output_pmi[label][w] = safe_divide((output_pmi[label][w] - min_value) , (max_value - min_value))
 
     # # Print for debug
     # for label in output_pmi:
@@ -174,19 +187,30 @@ def pmi_weighted(label_values_dict, subsets_of_interest, args):
     return output_pmi
 
 def pmi_normalized_weighted(label_values_dict, subsets_of_interest, args):
-    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)      
-    min_max_list = []
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)  
+
     for label in output_pmi:
         if len(output_pmi[label]) > 0: # if the list is not empty
+            min_max_list = []
             min_max_list.append(min(output_pmi[label].values()))
             min_max_list.append(max(output_pmi[label].values()))
+            min_value = min(min_max_list)
+            max_value = max(min_max_list)
+            for w in output_pmi[label]:
+                output_pmi[label][w] = safe_divide((output_pmi[label][w]-min_value), (max_value-min_value))
 
-    min_value = min(min_max_list)
-    max_value = max(min_max_list)
+    # min_max_list = []
+    # for label in output_pmi:
+    #     if len(output_pmi[label]) > 0: # if the list is not empty
+    #         min_max_list.append(min(output_pmi[label].values()))
+    #         min_max_list.append(max(output_pmi[label].values()))
+
+    # min_value = min(min_max_list)
+    # max_value = max(min_max_list)
     
-    for label in output_pmi:
-        for w in output_pmi[label]:
-            output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
+    # for label in output_pmi:
+    #     for w in output_pmi[label]:
+    #         output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
     
     # # Print for debug
     # for label in output_pmi:
@@ -212,22 +236,35 @@ def pmi_positive_weighted(label_values_dict, subsets_of_interest, args):
     return output_pmi
 
 def pmi_positive_normalized_weighted(label_values_dict, subsets_of_interest, args):
-    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)   
-    min_max_list = []
-    for label in output_pmi:
-        for w in output_pmi[label]:
-            if output_pmi[label][w] < 0:
-                output_pmi[label][w] = 0
-        if len(output_pmi[label]) > 0: # if the list is not empty
-            min_max_list.append(min(output_pmi[label].values()))
-            min_max_list.append(max(output_pmi[label].values()))    
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
 
-    min_value = min(min_max_list)
-    max_value = max(min_max_list)
-    
     for label in output_pmi:
-        for w in output_pmi[label]:
-            output_pmi[label][w] = safe_divide((output_pmi[label][w] - min_value) , (max_value - min_value))
+        if len(output_pmi[label]) > 0: # if the list is not empty
+            min_max_list = []
+            min_max_list.append(min(output_pmi[label].values()))
+            min_max_list.append(max(output_pmi[label].values()))
+            min_value = min(min_max_list)
+            max_value = max(min_max_list)
+            for w in output_pmi[label]:
+                output_pmi[label][w] = safe_divide((output_pmi[label][w]-min_value), (max_value-min_value))
+                if output_pmi[label][w] < 0:
+                    output_pmi[label][w] = 0
+
+    # min_max_list = []
+    # for label in output_pmi:
+    #     for w in output_pmi[label]:
+    #         if output_pmi[label][w] < 0:
+    #             output_pmi[label][w] = 0
+    #     if len(output_pmi[label]) > 0: # if the list is not empty
+    #         min_max_list.append(min(output_pmi[label].values()))
+    #         min_max_list.append(max(output_pmi[label].values()))    
+
+    # min_value = min(min_max_list)
+    # max_value = max(min_max_list)
+    
+    # for label in output_pmi:
+    #     for w in output_pmi[label]:
+    #         output_pmi[label][w] = safe_divide((output_pmi[label][w] - min_value) , (max_value - min_value))
 
     # # Print for debug
     # for label in output_pmi:
