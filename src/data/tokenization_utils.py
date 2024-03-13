@@ -30,6 +30,10 @@ def huggingface_tokenization(text_column, args):
     tokenizer_name = args.tokenizer.strip("hf::")
     hf_tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     tqdm.pandas()
+    nulls = text_column.isnull()
+    if nulls.values.any():
+        print(f"INFO: we detected one or more null value in the provided text column (indices {list(nulls[nulls].index)}. We will substitute them with an empty string.")
+        text_column = text_column.fillna("")
     tok_column = text_column.squeeze().progress_apply(hf_tokenizer.encode, add_special_tokens=False)
     tok_column = tok_column.squeeze().apply(hf_tokenizer.convert_ids_to_tokens)
     return tok_column

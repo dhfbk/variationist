@@ -2,6 +2,7 @@
 The Inspector class, to handle all the operations of Variationist.
 """
 import os
+import sys
 from dataclasses import dataclass, asdict, field
 from datasets import Dataset
 import pandas as pd
@@ -26,13 +27,13 @@ class InspectorArgs:
             The list of variable types corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `nominal` (default), `ordinal`, `quantitative`, and `coordinates`.
         var_semantics (`List[str]`):
             The list of variable semantics corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `general` (default), `temporal`, and `spatial`.
-        var_subsets (`Tuple[List]`):
-            Subsets to use for the analysis. To be used when the combinations of all variables are too many and we want to focus on analyzing a subset against another subset, specifying values for multiple variables. Should follow the format `(['var_a_value_1', 'var_b_value_1'], ['var_a_value_2', 'var_b_value_2'])`.
+        var_bins (Int):
+            The list of indices for variables that should be split into bins for the analysis. Works with quantitative variables, dates and timestamps. Will default to 0 for each specified variable, indicating 0 bins.
         tokenizer ([`PreTrainedTokenizerBase`], *optional*, defaults to `whitespace`): #TODO
             The tokenizer used to preprocess the data. Will default to whitespace tokenization if not specified.
         language (`str`):
             The language of the text in the dataset. Used for proper tokenization and stopword removal.
-        metrics (`Callable[[EvalPrediction], Dict]`, *optional*):
+        metrics (`Callable[[EvalPrediction], Dict)`, *optional*):
             The list of metrics that should be calculated.
         n_tokens (`Int`):
             The number of tokens that should be considered for the analysis. 1 corresponds to unigrams, 2 corresponds to bigrams, and so on.
@@ -48,6 +49,8 @@ class InspectorArgs:
             Whether to remove stopwords from texts before tokenization or not. Will default to False.
         lowercase (`Bool`):
             Whether to lowercase all the texts before tokenization or not. Will default to False.
+        ignore_null_var (`Bool`):
+            Whether to proceed when null values are present for variables. Defaults to False, as this behavior can have unpredictable results. Set to True to treat "Nan" as any other variable value.
     """
     
     tokenizer: Optional[Union[str, Callable]] = 'whitespace'
@@ -58,6 +61,8 @@ class InspectorArgs:
     var_types: Optional[List] = None # nominal (default), ordinal, quantitative, coordinates
     var_semantics: Optional[List] = None # default=General, temporal, spatial
     var_subsets: Optional[List] = None
+    var_granularity: Optional[List] = None
+    var_bins: Optional[List] = None
     n_tokens: Optional[int] = 1 # maximum value for this should be 5, otherwise the computation will explode
     n_cooc: Optional[int] = 1
     unique_cooc: Optional[bool] = False
@@ -65,6 +70,7 @@ class InspectorArgs:
     freq_cutoff: Optional[int] = 3
     stopwords: Optional[bool] = False # TODO currently we only support stopwords = en,it. Add support for False, spacy, hf
     lowercase: Optional[bool] = False
+    ignore_null_var: Optional[bool] = False
     
     def to_dict(self):
         """Returns the InspectorArgs values inside a dictionary."""
@@ -109,6 +115,15 @@ class Inspector:
             default_semantics = "general"
             self.args.var_semantics = [default_semantics] * len(self.args.var_names)
             print(f"INFO: No values have been set for var_semantics. Defaults to {default_semantics}.")
+        if self.args.var_bins == None:
+            default_bin = 0
+            self.args.var_bins = [default_bin] * len(self.args.var_names)
+            # print(f"INFO: No values have been set for var_bins. Defaults to {default_bin}.")
+        if self.args.var_granularity == None:
+            default_granularity = None
+            self.args.var_granularity = [default_granularity] * len(self.args.var_names)
+            # print(f"INFO: No values have been set for var_granularity. Defaults to {default_granularity}.")
+
 
         # Dictionary for the metadata to be printed in the json output
         metadata_dict = self.args.to_dict()
@@ -147,6 +162,13 @@ class Inspector:
         self.tokenizer = Tokenizer(self.args)
         
         self.check_columns()
+        self.check_nan_values()
+        
+        # check if we need to bin or discretize any values
+        self.discretize = False
+        for i in range(len(self.args.var_names)):
+            if self.args.var_bins[i] != 0:
+                self.discretize = True
 
 
     def check_columns(self):
@@ -155,11 +177,58 @@ class Inspector:
         for col in self.args.text_names+self.args.var_names:
             if col not in self.dataframe_cols:
                 raise ValueError(f"ERROR: the '{col}' column is not present in the dataframe.")
+    
+    
+    def check_nan_values(self):
+        """Checks if the specified variable columns contain Nan values and returns an error."""
+        for var in self.args.var_names:
+            nulls = self.dataframe[var].isnull()
+            if nulls.values.any():
+                if self.args.ignore_null_var:
+                    print(f"INFO: One or more null values were found for the '{var}' variable. The indices (lines) of null values are {list(nulls[nulls].index)}. Since 'ignore_null_var' was set to True, Nan values will be treated as any other variable value. This might lead to unexpected results.")
+                else:
+                    sys.exit(f"ERROR: One or more null values were found for the '{var}' variable. The indices (lines) of null values are {list(nulls[nulls].index)}. If you wish to ignore null values and proceed, please set 'ignore_null_var' to True when defining the InspectorArgs.")
+                    
+            
+    def handle_bins_and_granularity(self):
+        for i in range(len(self.args.var_names)):
+            curr_var_name = self.args.var_names[i]
+            curr_bins = self.args.var_bins[i]
+            curr_type = self.args.var_types[i]
+            curr_sem = self.args.var_semantics[i]
+            curr_var_column = self.dataframe[curr_var_name]
+            if curr_bins != 0:
+                if type(curr_bins) is int:
+                    if curr_sem == "temporal":
+                        curr_var_column = pd.to_datetime(curr_var_column)
+                        print(self.dataframe)
+                        print(self.dataframe.info())
+                    print(f"INFO: For the variable {curr_var_name}, bins were defined. It will therefore be split into {curr_bins} equal bins.")
+                    self.dataframe[curr_var_name] = preprocess_utils.discretize_bins_col(curr_var_column,
+                                                                                        curr_type,
+                                                                                        curr_sem,
+                                                                                        curr_bins
+                                                                                        )
+                    print(self.dataframe.info())
+                else:
+                    sys.exit(f"ERROR: var_bins was defined, but not correctly. We expected a list of integer values for each variable (with 0 for variables where no binning is desired), but instead for the variable {curr_var_name} the input was of type {type(curr_bins).__name__}.")
+            # elif curr_gran is not None and curr_bins == 0:
+            #     print(f"INFO: For the variable {curr_var_name}, granularity was defined.")  #TODO finish this info string with the values for granularity etc.
+            #     # this case should be divided among temporal, spatial, and generic.
+            #     sys.exit("ERROR: Granularity is not fully implemented yet.")
+                
+            # elif curr_bins != 0 and curr_gran is not None:
+            #     sys.exit(f"ERROR: both bins and granularity are defined for the variable '{curr_var_name}', while only one of them should be specified for each variable.")
             
 
-    def compute(self):
-        """Function that runs the actual computation"""
-        # TODO handle metrics in a smarter way.
+
+    def preprocess(self):
+        """Performs all of the preprocessing operations of variationist, such as grouping together variables and dividing variables into bins."""
+        # check if any discretization or binning should be carried out and do it
+        if self.discretize == True:
+            self.handle_bins_and_granularity()
+
+        
         label_values_dict = preprocess_utils.get_label_values(self.dataframe, self.col_names_dict)
         
         if len(self.args.var_names) == 1:
@@ -177,8 +246,13 @@ class Inspector:
             # print(label_values_dict)
             label_values_dict = preprocess_utils.update_label_values_dict_with_inters(label_values_dict)
             print(label_values_dict)
-            
-        
+        return label_values_dict, subsets_of_interest
+
+
+    def compute(self):
+        """Function that runs the actual computation"""
+        # TODO handle metrics in a smarter way.
+        label_values_dict, subsets_of_interest = self.preprocess()
         
         results_dict = dict()
         for metric in self.args.metrics:
@@ -191,7 +265,6 @@ class Inspector:
             results_dict[metric_name] = {}
             results_dict[metric_name][list(label_values_dict.keys())[0]] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
             
-        # TODO handle series_dict
         self.results_dict = results_dict
         return subsets_of_interest,results_dict
 

@@ -36,18 +36,33 @@ def convert_to_ngrams(token_list, n_tokens):
         new_array.append(" ".join(token_list[i: i + n_tokens]))
     return(new_array)
 
+
 def create_tokenized_ngrams_column(tokenized_text_column, n_tokens):
     # Takes as input an already tokenized array/series of texts and the length of the ngrams
     # Returns tokenized_text_column with the tokens merged into ngrams
     tqdm.pandas()
     tokenized_text_column = tokenized_text_column.squeeze().progress_apply(lambda x: convert_to_ngrams(x,n_tokens))
     return(tokenized_text_column)
+    # TODO this will be developed in a future release
+    # def discretize_granularity(dataframe, var_names, var_types, var_semantics, var_granularity):
+    #     for i in range(len(var_names)):
+    #         if var_granularity != None:
+    #             break
+    #     # allora mappiamo le robe. controllare doc pandas
+    #     return dataframe
+
+
+def discretize_bins_col(dataframe_var_col, curr_var_type, curr_var_semantic, curr_var_bins):
+    discretized_var_col, bin_names = pd.cut(dataframe_var_col,
+                                            bins=curr_var_bins,
+                                            retbins=True)
+    print(f"""INFO: The calculated cutoff values of bins for the {dataframe_var_col.name} variable are:\n{list(bin_names)}\nThese will be reported as (value_x, value_x+1] in the results.""")
+    return discretized_var_col
 
 
 def extract_combinations(token_list, n_items, context_window, unique_cooc):
     # Takes as input a list of tokens, the number of words that cooccur and the context window size 
     # Returns token_list merged into cooccurrences
-
     if context_window == 0:
         context_window = len(token_list)
     new_array = []
@@ -56,7 +71,6 @@ def extract_combinations(token_list, n_items, context_window, unique_cooc):
             if (not unique_cooc) or ((unique_cooc) and (len(set(cooc)) == len(cooc))):
                 new_array.append(" ".join(sorted(cooc)))
     new_array = list(set(new_array))
-    
     return(new_array)
     
 
@@ -95,7 +109,7 @@ def update_label_values_dict_with_inters(label_values_dict):
     subset_intersections = itertools.product(*current_var_values)
     for intersection in subset_intersections:
         intersection_name = "::".join(map(str, intersection))
-        inters_label_values_dict[var_combination_name]. append(intersection_name)
+        inters_label_values_dict[var_combination_name].append(intersection_name)
     return inters_label_values_dict
 
 
@@ -120,7 +134,6 @@ def get_subset_dict(input_dataframe, tok_columns_dict, label_values_dict):
                 current_label_subset.append(series_with_current_label)
             subsets_of_interest[label] = current_label_subset    
     return subsets_of_interest    
-
 
 
 def get_subset_intersections(input_dataframe, tok_columns_dict, label_values_dict):
