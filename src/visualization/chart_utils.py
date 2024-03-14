@@ -165,7 +165,13 @@ VAR_CHARTS_MAP = {
                     "search": []
                 },
             },
-            # "general-spatial": [], # @TODO: [chroplet] spatial (xy), score (color), general (filter), ngram (filter)
+            "general-spatial": {
+                ChoroplethChart: {
+                    "color": (1, "nominal"),
+                    "dropdown": [("ngram", "nominal"), (0, "nominal")],
+                    "search": []
+                },
+            },
         },
         "nominal-ordinal": {
             "general-general": {
@@ -213,7 +219,13 @@ VAR_CHARTS_MAP = {
                     "search": []
                 },
             },
-            # "spatial-general": [], # @TODO: [chroplet] spatial (xy), score (color), ~quant (filter), ngram (filter)
+            "spatial-general": {
+                ChoroplethChart: {
+                    "color": (0, "nominal"),
+                    "dropdown": [("ngram", "nominal"), (1, "nominal")],
+                    "search": []
+                },
+            },
         },
         "ordinal-ordinal": {
             "general-general": {
@@ -273,23 +285,65 @@ VAR_CHARTS_MAP = {
     },
     "5-dims": {
         "coordinates-coordinates-nominal": {
-            # "general-general-general": [], # @TODO: [scatter] coord (x), coord (y), nom (filter), ngram (filter) + @FUTURE: add density plot
-            # "general-general-spatial": [], # @TODO: [scatter] coord (x), coord (y), nom (filter), ngram (filter) + @FUTURE: add density plot
-            # "spatial-spatial-general": [], # @TODO: [scatter] coord (x), coord (y), nom (filter), ngram (filter) + @FUTURE: add density plot
-        },
-        "coordinates-coordinates-ordinal": {
-            # "general-general-general": [], # @TODO: [scatter] coord (x), coord (y), ordinal (filter), ngram (filter) + @FUTURE: add density plot
-            "general-general-temporal": {
+            "general-general-general": {
+                ScatterChart: {
+                    "x": (0, "quantitative"),
+                    "y": (1, "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "opacity": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal"), (2, "nominal")],
+                    "search": []
+                },
+            },
+            "spatial-spatial-general": {
                 ScatterGeoChart: {
                     "lat": (0, "quantitative"),
                     "lon": (1, "quantitative"),
                     "color": ("value", "quantitative"),
-                    "dropdown": [],
-                    "search": [("ngram", "nominal"), (2, "ordinal")]
-                }
-            }, # @TODO: [scatter] coord (x), coord (y), ordinal (filter), ngram (filter) + @FUTURE: add density plot
-            # "spatial-spatial-general": [], # @TODO: [scatter] coord (x), coord (y), ordinal (filter), ngram (filter) + @FUTURE: add density plot
-            # "spatial-spatial-temporal": [], # @TODO: [scatter] coord (x), coord (y), ordinal (filter), ngram (filter) + @FUTURE: add density plot
+                    "dropdown": [("ngram", "nominal"), (2, "nominal")],
+                    "search": []
+                },
+            },
+        },
+        "coordinates-coordinates-ordinal": {
+            "general-general-general": {
+                ScatterChart: {
+                    "x": (0, "quantitative"),
+                    "y": (1, "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "opacity": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal"), (2, "ordinal")],
+                    "search": []
+                },
+            },
+            "general-general-temporal": {
+                ScatterChart: {
+                    "x": (0, "quantitative"),
+                    "y": (1, "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "opacity": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal"), (2, "temporal")],
+                    "search": []
+                },
+            },
+            "spatial-spatial-general": {
+                ScatterGeoChart: {
+                    "lat": (0, "quantitative"),
+                    "lon": (1, "quantitative"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal"), (2, "ordinal")],
+                    "search": []
+                },
+            },
+            "spatial-spatial-temporal": {
+                ScatterGeoChart: {
+                    "lat": (0, "quantitative"),
+                    "lon": (1, "quantitative"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal"), (2, "temporal")],
+                    "search": []
+                },
+            },
         },
     },
 }
