@@ -223,6 +223,31 @@ class AltairChart(Chart):
                 tooltip = tooltip
             )
             base_chart = base_chart.configure_legend(disable=True)
+        elif operation == "size":
+            base_chart = base_chart.encode(
+                color = alt.condition(
+                    functools.reduce(operator.and_, dropdowns),
+                    color,
+                    alt.value("")
+                ),
+                size = alt.condition(
+                    functools.reduce(operator.and_, dropdowns),
+                    "value",
+                    alt.value(0)
+                ),
+                tooltip = tooltip
+            )
+            base_chart = base_chart.configure_legend(disable=True)
+        elif operation == "shape":
+            base_chart = base_chart.encode(
+                color = alt.condition(
+                    functools.reduce(operator.and_, dropdowns),
+                    color,
+                    alt.value("")
+                ),
+                tooltip = tooltip
+            )
+            base_chart = base_chart.configure_legend(disable=True)
         else:
             raise ValueError(f"The operation \"{operation}\" is not envisioned.")
 
@@ -263,6 +288,12 @@ class AltairChart(Chart):
         # Get the variable name (from string or its index) and the (altair) type for plotting
         var_name = chart_dims[dim][0] if (type(chart_dims[dim][0])==str) else var_names[chart_dims[dim][0]]
         var_type_ = chart_dims[dim][1]
+
+        # @TEMP workaround: Check for unwanted inversions
+        if ("ordinal" in self.var_types) and ("quantitative" in self.var_types):
+            if ("temporal" in self.var_semantics) and ("general" in self.var_semantics):
+                index = 1 if chart_dims[dim][0] == 0 else 0
+                var_name = chart_dims[dim][0] if (type(chart_dims[dim][0])==str) else var_names[index]
         
         return var_name, var_type_
 

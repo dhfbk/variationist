@@ -132,7 +132,16 @@ VAR_CHARTS_MAP = {
                     "search": []
                 },
             },
-            # "general-temporal": [], # @TODO: [line] time (x), coord (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
+            "general-temporal": {
+                TemporalLineChart: {
+                    "x": (1, "temporal"),
+                    "y": (0, "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "size": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
+                },
+            }
         },
         "coordinates-quantitative": {
             "general-general": {
@@ -168,7 +177,16 @@ VAR_CHARTS_MAP = {
                     "search": []
                 },
             },
-            # "general-temporal": [], # @TODO: [line] time (x), score (y), nom (shape), ngram (filter)
+            "general-temporal": {
+                TemporalLineChart: {
+                    "x": (1, "temporal"),
+                    "y": ("value", "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "shape": (0, "nominal"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
+                },
+            },
             "spatial-general": {
                 ChoroplethChart: {
                     "color": (0, "nominal"),
@@ -207,7 +225,16 @@ VAR_CHARTS_MAP = {
                     "search": []
                 },
             },
-            # "general-temporal": [], # @TODO: [line] time (x), score (y), ord (~shape), ngram (filter)
+            "general-temporal": {
+                TemporalLineChart: {
+                    "x": (1, "temporal"),
+                    "y": ("value", "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "shape": (0, "nominal"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
+                },
+            },
         },
         "ordinal-quantitative": {
             "general-general": {
@@ -220,7 +247,16 @@ VAR_CHARTS_MAP = {
                     "search": []
                 },
             },
-            # "temporal-general": [], # @TODO: [line] time (x), quant (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
+            "temporal-general": {
+                TemporalLineChart: {
+                    "x": (0, "temporal"),
+                    "y": (1, "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "size": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
+                },
+            },
         },
         "quantitative-quantitative": {
             "general-general": {

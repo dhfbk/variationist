@@ -58,31 +58,69 @@ class TemporalLineChart(AltairChart):
             self.text_label = "tokens"
 
         # Set base chart style
-        self.base_chart = self.base_chart.mark_line(point=True, strokeDash=[1, 0])
+        if ("size" in chart_dims) or ("shape" in chart_dims):
+            self.base_chart = self.base_chart.mark_trail(
+                point=alt.OverlayMarkDef(size=75, strokeWidth=0.5))
+        else:
+            self.base_chart = self.base_chart.mark_line(point=True, strokeDash=[1, 0])
 
         # Get relevant dimensions
         x_name, x_type = self.get_dim("x", chart_dims)
         y_name, y_type = self.get_dim("y", chart_dims)
+        if "size" in chart_dims:
+            size_name, size_type = self.get_dim("size", chart_dims)
+            color_name, color_type = self.get_dim("color", chart_dims)
+        if "shape" in chart_dims:
+            shape_name, shape_type = self.get_dim("shape", chart_dims)
+            color_name, color_type = self.get_dim("color", chart_dims)
 
         # Set dimensions
+        y_domain = list(df_data[y_name].astype(float).unique())
         x_dim = alt.X(x_name, type=x_type)
-        y_dim = alt.Y(y_name, type=y_type, title=chart_metric)
-        color = alt.Color("ngram", type="nominal", title="", legend=None)
+        if "size" in chart_dims:
+            y_dim = alt.Y(y_name, type=y_type)
+            size = alt.Size(size_name, type=size_type)
+            color = alt.Color(color_name, type=color_type)
+        elif "shape" in chart_dims:
+            y_dim = alt.Y(y_name, type=y_type)
+            shape = alt.Shape(shape_name, type=shape_type)
+            color = alt.Color(color_name, type=color_type)
+        else:
+            y_dim = alt.Y(y_name, type=y_type, title=chart_metric)
+            color = alt.Color("ngram", type="nominal", title="", legend=None)
 
         # Set tooltip (it will be overwritten if "filterable" is True)
         tooltip = [
             alt.Tooltip("ngram", type="nominal", title=self.text_label),
             alt.Tooltip(x_name, type=x_type),
-            alt.Tooltip(y_name, type=y_type, title=self.metric_label)
         ]
+        if "size" in chart_dims:
+            tooltip.append(alt.Tooltip(y_name, type=y_type))
+            tooltip.append(alt.Tooltip(size_name, type=size_type, title=self.metric_label))
+        elif "shape" in chart_dims:
+            tooltip.append(alt.Tooltip(shape_name, type=shape_type))
+            tooltip.append(alt.Tooltip(y_name, type=y_type))
+        else:
+            tooltip.append(alt.Tooltip(y_name, type=y_type, title=self.metric_label))
 
         # Encoding the data
-        self.base_chart = self.base_chart.encode(
-            x_dim,
-            y_dim,
-            color,
-            tooltip
-        )
+        if "shape" in chart_dims:
+            self.base_chart = self.base_chart.encode(
+                x_dim,
+                y_dim,
+                color,
+                shape,
+                # Note: opacity will be conditionally added by the "add_dropdown_component", if needed
+                tooltip
+            )
+        else:
+            self.base_chart = self.base_chart.encode(
+                x_dim,
+                y_dim,
+                color,
+                # Note: opacity will be conditionally added by the "add_dropdown_component", if needed
+                tooltip
+            )
 
         # Set extra properties
         chart_width = 800
@@ -90,7 +128,19 @@ class TemporalLineChart(AltairChart):
 
         # If the chart has to be filterable, create and add a search component to it
         if self.filterable == True:
-            self.base_chart = self.add_search_component(self.base_chart, tooltip, color)
+            if ("size" in chart_dims) or ("shape" in chart_dims):
+                dropdown_keys = []
+                dropdown_values = []
+                for i in range(len(chart_dims["dropdown"])):
+                    dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
+                for dropdown_key in dropdown_keys:
+                    dropdown_values.append(list(set(df_data[dropdown_key])))
+                if "size" in chart_dims:
+                    self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "size")
+                else:
+                    self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "shape")
+            else:
+                self.base_chart = self.add_search_component(self.base_chart, tooltip, color)
 
         # If the chart has to be zoomable, set the property
         if self.zoomable == True:
