@@ -24,17 +24,17 @@ class InspectorArgs:
         var_names (`List[str]`):
             The list of variable names to use for the analysis. Each string in var_names should correspond to a dataset column.
         var_types (`List[str]`):
-            The list of variable types corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `nominal` (default), `ordinal`, `quantitative`, and `coordinates`.
+            The list of variable types corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `nominal` (default), `ordinal`, `quantitative`, and `coordinates`. These are mostly used for binning and visualization.
         var_semantics (`List[str]`):
-            The list of variable semantics corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `general` (default), `temporal`, and `spatial`.
-        var_bins (Int):
+            The list of variable semantics corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `general` (default), `temporal`, and `spatial`. These are mostly used for binning and visualization.
+        var_bins (`List[int]`):
             The list of indices for variables that should be split into bins for the analysis. Works with quantitative variables, dates and timestamps. Will default to 0 for each specified variable, indicating 0 bins.
-        tokenizer ([`PreTrainedTokenizerBase`], *optional*, defaults to `whitespace`): #TODO
-            The tokenizer used to preprocess the data. Will default to whitespace tokenization if not specified.
+        tokenizer (`str` or `Callable`), *optional*, defaults to `whitespace`):
+            The tokenizer used to preprocess the data. Will default to whitespace tokenization if not specified. Alternatively, it can be a string in the format "hf::tokenizer_name" for loading a HuggingFace tokenizer. A custom function can also be passed for tokenization. It should take as input an array of texts (assumed to be a Pandas Series) and the InspectorArgs. It should return the same array but tokenized. Check out our example notebooks for examples.
         language (`str`):
             The language of the text in the dataset. Used for proper tokenization and stopword removal.
-        metrics (`Callable[[EvalPrediction], Dict)`, *optional*):
-            The list of metrics that should be calculated.
+        metrics (`List[str, Callable]`, *optional*):
+            The list of metrics that should be calculated. It can be one of the metrics natively implemented by Variationist or a custom callable function.
         n_tokens (`Int`):
             The number of tokens that should be considered for the analysis. 1 corresponds to unigrams, 2 corresponds to bigrams, and so on.
         n_cooc (`Int`):
@@ -53,15 +53,15 @@ class InspectorArgs:
             Whether to proceed when null values are present for variables. Defaults to False, as this behavior can have unpredictable results. Set to True to treat "Nan" as any other variable value.
     """
     
-    tokenizer: Optional[Union[str, Callable]] = 'whitespace'
-    language: Optional[str] = None
-    metrics: Optional[List] = None
     text_names: Optional[List] = None # explicit column name(s)
     var_names: Optional[List] = None # explicit variable name(s)
+    metrics: Optional[List] = None
     var_types: Optional[List] = None # nominal (default), ordinal, quantitative, coordinates
     var_semantics: Optional[List] = None # default=General, temporal, spatial
     var_subsets: Optional[List] = None
     var_bins: Optional[List] = None
+    tokenizer: Optional[Union[str, Callable]] = 'whitespace'
+    language: Optional[str] = None
     n_tokens: Optional[int] = 1 # maximum value for this should be 5, otherwise the computation will explode
     n_cooc: Optional[int] = 1
     unique_cooc: Optional[bool] = False
@@ -70,6 +70,15 @@ class InspectorArgs:
     stopwords: Optional[bool] = False # TODO currently we only support stopwords = en,it. Add support for False, spacy, hf
     lowercase: Optional[bool] = False
     ignore_null_var: Optional[bool] = False
+    
+    def check_values(self):
+        if self.text_names == None:
+            sys.exit("ERROR: No text_names were provided. These are the names or indices of the columns containing the text to be analyzed.")
+        if self.var_names == None:
+            sys.exit("ERROR: No var_names were provided. These are the names or indices of the columns containing the variables to be analyzed.")
+        if self.metrics == None:
+            print("WARNING: No metrics were defined. Variationist will assume only some basic dataset statistics are needed. Please consult the documentation to read what metrics are natively supported and how to use your own.")
+            self.metrics = ["basic-stats"]
     
     def to_dict(self):
         """Returns the InspectorArgs values inside a dictionary."""
@@ -86,13 +95,14 @@ class InspectorArgs:
 
 class Inspector:
     """
-    # TODO Description of the Inspector class.
+    The Inspector class. It takes care of orchestrating the analysis, from importing and tokenizing the data to calculating the metrics and creating an output file with all the calculated metrics for each text column, variable, and combination thereof. 
 
     Parameters
     ----------
-        dataset ([`pandas.DataFrame` or `datasets.Dataset` or `str`]): #TODO
-            The dataset to be used for our analysis.
+        dataset ([`pandas.DataFrame` or `str`]):
+            The dataset to be used for our analysis. It can be a pre-loaded pandas dataframe, or a string indicating a filepath to a .tsv, .csv file, or a Huggingface datase. Huggingface datasets can also be imported using strings, with the following format: 'hf::DATASET_NAME'.
         args (`InspectorArguments`)
+            The Inspector arguments. Refer to the InspectorArgs class for details on what these should be.
         
     """
 
@@ -105,6 +115,8 @@ class Inspector:
         self.dataset = dataset
         self.args = args
 
+        args.check_values()
+        
         # Set defaults for variable types and semantics in case they are not defined
         if self.args.var_types == None:
             default_type = "nominal"
@@ -128,11 +140,12 @@ class Inspector:
         self.metadata_dict = metadata_dict
         
         # Check if variable definitions match in length
-        if any(len(args.var_names) != len(l) for l in [args.var_types, args.var_semantics]):
-            raise ValueError(f"ERROR! All variables in {args.var_names} should have an associated "
-                            f"variable type and semantics, but now only var_types: {args.var_types} "
-                            f"and var_semantics: {args.var_semantics} are provided. Please provide "
-                            f"an ordered list of types and semantics that match variable names.")
+        if any(len(args.var_names) != len(l) for l in [args.var_types, args.var_semantics, args.var_bins]):
+            sys.exit(f"ERROR! All variables in {args.var_names} should have an associated "
+                            f"variable type, semantics, and bins. We instead got var_types: {args.var_types}, "
+                            f"var_semantics: {args.var_semantics}, and var_bins: {args.var_bins}. Please provide "
+                            f"an ordered list of types, semantics, and bins that match variable names "
+                            f"and which have matching length for correct variable assignment.")
         
         # Check if column strings are names or indices (for both texts and labels)
         text_names_type = utils.check_column_type(args.text_names)
@@ -141,7 +154,7 @@ class Inspector:
         
         # Since the input file/dataset is the same, we require texts and labels columns to be of the same type
         if text_names_type != label_names_type:
-            raise ValueError(f"ERROR! text_cols are {text_names_type} while label_cols are {label_names_type}. "
+            sys.exit(f"ERROR! text_cols are {text_names_type} while label_cols are {label_names_type}. "
                             "Please provide all column identifiers as names (as in the header line) or indices.")
         self.cols_type = text_names_type
         print(f"INFO: all column identifiers are treated as column {self.cols_type}.")
@@ -168,11 +181,12 @@ class Inspector:
 
 
     def check_columns(self):
+        """A function to check that the specified text and variable columns are actually in the provided dataset."""
         # Check if the specified columns are actually in the dataframe
         self.dataframe_cols = [col_name for col_name in self.dataframe.columns]
         for col in self.args.text_names+self.args.var_names:
             if col not in self.dataframe_cols:
-                raise ValueError(f"ERROR: the '{col}' column is not present in the dataframe.")
+                sys.exit(f"ERROR: the '{col}' column is not present in the dataframe.")
     
     
     def check_nan_values(self):
@@ -187,6 +201,7 @@ class Inspector:
     
             
     def handle_bins_and_granularity(self):
+        """For each variable that requires binning, checks that it can be carried out and calls the dedicated function."""
         for i in range(len(self.args.var_names)):
             curr_var_name = self.args.var_names[i]
             curr_bins = self.args.var_bins[i]
@@ -211,11 +226,10 @@ class Inspector:
 
 
     def preprocess(self):
-        """Performs all of the preprocessing operations of variationist, such as grouping together variables and dividing variables into bins."""
+        """Performs all of the preprocessing operations of Variationist, such as grouping together variables and dividing variables into bins."""
         # check if any discretization or binning should be carried out and do it
         if self.discretize == True:
             self.handle_bins_and_granularity()
-
         
         label_values_dict = preprocess_utils.get_label_values(self.dataframe, self.col_names_dict)
         if len(self.args.var_names) == 1 and  len(self.args.text_names) == 1:
@@ -232,8 +246,7 @@ class Inspector:
 
 
     def compute(self):
-        """Function that runs the actual computation"""
-        # TODO handle metrics in a smarter way.
+        """Main function carrying out the entire analysis pipeline. It creates a results dict with the calculated metrics."""
         label_values_dict, subsets_of_interest = self.preprocess()
         
         results_dict = dict()
@@ -252,21 +265,24 @@ class Inspector:
 
     
     def create_output_dict(self):
-        """Function to create the output dictionary, containing both metadata and calculated metrics. """
+        """Function to create the output dictionary, containing both metadata and calculated metrics."""
         output_dict = dict()
         output_dict["metadata"] = self.metadata_dict
         output_dict["metrics"] = self.results_dict
         self.output_dict = output_dict
-        
-    def save_output_to_json(self,
-                            output_path = "output.json"
-                            ):
-        output_file = open(output_path, "w")
-        json.dump(self.output_dict, output_file, indent=4)
-        output_file.close()
-        
+    
     def inspect(self):
+        """Wrapper function for tokenizing, carrying out computation, and saving the output dictionary, which it returns."""
         self.dataframe = self.tokenizer.tokenize(self.dataframe)
         self.compute()
         self.create_output_dict()
         return self.output_dict
+        
+    def save_output_to_json(self,
+                            output_path = "output.json"
+                            ):
+        """Saves the output dictionary to a json file, which can then be imported with the Visualizer module."""
+        output_file = open(output_path, "w")
+        json.dump(self.output_dict, output_file, indent=4)
+        output_file.close()
+        

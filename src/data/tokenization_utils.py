@@ -37,9 +37,3 @@ def huggingface_tokenization(text_column, args):
     tok_column = text_column.squeeze().progress_apply(hf_tokenizer.encode, add_special_tokens=False)
     tok_column = tok_column.squeeze().apply(hf_tokenizer.convert_ids_to_tokens)
     return tok_column
-
-
-def spacy_tokenization(text_column, args):
-    """TODO"""
-    raise NotImplementedError("We don't support Spacy tokenization yet.")
-    return
