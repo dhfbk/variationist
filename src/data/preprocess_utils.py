@@ -95,16 +95,20 @@ def get_label_values(input_dataframe, col_names_dict):
     for label in current_labels:
         # TODO FutureWarning: unique with argument that is not not a Series, Index, ExtensionArray, 
         # or np.ndarray is deprecated and will raise in a future version.
-        label_values_dict[label] = pd.unique(input_dataframe[label].values.tolist()).tolist()
+        label_values_dict[label] = pd.unique(input_dataframe[label]).tolist()
     return label_values_dict
 
 
-def update_label_values_dict_with_inters(label_values_dict):
+def update_label_values_dict_with_inters(label_values_dict, text_names):
     inters_label_values_dict = {}
     current_var_values = list(label_values_dict.values())
     current_vars = list(label_values_dict.keys())
     # n_vars = len(label_values_dict.keys())
     var_combination_name = "::".join(current_vars)
+    if len(text_names) > 1:
+        var_combination_name = f"text_name::{var_combination_name}"
+        # print(current_var_values)
+        current_var_values.append(text_names)
     inters_label_values_dict[var_combination_name] = []
     subset_intersections = itertools.product(*current_var_values)
     for intersection in subset_intersections:
@@ -140,15 +144,23 @@ def get_subset_intersections(input_dataframe, tok_columns_dict, label_values_dic
     current_var_values = list(label_values_dict.values())
     current_vars = list(label_values_dict.keys())
     n_vars = len(label_values_dict.keys())
+    text_cols = list(tok_columns_dict.keys())
     var_combination_name = "::".join(current_vars)
-    subsets_of_interest = {var_combination_name: []}
-    for text_column in tok_columns_dict:
+    if len(text_cols) > 1:
+        subsets_of_interest = {f"text_name::{var_combination_name}": []}
+    else:
+        subsets_of_interest = {var_combination_name: []}
+    for text_column in text_cols:
+        print("INFO: Splitting intersections of variables into subsets.")
+        print(f"Subsets for text column '{text_column}'...")
         tokenized_text_column = tok_columns_dict[text_column]
         subset_intersections = list(itertools.product(*current_var_values))
         for i in tqdm(range(len(subset_intersections))):
             intersection = subset_intersections[i]
             current_subset = input_dataframe
             intersection_name = "::".join(map(str, intersection))
+            if len(text_cols) > 1:
+                intersection_name = f"{text_column}::{intersection_name}"
             for i in range(n_vars):
                 current_subset = current_subset[(current_subset[current_vars[i]] == intersection[i])]
             # if the series contains 2 or more elements, we squeeze it
@@ -157,5 +169,8 @@ def get_subset_intersections(input_dataframe, tok_columns_dict, label_values_dic
             series_with_current_inters = current_subset[tokenized_text_column]
             subsets_of_interest[intersection_name] = current_subset
             series_with_current_inters = series_with_current_inters.rename(intersection_name)
-            subsets_of_interest[var_combination_name].append(series_with_current_inters)
+            if len(text_cols) == 1:
+                subsets_of_interest[var_combination_name].append(series_with_current_inters)
+            else:
+                subsets_of_interest[f"text_name::{var_combination_name}"].append(series_with_current_inters)
     return subsets_of_interest

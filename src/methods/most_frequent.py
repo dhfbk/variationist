@@ -1,6 +1,7 @@
 import pandas as pd
 from itertools import islice
 from src.methods import shared_metrics
+from tqdm import tqdm
 
 
 def take(n, iterable):
@@ -11,10 +12,9 @@ def create_most_frequent_dictionary(label_values_dict, subsets_of_interest, args
     # TODO change the name of this function: it just calculates frequency!
     output_freqs = dict()
     for column in label_values_dict:
-        for l in range(len(label_values_dict[column])):
+        for l in tqdm(range(len(label_values_dict[column]))):
             curr_label = subsets_of_interest[column][l].name
             mydict = shared_metrics.get_all_frequencies(subsets_of_interest[column][l])
-            
             sorted_mydict = sorted(mydict.items(), key=lambda x:x[1], reverse=True)
             converted_dict = dict(sorted_mydict)
             output_freqs[curr_label] = converted_dict

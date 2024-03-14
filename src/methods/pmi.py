@@ -33,14 +33,13 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest, weighted, freq
     label_count = dict()
 
     for column in label_values_dict:
-        print(f"INFO: Creating PMI dictionary for {column}:")
-        for l in range(len(label_values_dict[column])):
+        # print(subsets_of_interest[column])
+        for l in tqdm(range(len(label_values_dict[column]))):
             curr_label = subsets_of_interest[column][l].name
-            print(curr_label)
             mydict = shared_metrics.get_all_frequencies(subsets_of_interest[column][l])
             freqs_dict[curr_label] = mydict
             tok_list = list(mydict.keys())
-            for i in tqdm(range(len(tok_list))):
+            for i in range(len(tok_list)):
                 tok = tok_list[i]
                 if tok not in freqs_merged_dict:
                     freqs_merged_dict[tok] = 0
@@ -74,7 +73,6 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest, weighted, freq
 
         converted_dict = dict(sorted_pmiDict)
         output_pmi[label] = converted_dict
-
     return output_pmi
 
 
@@ -165,11 +163,6 @@ def pmi_positive_normalized(label_values_dict, subsets_of_interest, args):
     #     print("\nPositive PMI normalized", label, take(10, converted_dict.items())) #print for debug
 
     return output_pmi
-
-
-
-
-
 
 
 

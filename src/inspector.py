@@ -61,7 +61,6 @@ class InspectorArgs:
     var_types: Optional[List] = None # nominal (default), ordinal, quantitative, coordinates
     var_semantics: Optional[List] = None # default=General, temporal, spatial
     var_subsets: Optional[List] = None
-    var_granularity: Optional[List] = None
     var_bins: Optional[List] = None
     n_tokens: Optional[int] = 1 # maximum value for this should be 5, otherwise the computation will explode
     n_cooc: Optional[int] = 1
@@ -119,14 +118,11 @@ class Inspector:
             default_bin = 0
             self.args.var_bins = [default_bin] * len(self.args.var_names)
             # print(f"INFO: No values have been set for var_bins. Defaults to {default_bin}.")
-        if self.args.var_granularity == None:
-            default_granularity = None
-            self.args.var_granularity = [default_granularity] * len(self.args.var_names)
-            # print(f"INFO: No values have been set for var_granularity. Defaults to {default_granularity}.")
 
 
         # Dictionary for the metadata to be printed in the json output
         metadata_dict = self.args.to_dict()
+        print("INFO: The metadata we will be using for the current analysis are:")
         print(metadata_dict)
         metadata_dict["dataset"] = self.dataset     
         self.metadata_dict = metadata_dict
@@ -188,7 +184,7 @@ class Inspector:
                     print(f"INFO: One or more null values were found for the '{var}' variable. The indices (lines) of null values are {list(nulls[nulls].index)}. Since 'ignore_null_var' was set to True, Nan values will be treated as any other variable value. This might lead to unexpected results.")
                 else:
                     sys.exit(f"ERROR: One or more null values were found for the '{var}' variable. The indices (lines) of null values are {list(nulls[nulls].index)}. If you wish to ignore null values and proceed, please set 'ignore_null_var' to True when defining the InspectorArgs.")
-                    
+    
             
     def handle_bins_and_granularity(self):
         for i in range(len(self.args.var_names)):
@@ -202,27 +198,16 @@ class Inspector:
                     if type(curr_bins) is int:
                         if curr_sem == "temporal":
                             curr_var_column = pd.to_datetime(curr_var_column)
-                            print(self.dataframe)
-                            print(self.dataframe.info())
                         print(f"INFO: For the variable {curr_var_name}, bins were defined. It will therefore be split into {curr_bins} equal bins.")
                         self.dataframe[curr_var_name] = preprocess_utils.discretize_bins_col(curr_var_column,
                                                                                             curr_type,
                                                                                             curr_sem,
                                                                                             curr_bins
                                                                                             )
-                        print(self.dataframe.info())
                     else:
                         sys.exit(f"ERROR: var_bins was defined, but not correctly. We expected a list of integer values for each variable (with 0 for variables where no binning is desired), but instead for the variable {curr_var_name} the input was of type {type(curr_bins).__name__}.")
                 else:
                     sys.exit(f"ERROR: var_bins was defined for variable {curr_var_name}, whose type is 'nominal'. However, nominal values cannot be divided into bins. If the {curr_var_name} variable is numeric, please specify another var_type for it. If it is an actual nominal variable, its var_bins value should be 0.")
-            # elif curr_gran is not None and curr_bins == 0:
-            #     print(f"INFO: For the variable {curr_var_name}, granularity was defined.")  #TODO finish this info string with the values for granularity etc.
-            #     # this case should be divided among temporal, spatial, and generic.
-            #     sys.exit("ERROR: Granularity is not fully implemented yet.")
-                
-            # elif curr_bins != 0 and curr_gran is not None:
-            #     sys.exit(f"ERROR: both bins and granularity are defined for the variable '{curr_var_name}', while only one of them should be specified for each variable.")
-            
 
 
     def preprocess(self):
@@ -233,22 +218,16 @@ class Inspector:
 
         
         label_values_dict = preprocess_utils.get_label_values(self.dataframe, self.col_names_dict)
-        
-        if len(self.args.var_names) == 1:
+        if len(self.args.var_names) == 1 and  len(self.args.text_names) == 1:
             subsets_of_interest = preprocess_utils.get_subset_dict(self.dataframe,
                                                     self.tokenizer.tokenized_col_dict,
                                                     label_values_dict)
         else:        
             # if we have more than two variables, we are interested in the intersections between them
-
-            print("INFO: splitting intersections of variables into subsets...")
             subsets_of_interest = preprocess_utils.get_subset_intersections(self.dataframe,
                                                     self.tokenizer.tokenized_col_dict,
                                                     label_values_dict)
-            
-            # print(label_values_dict)
-            label_values_dict = preprocess_utils.update_label_values_dict_with_inters(label_values_dict)
-            print(label_values_dict)
+            label_values_dict = preprocess_utils.update_label_values_dict_with_inters(label_values_dict, self.args.text_names)
         return label_values_dict, subsets_of_interest
 
 
@@ -264,7 +243,7 @@ class Inspector:
                 metric_name = metric.__name__
             else:
                 metric_name = metric
-            print(f"INFO: Currently calculating metric {metric_name}...")
+            print(f"INFO: Currently calculating metric: '{metric_name}'")
             results_dict[metric_name] = {}
             results_dict[metric_name][list(label_values_dict.keys())[0]] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
             
@@ -277,7 +256,6 @@ class Inspector:
         output_dict = dict()
         output_dict["metadata"] = self.metadata_dict
         output_dict["metrics"] = self.results_dict
-
         self.output_dict = output_dict
         
     def save_output_to_json(self,

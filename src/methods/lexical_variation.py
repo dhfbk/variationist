@@ -1,6 +1,6 @@
 from statistics import stdev, mean
 import math
-
+from tqdm import tqdm
 
 
 def safe_divide(numerator, denominator):
@@ -13,7 +13,7 @@ def safe_divide(numerator, denominator):
 def ttr(label_values_dict, subsets_of_interest, args):  
     values_dict = dict()
     for column in label_values_dict:
-        for l in range(len(label_values_dict[column])):
+        for l in tqdm(range(len(label_values_dict[column]))):
             values_list = []
             curr_label = subsets_of_interest[column][l].name
             for sentence in subsets_of_interest[column][l]:
@@ -37,7 +37,7 @@ def ttr(label_values_dict, subsets_of_interest, args):
 def rttr(label_values_dict, subsets_of_interest, args):  
     values_dict = dict()
     for column in label_values_dict:
-        for l in range(len(label_values_dict[column])):
+        for l in tqdm(range(len(label_values_dict[column]))):
             values_list = []
             curr_label = subsets_of_interest[column][l].name
             for sentence in subsets_of_interest[column][l]:
@@ -61,7 +61,7 @@ def rttr(label_values_dict, subsets_of_interest, args):
 def maas(label_values_dict, subsets_of_interest, args):  
     values_dict = dict()
     for column in label_values_dict:
-        for l in range(len(label_values_dict[column])):
+        for l in tqdm(range(len(label_values_dict[column]))):
             values_list = []
             curr_label = subsets_of_interest[column][l].name
             for sentence in subsets_of_interest[column][l]:
@@ -85,7 +85,7 @@ def maas(label_values_dict, subsets_of_interest, args):
 def lttr(label_values_dict, subsets_of_interest, args):  
     values_dict = dict()
     for column in label_values_dict:
-        for l in range(len(label_values_dict[column])):
+        for l in tqdm(range(len(label_values_dict[column]))):
             values_list = []
             curr_label = subsets_of_interest[column][l].name
             for sentence in subsets_of_interest[column][l]:
