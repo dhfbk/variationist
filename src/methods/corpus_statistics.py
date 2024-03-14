@@ -1,6 +1,9 @@
+"""Functions for calculating a series of statistics for a given corpus."""
+
+
 from statistics import stdev, mean
 
-def number_of_texts(label_values_dict, subsets_of_interest):  
+def number_of_texts(label_values_dict, subsets_of_interest):
     values_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -8,7 +11,7 @@ def number_of_texts(label_values_dict, subsets_of_interest):
             values_dict[curr_label] = len(subsets_of_interest[column][l])
     return values_dict
 
-def average_text_lengt(label_values_dict, subsets_of_interest):  
+def average_text_length(label_values_dict, subsets_of_interest):  
     values_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -74,7 +77,7 @@ def number_of_duplicates(label_values_dict, subsets_of_interest):
 def compute_basic_stats(label_values_dict, subsets_of_interest, args):  
     stats_dict = dict()
     stats_dict["number_of_texts"] = number_of_texts(label_values_dict, subsets_of_interest)
-    stats_dict["average_text_length"] = average_text_lengt(label_values_dict, subsets_of_interest)
+    stats_dict["average_text_length"] = average_text_length(label_values_dict, subsets_of_interest)
     stats_dict["number-of-words"] = num_words(label_values_dict, subsets_of_interest)
     stats_dict["vocabulary-size"] = vocab_size(label_values_dict, subsets_of_interest)
     stats_dict["number-of-duplicates"] = number_of_duplicates(label_values_dict, subsets_of_interest)
