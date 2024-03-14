@@ -1,3 +1,4 @@
+import altair as alt
 import os
 import pandas as pd
 
@@ -5,10 +6,6 @@ from typing import Any, Optional, Union
 
 from src import utils
 from src.visualization import chart_utils
-
-
-# @TODO: Maybe change the "ngrams" name for clarity across the script (it supports cooccs, too!)
-# @TODO: Also redifine/change/remove top_per_class_ngrams
 
 
 class VisualizerArgs:
@@ -41,16 +38,18 @@ class VisualizerArgs:
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
         top_per_class_ngrams: int = 20
-            The maximum number of highest scoring per-class n-grams to show. If set to 
-            None, it will show all the ngrams in the corpus (it may easily be 
-            overwhelming). By default is 20 to keep the visualization compact.
+            The maximum number of highest scoring per-class n-grams to show (for bar
+            charts only). If set to None, it will show all the n-grams in the corpus 
+            (it may easily be overwhelming). By default is 20 to keep the visualization 
+            compact.
         ngrams: Optional[list[str]] = None
             A list of n-grams of interest to focus the resulting visualizations on.
             N-grams should match the number of tokens used in the prior computation
             reflected by the "results" variable (e.g., if unigrams were chosen, this
             list should only contain unigrams).
         shapefile_path: Optional[str] = None
-            A path to the .shp shapefile to be visualized as background map to the chart.
+            A path to the .shp shapefile to be visualized as background map to the chart
+            (needed only when including a variable type "nominal" with "spatial" semantics.
             Note that auxiliary files to the .shp one (i.e., .dbf, .prg, .shx ones) are 
             required for chart creation too, but do not need to be specified. They should
             have the same name as the .shp file but different extension, and be located 
@@ -137,21 +136,24 @@ class Visualizer:
         """
         A function that returns a long-form dataframe from a json which 
         stores the information about a prior analysis using Variationist.
-        Optionally, it takes a list of ngrams to focus the filtering on.
+        Optionally, it takes a list of n-grams to focus the filtering on.
 
         Parameters
         ----------
         json_data: dict[str, Any]
             The json object storing the results from a prior analysis in the form:
-            {varA: {ngram1: value1, ngram2: value2, ...}, varB: {...}, ...}
+            {varA: {ngram1: value1, ngram2: value2, ...}, varB: {...}, ...}. Note
+            that varA, varB, etc. could also take the form of "::"-concatenated
+            variable names if multiple variables are present in the analysis.
         var_names_concat: str
             A string denoting the ordered concatenation of variable names (i.e., 
             original column names), separated by utils.MULTI_VAR_SEP, to be used for 
             giving meaningful names to the long-form dataframe.
         top_per_class_ngrams: int = 20
-            The maximum number of highest scoring per-class n-grams to show. If set to 
-            None, it will show all the ngrams in the corpus (it may easily be 
-            overwhelming). By default is 20 to keep the visualization compact.
+            The maximum number of highest scoring per-class n-grams to show (for bar
+            charts only). If set to None, it will show all the n-grams in the corpus 
+            (it may easily be overwhelming). By default is 20 to keep the visualization 
+            compact.
         fucus_ngrams: Optional[list[str]] = None
             A list of n-grams of interest to focus the filtering on. N-grams should 
             match the number of tokens used in the prior computation (e.g., if 
@@ -261,11 +263,22 @@ class Visualizer:
 
     def visualize(
         self,
-    ) -> None:
+    ) -> dict[str, list[alt.Chart]]:
         """
         A function that orchestrates the creation of charts based on the results
-        and metadata from a prior analysis using Variationist.
+        and metadata from a prior analysis using Variationist, returning a dictionary 
+        of metrics (keys) and an associated list of alt.Chart objects (values).
+
+        Returns
+        -------
+        charts: dict[str, list[alt.Chart]]
+            A dictionary containing the metrics as keys and a list of chart objects
+            as values.
         """
+
+        # A dictionary holding the chart objects to be returned to the user
+        # This is especially useful when the user would show the chart in a notebook
+        charts = {}
 
         # Create a dictionary of chart-specific arguments
         extra_args = {}
@@ -278,10 +291,7 @@ class Visualizer:
         # semantics, then save them to the user-specified output folder
         for metric, df_data in self.df_metric_data.items():
             # @TODO: Differentiate chart creation by metric
-
-            # @TODO:
-            # var_granularities = self.metadata["var_granularities"]
-            # var_bins = self.metadata["var_bins"]
+            # @TODO: var_bins = self.metadata["var_bins"]
 
             # Get dictionary containing information on which and how to create charts
             charts_metadata = self.get_charts_metadata(metric)
@@ -298,3 +308,10 @@ class Visualizer:
                 output_filepath = os.path.join(self.args.output_folder, metric)
                 chart.save(output_filepath, ChartClass.__name__, self.args.output_formats)
 
+                # Add the chart to the dictionary of metric-associated charts
+                if metric not in charts:
+                    charts[metric] = [chart]
+                else:
+                    charts[metric].append(chart)
+
+        return charts
