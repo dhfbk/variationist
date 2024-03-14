@@ -1,12 +1,26 @@
 import re
 from src import utils
+from src import inspector
 from tqdm import tqdm
 from transformers import AutoTokenizer
-from src import utils
+import pandas as pd
 
-def whitespace_tokenization(text_column, args):
-    """Takes as input an array/series of texts and tokenizes it, returns same array/series 
-    but tokenized splitting on whitespace."""
+def whitespace_tokenization(text_column: pd.Series, 
+                            args):
+    """Takes as input an array/series of texts and tokenizes it, returns same array/series but tokenized splitting on whitespace.
+    
+    Parameters
+    ----------
+        text_column (`pandas.Series`):
+            A pandas Series of text that should be tokenized.
+        args (`InspectorArgs`):
+            The InspectorArgs that were passed to Inspector.
+    
+    Returns
+    -------
+        tok_column: `pandas.Series`:
+            A pandas Series containing the initial texts but tokenized.
+    """
     # Remove punctuation and any not alphanumeric charachter      
     
     tqdm.pandas()
@@ -14,19 +28,30 @@ def whitespace_tokenization(text_column, args):
         tok_column = text_column.squeeze().apply(lambda x: str(x).lower())
     else:
         tok_column = text_column.squeeze().astype(str)
-
+        
     tok_column = tok_column.progress_apply(lambda x: utils.replace_symbols(x))
     tok_column = tok_column.apply(lambda x: re.sub(r'\s+', ' ', x))
     tok_column = tok_column.apply(lambda x: x.strip().split(" "))
-    
     # tok_column = tok_column.squeeze().apply(lambda x: pd.Series(x.split(" ")))
     return tok_column
 
 
-def huggingface_tokenization(text_column, args):
-    """Load a HuggingFace AutoTokenizer from the string given by the user."""
-    # print(text_column)
-    # text_column = text_column.dropna()
+def huggingface_tokenization(text_column: pd.Series, 
+                             args):
+    """Takes as input an series of texts and tokenizes it, returns same series but tokenized using the huggingface tokenizer specified in the InspectorArgs.
+    
+    Parameters
+    ----------
+        text_column (`pandas.Series`):
+            A pandas Series of text that should be tokenized.
+        args (`InspectorArgs`):
+            The InspectorArgs that were passed to Inspector.
+    
+    Returns
+    -------
+        tok_column: `pandas.Series`:
+            A pandas Series containing the initial texts but tokenized.
+    """
     tokenizer_name = args.tokenizer.strip("hf::")
     hf_tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     tqdm.pandas()

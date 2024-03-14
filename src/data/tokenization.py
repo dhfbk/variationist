@@ -3,17 +3,21 @@ The Tokenizer class, to handle all the tokenization-related operations of Variat
 """
 from src.data import preprocess_utils, tokenization_utils
 from src import utils
+import pandas as pd
 import sys
 
 
 class Tokenizer:
     """A class that handles all the tokenization-related operations of Variationist.
+    
     Parameters
     ----------
-    
+    inspector_args (`InspectorArgs`): 
+        The arguments that were passed to the Inspector.
     """
     
-    def __init__(self, inspector_args) -> None:
+    def __init__(self, 
+                 inspector_args) -> None:
         self.args = inspector_args
         
         self.column_names_dict = {
@@ -34,14 +38,21 @@ class Tokenizer:
         # TODO add the possibility to add a custom tokenizer as a function in inspectorargs.
     
     
-    def tokenize_column(self, text_column):
-        # print(stopwords)
-        """"""
-        # TODO take an array/series of texts and tokenize it, return same array/series but tokenized
-        # TODO do not check here for n_tokens, just tokenize first and THEN add a component that
-        # will aggregate the tokens to create bi, tri-grams and so on.
-        # TODO we want to add co-occurrences. Should we do that with context windows? e.g. 2 tokens
-        # before, 2 tokens after. Could also do co-occurrences of n-grams?
+    def tokenize_column(self, 
+                        text_column: pd.Series):
+        """A function that tokenizes a text column using the selected tokenization function. It will also create n-grams and co-occurrences if requested by the user. It will then return the same text column, but tokenized/grouped according to the desired result.
+        
+        Parameters
+        ----------
+        text_column (`pandas.Series`):
+            The series (text column) that should be tokenized.
+            
+        Returns
+        -------
+        text_column (`pandas.Series`):
+            The same series as input, but tokenized/regrouped as requested.
+             
+        """
         tokenized_text_column = self.tok_function(text_column, self.args)
 
         if self.args.stopwords is not False:        
@@ -59,6 +70,18 @@ class Tokenizer:
         
 
     def tokenize(self, dataframe):
+        """A wrapper function to tokenize each text column and add it to the original input dataframe as 'tok_ORIGINAL_TEXT_COL_NAME'. Returns the dataframe with the added tokenized columns.
+        
+        Parameters
+        ----------
+        dataframe (`pandas.DataFrame`):
+            The dataframe that contains the data for the analysis
+            
+        Returns
+        -------
+        dataframe (`pandas.DataFrame`):
+            The same dataframe as input, but with added columns containing the tokenized texts.
+        """
         tokenized_col_dict = {}
         for text_col in self.column_names_dict[utils.TEXT_COLS_KEY]:
             print(f"INFO: Tokenizing the {text_col} column...")

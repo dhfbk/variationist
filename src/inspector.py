@@ -44,7 +44,7 @@ class InspectorArgs:
         cooc_window_size (`Int`):
             Size of the context window for co-occurrences. For instance, a `cooc_window_size` of 3 means we use a context window of 3 to calculate co-occurrences, meaning that any token that is within 3 tokens before or after a given token is added as a co-occurrence.
         freq_cutoff (`Int`):
-            The token frequency, expressed as an integer, below which we do not consider the token in the analysis of pmi-based metrics.
+            The token frequency, expressed as an integer, below which we do not consider the token in the analysis of pmi-based metrics. Defaults to 3.
         stopwords (`Bool`):
             Whether to remove stopwords from texts before tokenization or not. Will default to False.
         lowercase (`Bool`):
