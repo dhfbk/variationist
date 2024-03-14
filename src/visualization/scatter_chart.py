@@ -58,11 +58,17 @@ class ScatterChart(AltairChart):
             self.text_label = "tokens"
 
         # Set base chart style
-        self.base_chart = self.base_chart.mark_line(point=True, strokeDash=[1, 0])
+        if "opacity" in chart_dims:
+            self.base_chart = self.base_chart.mark_line(
+                point=alt.OverlayMarkDef(size=75, strokeWidth=0.5), strokeWidth=0)
+        else:
+            self.base_chart = self.base_chart.mark_line(point=True, strokeDash=[1, 0])
 
         # Get relevant dimensions
         x_name, x_type = self.get_dim("x", chart_dims)
         y_name, y_type = self.get_dim("y", chart_dims)
+        if "opacity" in chart_dims:
+            opacity_name, opacity_type = self.get_dim("opacity", chart_dims)
         if "extra" in chart_dims:
             extra_name, extra_type = self.get_dim("extra", chart_dims)
 
@@ -70,15 +76,23 @@ class ScatterChart(AltairChart):
         x_domain = list(df_data[x_name].astype(float).unique())
         y_domain = list(df_data[y_name].astype(float).unique())
         x_dim = alt.X(x_name, type=x_type, scale=alt.Scale(domain=[min(x_domain), max(x_domain)]))
-        y_dim = alt.Y(y_name, type=y_type, scale=alt.Scale(domainMin=min(y_domain)), title=chart_metric, axis=alt.Axis(format=".2f"))
+        if "opacity" in chart_dims:
+            y_dim = alt.Y(y_name, type=y_type, scale=alt.Scale(domain=[min(y_domain), max(y_domain)]), axis=alt.Axis(format=".2f"))
+            opacity = alt.Opacity(opacity_name, opacity_type)
+        else:
+            y_dim = alt.Y(y_name, type=y_type, scale=alt.Scale(domainMin=min(y_domain)), title=chart_metric, axis=alt.Axis(format=".2f"))
         color = alt.Color("ngram", type="nominal", title="", legend=None)
 
         # Set tooltip (it will be overwritten if "filterable" is True)
         tooltip = [
             alt.Tooltip("ngram", type="nominal", title=self.text_label),
             alt.Tooltip(x_name, type=x_type),
-            alt.Tooltip(y_name, type=y_type, title=self.metric_label)
         ]
+        if "opacity" in chart_dims:
+            tooltip.append(alt.Tooltip(y_name, type=y_type))
+            tooltip.append(alt.Tooltip(opacity_name, type=opacity_type, title=self.metric_label))
+        else:
+            tooltip.append(alt.Tooltip(y_name, type=y_type, title=self.metric_label))
         if "extra" in chart_dims:
             tooltip.append(alt.Tooltip(extra_name, type=extra_type))
 
@@ -87,6 +101,7 @@ class ScatterChart(AltairChart):
             x_dim,
             y_dim,
             # Note: color will be conditionally added by the "add_search_component"
+            # Note: opacity will be conditionally added by the "add_dropdown_component", if needed
             tooltip
         )
 
@@ -96,14 +111,17 @@ class ScatterChart(AltairChart):
 
         # If the chart has to be filterable, create and add a search component to it
         if self.filterable == True:
-            if "extra" in chart_dims: # >= 4-dim case
+            if ("opacity" in chart_dims) or ("extra" in chart_dims):
                 dropdown_keys = []
                 dropdown_values = []
                 for i in range(len(chart_dims["dropdown"])):
                     dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
                 for dropdown_key in dropdown_keys:
                     dropdown_values.append(list(set(df_data[dropdown_key])))
-                self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "color")
+                if "opacity" in chart_dims:
+                    self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "opacity")
+                else:
+                    self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "color")
             else:
                 self.base_chart = self.add_search_component(self.base_chart, tooltip, color)
 

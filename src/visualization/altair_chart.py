@@ -155,7 +155,7 @@ class AltairChart(Chart):
         color: alt.Color
             The alt.Color dimension to be filtered in the chart.
         operation: str
-            Whether the operation based on color is "fill" or "color".
+            Whether the operation based on color is "fill", "color", or "opacity".
 
         Returns
         -------
@@ -173,7 +173,7 @@ class AltairChart(Chart):
 
             # Create the dropdown component
             dropdown = alt.binding_select(
-                options = sorted(["*Select " + dropdown_label + "*"] + dropdown_elements[i]), 
+                options = sorted(["*Select " + str(dropdown_label) + "*"] + [str(el) for el in dropdown_elements[i]]), 
                 name = f"Filter by {dropdown_label} ",
             )
             select = alt.selection_point(
@@ -208,6 +208,21 @@ class AltairChart(Chart):
                 ),
                 tooltip = tooltip
             )
+        elif operation == "opacity":
+            base_chart = base_chart.encode(
+                color = alt.condition(
+                    functools.reduce(operator.and_, dropdowns),
+                    color,
+                    alt.value("")
+                ),
+                opacity = alt.condition(
+                    functools.reduce(operator.and_, dropdowns),
+                    "value",
+                    alt.value(0)
+                ),
+                tooltip = tooltip
+            )
+            base_chart = base_chart.configure_legend(disable=True)
         else:
             raise ValueError(f"The operation \"{operation}\" is not envisioned.")
 

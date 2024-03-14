@@ -86,11 +86,12 @@ VAR_CHARTS_MAP = {
                 ScatterChart: {
                     "x": (0, "quantitative"),
                     "y": (1, "quantitative"),
-                    "color": ("value", "quantitative"),
-                    "dropdown": [],
-                    "search": [("ngram", "nominal")]
+                    "color": ("ngram", "nominal"),
+                    "opacity": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
                 },
-            }, # @TODO
+            },
             "spatial-spatial": {
                 ScatterGeoChart: {
                     "lat": (0, "quantitative"),
@@ -134,7 +135,16 @@ VAR_CHARTS_MAP = {
             # "general-temporal": [], # @TODO: [line] time (x), coord (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
         },
         "coordinates-quantitative": {
-            # "general-general": [], # @TODO: [scatter] coord (x), quant (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
+            "general-general": {
+                ScatterChart: {
+                    "x": (0, "quantitative"),
+                    "y": (1, "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "opacity": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
+                },
+            },
         },
         "nominal-nominal": {
             "general-general": {
@@ -213,7 +223,16 @@ VAR_CHARTS_MAP = {
             # "temporal-general": [], # @TODO: [line] time (x), quant (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
         },
         "quantitative-quantitative": {
-            # "general-general": [], # @TODO: [scatter] quant (x), quant (y), score (size), ngram (filter) + @FUTURE: heatmap or similar?
+            "general-general": {
+                ScatterChart: {
+                    "x": (0, "quantitative"),
+                    "y": (1, "quantitative"),
+                    "color": ("ngram", "nominal"),
+                    "opacity": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": []
+                },
+            },
         },
     },
     "5-dims": {
