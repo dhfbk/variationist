@@ -5,12 +5,15 @@ from typing import Callable, Union
 
 
 class Metric:
-    """
-    The Metric class, a generic class that carries out all the metric operations.
-    """
-    def __init__(self, 
-                 metric: Union[str, Callable[[dict, dict], dict]],
-                 args: int):
+    """The Metric class, a generic class that carries out all the metric operations."""
+
+    def __init__(
+        self,
+        metric: Union[str, Callable[[dict, dict], dict]],
+        args: int
+    ) -> None:
+        """"""
+
         self.metric = metric
         self.args = args
 
@@ -30,8 +33,14 @@ class Metric:
             self.metric_fn = methods.pmi.pmi_positive_weighted
         elif self.metric == "pmi-positive-normalized-weighted":
             self.metric_fn = methods.pmi.pmi_positive_normalized_weighted
-        elif self.metric == "pmi-lexical-artifact":
-            self.metric_fn = methods.pmi.pmi_lexical_artifact
+        elif self.metric == "class-relevance-positive-normalized":
+            self.metric_fn = methods.pmi.class_relevance_positive_normalized
+        elif self.metric == "class-relevance-normalized-weighted":
+            self.metric_fn = methods.pmi.class_relevance_normalized_weighted
+        elif self.metric == "class-relevance-positive-normalized-weighted":
+            self.metric_fn = methods.pmi.class_relevance_positive_normalized_weighted
+        elif self.metric == "pmi-lexical-artifacts":
+            self.metric_fn = methods.pmi.pmi_lexical_artifacts
         elif self.metric == "ttr":
             self.metric_fn = lexical_variation.ttr
         elif self.metric == "rttr":
@@ -54,4 +63,5 @@ class Metric:
     
     def calculate_metric(self, label_values_dict, subsets_of_interest):
         """Calls the appropriate metric function."""
+        
         return self.metric_fn(label_values_dict, subsets_of_interest, self.args)

@@ -10,22 +10,30 @@ from tqdm import tqdm
 
 
 def safe_divide(numerator, denominator):
-        if denominator == 0 or denominator == 0.0:
-            result = 0
-        else:
-            result = numerator/denominator
-        return result
+    """"""
+    if denominator == 0 or denominator == 0.0:
+        result = 0
+    else:
+        result = numerator / denominator
+
+    return result
+
 
 def take(n, iterable):
     """Return the first n items of the iterable as a list."""
     return list(islice(iterable, n))
 
+
 def get_total(freqs_merged_dict):
+    """"""
     total = 0
     for w in freqs_merged_dict: total += freqs_merged_dict[w]
-    return(total)
+
+    return total
+
 
 def create_pmi_dictionary(label_values_dict, subsets_of_interest, weighted, freq_cutoff):
+    """"""
     output_pmi = dict()
     freqs_dict = dict()
     freqs_merged_dict = dict()
@@ -39,11 +47,13 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest, weighted, freq
             mydict = shared_metrics.get_all_frequencies(subsets_of_interest[column][l])
             freqs_dict[curr_label] = mydict
             tok_list = list(mydict.keys())
+
             for i in range(len(tok_list)):
                 tok = tok_list[i]
                 if tok not in freqs_merged_dict:
                     freqs_merged_dict[tok] = 0
                 freqs_merged_dict[tok] += mydict[tok]
+
             for i in subsets_of_interest[column][l]:
                 if curr_label not in label_count:
                     label_count[curr_label] = 0
@@ -58,6 +68,7 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest, weighted, freq
 
     for label in freqs_dict:
         label_pmi_dict = dict()
+
         for w in freqs_dict[label]:
             if w in freqs_merged_dict:
                 pxy = freqs_dict[label][w]/total
@@ -73,10 +84,12 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest, weighted, freq
 
         converted_dict = dict(sorted_pmiDict)
         output_pmi[label] = converted_dict
+
     return output_pmi
 
 
 def pmi(label_values_dict, subsets_of_interest, args):
+    """"""
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)
     
     # # Print for debug
@@ -87,9 +100,12 @@ def pmi(label_values_dict, subsets_of_interest, args):
 
     return output_pmi
 
+
 def pmi_normalized(label_values_dict, subsets_of_interest, args):
-    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)      
+    """"""
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)
     min_max_list = []
+    
     for label in output_pmi:
         if len(output_pmi[label]) > 0: # if the list is not empty
             min_max_list.append(min(output_pmi[label].values()))
@@ -110,12 +126,15 @@ def pmi_normalized(label_values_dict, subsets_of_interest, args):
 
     return output_pmi
 
+
 def pmi_positive(label_values_dict, subsets_of_interest, args):
-    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)   
+    """"""
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)
+    
     for label in output_pmi:
         for w in output_pmi[label]:
             if output_pmi[label][w] < 0:
-                output_pmi[label][w] = 0        
+                output_pmi[label][w] = 0
 
     # # Print for debug
     # for label in output_pmi:
@@ -125,36 +144,28 @@ def pmi_positive(label_values_dict, subsets_of_interest, args):
 
     return output_pmi
 
-def pmi_positive_normalized(label_values_dict, subsets_of_interest, args):
-    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff) 
 
+def pmi_positive_normalized(label_values_dict, subsets_of_interest, args):
+    """"""
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)
+
+    min_max_list = []
     for label in output_pmi:
+        for w in output_pmi[label]:
+            if output_pmi[label][w] < 0:
+                output_pmi[label][w] = 0
         if len(output_pmi[label]) > 0: # if the list is not empty
-            min_max_list = []
             min_max_list.append(min(output_pmi[label].values()))
             min_max_list.append(max(output_pmi[label].values()))
-            min_value = min(min_max_list)
-            max_value = max(min_max_list)
-            for w in output_pmi[label]:
-                output_pmi[label][w] = safe_divide((output_pmi[label][w]-min_value), (max_value-min_value))
-                if output_pmi[label][w] < 0:
-                    output_pmi[label][w] = 0
 
-    # min_max_list = []
-    # for label in output_pmi:
-    #     for w in output_pmi[label]:
-    #         if output_pmi[label][w] < 0:
-    #             output_pmi[label][w] = 0
-    #     if len(output_pmi[label]) > 0: # if the list is not empty
-    #         min_max_list.append(min(output_pmi[label].values()))
-    #         min_max_list.append(max(output_pmi[label].values()))    
-
-    # min_value = min(min_max_list)
-    # max_value = max(min_max_list)
+    min_value = min(min_max_list)
+    max_value = max(min_max_list)
     
-    # for label in output_pmi:
-    #     for w in output_pmi[label]:
-    #         output_pmi[label][w] = safe_divide((output_pmi[label][w] - min_value) , (max_value - min_value))
+    for label in output_pmi:
+        for w in output_pmi[label]:
+            output_pmi[label][w] = safe_divide(
+                (output_pmi[label][w] - min_value) , (max_value - min_value)
+            )
 
     # # Print for debug
     # for label in output_pmi:
@@ -165,10 +176,8 @@ def pmi_positive_normalized(label_values_dict, subsets_of_interest, args):
     return output_pmi
 
 
-
-
-
 def pmi_weighted(label_values_dict, subsets_of_interest, args):
+    """"""
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
     
     # # Print for debug
@@ -179,31 +188,23 @@ def pmi_weighted(label_values_dict, subsets_of_interest, args):
 
     return output_pmi
 
-def pmi_normalized_weighted(label_values_dict, subsets_of_interest, args):
-    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)  
 
+def pmi_normalized_weighted(label_values_dict, subsets_of_interest, args):
+    """"""
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
+
+    min_max_list = []
     for label in output_pmi:
         if len(output_pmi[label]) > 0: # if the list is not empty
-            min_max_list = []
             min_max_list.append(min(output_pmi[label].values()))
             min_max_list.append(max(output_pmi[label].values()))
-            min_value = min(min_max_list)
-            max_value = max(min_max_list)
-            for w in output_pmi[label]:
-                output_pmi[label][w] = safe_divide((output_pmi[label][w]-min_value), (max_value-min_value))
 
-    # min_max_list = []
-    # for label in output_pmi:
-    #     if len(output_pmi[label]) > 0: # if the list is not empty
-    #         min_max_list.append(min(output_pmi[label].values()))
-    #         min_max_list.append(max(output_pmi[label].values()))
-
-    # min_value = min(min_max_list)
-    # max_value = max(min_max_list)
+    min_value = min(min_max_list)
+    max_value = max(min_max_list)
     
-    # for label in output_pmi:
-    #     for w in output_pmi[label]:
-    #         output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
+    for label in output_pmi:
+        for w in output_pmi[label]:
+            output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
     
     # # Print for debug
     # for label in output_pmi:
@@ -213,12 +214,14 @@ def pmi_normalized_weighted(label_values_dict, subsets_of_interest, args):
 
     return output_pmi
 
+
 def pmi_positive_weighted(label_values_dict, subsets_of_interest, args):
-    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)   
+    """"""
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
     for label in output_pmi:
         for w in output_pmi[label]:
             if output_pmi[label][w] < 0:
-                output_pmi[label][w] = 0        
+                output_pmi[label][w] = 0
 
     # # Print for debug
     # for label in output_pmi:
@@ -228,36 +231,27 @@ def pmi_positive_weighted(label_values_dict, subsets_of_interest, args):
 
     return output_pmi
 
+
 def pmi_positive_normalized_weighted(label_values_dict, subsets_of_interest, args):
+    """"""
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
 
+    min_max_list = []
     for label in output_pmi:
+        for w in output_pmi[label]:
+            if output_pmi[label][w] < 0:
+                output_pmi[label][w] = 0
         if len(output_pmi[label]) > 0: # if the list is not empty
-            min_max_list = []
             min_max_list.append(min(output_pmi[label].values()))
             min_max_list.append(max(output_pmi[label].values()))
-            min_value = min(min_max_list)
-            max_value = max(min_max_list)
-            for w in output_pmi[label]:
-                output_pmi[label][w] = safe_divide((output_pmi[label][w]-min_value), (max_value-min_value))
-                if output_pmi[label][w] < 0:
-                    output_pmi[label][w] = 0
 
-    # min_max_list = []
-    # for label in output_pmi:
-    #     for w in output_pmi[label]:
-    #         if output_pmi[label][w] < 0:
-    #             output_pmi[label][w] = 0
-    #     if len(output_pmi[label]) > 0: # if the list is not empty
-    #         min_max_list.append(min(output_pmi[label].values()))
-    #         min_max_list.append(max(output_pmi[label].values()))    
-
-    # min_value = min(min_max_list)
-    # max_value = max(min_max_list)
+    min_value = min(min_max_list)
+    max_value = max(min_max_list)
     
-    # for label in output_pmi:
-    #     for w in output_pmi[label]:
-    #         output_pmi[label][w] = safe_divide((output_pmi[label][w] - min_value) , (max_value - min_value))
+    for label in output_pmi:
+        for w in output_pmi[label]:
+            output_pmi[label][w] = safe_divide(
+                (output_pmi[label][w] - min_value) , (max_value - min_value))
 
     # # Print for debug
     # for label in output_pmi:
@@ -268,36 +262,96 @@ def pmi_positive_normalized_weighted(label_values_dict, subsets_of_interest, arg
     return output_pmi
 
 
-def pmi_lexical_artifact(label_values_dict, subsets_of_interest, args):
-        texts_list = []
-        labels_list = []
-        for column in label_values_dict:
-            
-            for l in range(len(label_values_dict[column])):
-                curr_label = subsets_of_interest[column][l].name
-                
-                for text in subsets_of_interest[column][l]:
-                    texts_list.append(" ".join(text))
-                    labels_list.append(str(curr_label))
-                    
-            uniqe_labels = list(dict.fromkeys(labels_list))   
+def class_relevance_positive_normalized(label_values_dict, subsets_of_interest, args):
+    """"""
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)
 
-            lexical_artifact_dict = dict()
-            for label in uniqe_labels:
-                lexical_artifact_dict[label] = dict()
-                values_df = lexical_artifacts.compute(
-                    texts= texts_list, 
-                    labels= labels_list, 
-                    label_of_interest= label, 
-                ) 
-                
-                top_k = len(values_df)          
-                
-                for token, row in values_df.head(top_k).iterrows():
-                    lexical_artifact_dict[label][token] = row[values_df.columns[0]]
-                
+    for label in output_pmi:
+        if len(output_pmi[label]) > 0: # if the list is not empty
+            min_max_list = []
+            min_max_list.append(min(output_pmi[label].values()))
+            min_max_list.append(max(output_pmi[label].values()))
+            min_value = min(min_max_list)
+            max_value = max(min_max_list)
+
+            for w in output_pmi[label]:
+                output_pmi[label][w] = safe_divide(
+                    (output_pmi[label][w]-min_value), (max_value-min_value))
+                if output_pmi[label][w] < 0:
+                    output_pmi[label][w] = 0
+
+    return output_pmi
+
+
+def class_relevance_normalized_weighted(label_values_dict, subsets_of_interest, args):
+    """"""
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
+
+    for label in output_pmi:
+        if len(output_pmi[label]) > 0: # if the list is not empty
+            min_max_list = []
+            min_max_list.append(min(output_pmi[label].values()))
+            min_max_list.append(max(output_pmi[label].values()))
+            min_value = min(min_max_list)
+            max_value = max(min_max_list)
+
+            for w in output_pmi[label]:
+                output_pmi[label][w] = safe_divide(
+                    (output_pmi[label][w]-min_value), (max_value-min_value)
+                )
+
+    return output_pmi
+
+
+def class_relevance_positive_normalized_weighted(label_values_dict, subsets_of_interest, args):
+    """"""
+    output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
+
+    for label in output_pmi:
+        if len(output_pmi[label]) > 0: # if the list is not empty
+            min_max_list = []
+            min_max_list.append(min(output_pmi[label].values()))
+            min_max_list.append(max(output_pmi[label].values()))
+            min_value = min(min_max_list)
+            max_value = max(min_max_list)
+
+            for w in output_pmi[label]:
+                output_pmi[label][w] = safe_divide(
+                    (output_pmi[label][w]-min_value), (max_value-min_value))
+                if output_pmi[label][w] < 0:
+                    output_pmi[label][w] = 0
+
+    return output_pmi
+
+
+def pmi_lexical_artifacts(label_values_dict, subsets_of_interest, args):
+    """"""
+    texts_list = []
+    labels_list = []
+    
+    for column in label_values_dict:
             
-            return lexical_artifact_dict
+        for l in range(len(label_values_dict[column])):
+            curr_label = subsets_of_interest[column][l].name
                 
-           
-            
+            for text in subsets_of_interest[column][l]:
+                texts_list.append(" ".join(text))
+                labels_list.append(str(curr_label))
+                    
+        uniqe_labels = list(dict.fromkeys(labels_list))
+
+        lexical_artifacts_dict = dict()
+        for label in uniqe_labels:
+            lexical_artifacts_dict[label] = dict()
+            values_df = lexical_artifacts.compute(
+                texts = texts_list,
+                labels = labels_list,
+                label_of_interest = label,
+            )
+                
+            top_k = len(values_df)
+                
+            for token, row in values_df.head(top_k).iterrows():
+                lexical_artifacts_dict[label][token] = row[values_df.columns[0]]
+                
+        return lexical_artifacts_dict
