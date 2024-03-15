@@ -13,6 +13,7 @@ authors = [
 description = "Variationist: Exploring multifaceted variation and bias in written language data"
 readme = "README.md"
 license = { file="LICENSE" }
+keywords = ["computational linguistics", "language variation", "bias in NLP"]
 requires-python = ">=3.9"
 dependencies = [
     "pandas==2.2.1",
@@ -35,3 +36,5 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://github.com/dhfbk/variationist"
+"Documentation" = "https://variationist.readthedocs.io/en/latest"
+"Issues" = "https://github.com/dhfbk/variationist/issues"
