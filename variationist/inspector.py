@@ -48,7 +48,9 @@ class InspectorArgs:
         freq_cutoff (`Int`):
             The token frequency, expressed as an integer, below which we do not consider the token in the analysis of pmi-based metrics. Defaults to 3.
         stopwords (`Bool`):
-            Whether to remove stopwords from texts before tokenization or not. Will default to False.
+            Whether to remove stopwords from texts before tokenization or not (using default lists in a given `language`). Will default to False.
+        custom_stopwords (`Optional[Union[str, list]]):
+            A list of stopwords (or a path to a file containing stopwords, one per line) to be removed before tokenization. If `stopwords` is True, these stopwords will be added to that list. Will default to None.
         lowercase (`Bool`):
             Whether to lowercase all the texts before tokenization or not. Will default to False.
         ignore_null_var (`Bool`):
@@ -59,7 +61,7 @@ class InspectorArgs:
     var_names: Optional[List] = None # explicit variable name(s)
     metrics: Optional[List] = None
     var_types: Optional[List] = None # nominal (default), ordinal, quantitative, coordinates
-    var_semantics: Optional[List] = None # default=General, temporal, spatial
+    var_semantics: Optional[List] = None # general (default), temporal, spatial
     var_subsets: Optional[List] = None
     var_bins: Optional[List] = None
     tokenizer: Optional[Union[str, Callable]] = 'whitespace'
@@ -69,7 +71,8 @@ class InspectorArgs:
     unique_cooc: Optional[bool] = False
     cooc_window_size: Optional[int] = 0
     freq_cutoff: Optional[int] = 3
-    stopwords: Optional[bool] = False # TODO currently we only support stopwords = en,it. Add support for False, spacy, hf
+    stopwords: Optional[bool] = False
+    custom_stopwords: Optional[Union[str, list]] = None
     lowercase: Optional[bool] = False
     ignore_null_var: Optional[bool] = False
     
@@ -260,7 +263,7 @@ class Inspector:
             results_dict[metric_name][list(label_values_dict.keys())[0]] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
             
         self.results_dict = results_dict
-        return subsets_of_interest,results_dict
+        return subsets_of_interest, results_dict
 
     
     def create_output_dict(self):
