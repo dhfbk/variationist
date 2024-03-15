@@ -1,16 +1,20 @@
-from statistics import stdev, mean
 import math
+from statistics import stdev, mean
 from tqdm import tqdm
 
 
 def safe_divide(numerator, denominator):
-        if denominator == 0 or denominator == 0.0:
-            result = 0
-        else:
-            result = numerator/denominator
-        return result
+    """"""
+    if denominator == 0 or denominator == 0.0:
+        result = 0
+    else:
+        result = numerator/denominator
 
-def ttr(label_values_dict, subsets_of_interest, args):  
+    return result
+
+
+def ttr(label_values_dict, subsets_of_interest, args):
+    """"""
     values_dict = dict()
     for column in label_values_dict:
         for l in tqdm(range(len(label_values_dict[column]))):
@@ -31,10 +35,14 @@ def ttr(label_values_dict, subsets_of_interest, args):
                 values_dict[curr_label]["stdev"] = 0
             else:
                 values_dict[curr_label]["stdev"] = stdev(values_list)
+
     # print("TTR: ",values_dict)
+
     return values_dict
-    
-def rttr(label_values_dict, subsets_of_interest, args):  
+
+
+def rttr(label_values_dict, subsets_of_interest, args):
+    """"""
     values_dict = dict()
     for column in label_values_dict:
         for l in tqdm(range(len(label_values_dict[column]))):
@@ -55,10 +63,14 @@ def rttr(label_values_dict, subsets_of_interest, args):
                 values_dict[curr_label]["stdev"] = 0
             else:
                 values_dict[curr_label]["stdev"] = stdev(values_list)
+
     # print("RTTR: ",values_dict)
+
     return values_dict
 
-def maas(label_values_dict, subsets_of_interest, args):  
+
+def maas(label_values_dict, subsets_of_interest, args):
+    """"""
     values_dict = dict()
     for column in label_values_dict:
         for l in tqdm(range(len(label_values_dict[column]))):
@@ -79,10 +91,14 @@ def maas(label_values_dict, subsets_of_interest, args):
                 values_dict[curr_label]["stdev"] = 0
             else:
                 values_dict[curr_label]["stdev"] = stdev(values_list)
+
     # print("MAAS: ",values_dict)
+
     return values_dict
 
-def lttr(label_values_dict, subsets_of_interest, args):  
+
+def lttr(label_values_dict, subsets_of_interest, args):
+    """"""
     values_dict = dict()
     for column in label_values_dict:
         for l in tqdm(range(len(label_values_dict[column]))):
@@ -103,6 +119,8 @@ def lttr(label_values_dict, subsets_of_interest, args):
                 values_dict[curr_label]["stdev"] = 0
             else:
                 values_dict[curr_label]["stdev"] = stdev(values_list)
+
     # print("LTTR: ",values_dict)
+    
     return values_dict
 

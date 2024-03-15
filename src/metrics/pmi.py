@@ -1,12 +1,11 @@
-import pandas as pd
-from itertools import islice
-from src.methods import shared_metrics
-from src.methods import lexical_artifacts
-import math
-from collections import Counter
 import math
 import numpy as np
+import pandas as pd
+from collections import Counter
+from itertools import islice
 from tqdm import tqdm
+
+from src.metrics import shared_metrics, lexical_artifacts
 
 
 def safe_divide(numerator, denominator):

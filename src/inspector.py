@@ -11,7 +11,7 @@ from typing import Callable, List, Optional, Tuple, Union, Dict
 import json
 from src.data import preprocess_utils
 from src.data.tokenization import Tokenizer
-from src.methods import pmi, most_frequent, metrics
+from src.metrics import metrics
 
 @dataclass
 class InspectorArgs:

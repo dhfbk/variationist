@@ -1,6 +1,8 @@
 import pandas as pd
 
+
 def get_all_frequencies(pandas_series):
+    """"""
     freq_dict = dict()
     for sentence in pandas_series:
         if len(sentence) == 0:
@@ -9,4 +11,5 @@ def get_all_frequencies(pandas_series):
             if token not in freq_dict:
                 freq_dict[token] = 0
             freq_dict[token] += 1
-    return(freq_dict)
+
+    return freq_dict

@@ -2,14 +2,11 @@ import math
 import numpy as np
 import pandas as pd
 import sys
-
 from collections import Counter
 from transformers import AutoTokenizer
 from typing import List
 
-from src.methods import utils
-
-
+from src.metrics import utils
 
 
 def compute_pmi(
