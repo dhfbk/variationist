@@ -14,7 +14,20 @@ def take(n, iterable):
 
 
 def number_of_texts(label_values_dict, subsets_of_interest):
-    """"""
+    """Returns a dictionary with how many texts are in each subset of interest.
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+        
+    Returns
+    -------
+    values_dict (`dict`):
+        A dict containing the length of each subset.
+    """
     values_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -25,7 +38,20 @@ def number_of_texts(label_values_dict, subsets_of_interest):
 
 
 def average_text_length(label_values_dict, subsets_of_interest):
-    """"""
+    """Returns a dictionary with the average length of texts in each subset of interest.
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+        
+    Returns
+    -------
+    values_dict (`dict`):
+        A dict containing the average length (and its standard deviation) of texts in each subset.
+    """
     values_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -44,12 +70,23 @@ def average_text_length(label_values_dict, subsets_of_interest):
                 values_dict[curr_label]["stdev"] = 0
             else:
                 values_dict[curr_label]["stdev"] = stdev(values_list)
-    
     return values_dict
 
 
 def num_words(label_values_dict, subsets_of_interest):
-    """"""
+    """Returns a dictionary with the total number of tokens in each subset.
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+        
+    Returns
+    -------
+    n_word_dict (`dict`):
+        A dict containing the total number of tokens in each subset."""
     n_word_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -64,7 +101,19 @@ def num_words(label_values_dict, subsets_of_interest):
 
 
 def vocab_size(label_values_dict, subsets_of_interest):
-    """"""
+    """Returns a dictionary with the total number of unique tokens in each subset - i.e. the size of the vocabulary for each subset.
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+        
+    Returns
+    -------
+    vocab_dict (`dict`):
+        A dict containing the vocabulary size of each subset."""
     vocab_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -80,7 +129,20 @@ def vocab_size(label_values_dict, subsets_of_interest):
 
 
 def number_of_duplicates(label_values_dict, subsets_of_interest):
-    """"""
+    """Returns a dictionary with the number of duplicate texts in each subset of interest.
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+        
+    Returns
+    -------
+    duplicates_dict (`dict`):
+        A dict containing the number of duplicate texts in each subset."""
+        
     duplicates_dict = dict()
     for column in label_values_dict:
         for l in range(len(label_values_dict[column])):
@@ -99,7 +161,19 @@ def number_of_duplicates(label_values_dict, subsets_of_interest):
 
 
 def create_frequency_dictionary(label_values_dict, subsets_of_interest, args):
-    """"""
+    """Returns a dictionary with the frequency of tokens in each subset of interest.
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+        
+    Returns
+    -------
+    output_freqs (`dict`):
+        A dict containing the frequency of each token for each subset of interest."""
     output_freqs = dict()
     for column in label_values_dict:
         for l in tqdm(range(len(label_values_dict[column]))):
@@ -108,14 +182,12 @@ def create_frequency_dictionary(label_values_dict, subsets_of_interest, args):
             sorted_mydict = sorted(mydict.items(), key=lambda x:x[1], reverse=True)
             converted_dict = dict(sorted_mydict)
             output_freqs[curr_label] = converted_dict
-            
-            # print("most frequent", curr_label, take(10, converted_dict.items())) #print for debug
-            
+            # print("most frequent", curr_label, take(10, converted_dict.items())) #print for debug          
     return output_freqs
 
 
 def compute_basic_stats(label_values_dict, subsets_of_interest, args):
-    """"""
+    """A wrapper function for calling all of the basic statistics functions."""
     stats_dict = dict()
     stats_dict["number_of_texts"] = number_of_texts(label_values_dict, subsets_of_interest)
     stats_dict["average_text_length"] = average_text_length(label_values_dict, subsets_of_interest)
@@ -123,6 +195,5 @@ def compute_basic_stats(label_values_dict, subsets_of_interest, args):
     stats_dict["vocabulary-size"] = vocab_size(label_values_dict, subsets_of_interest)
     stats_dict["number-of-duplicates"] = number_of_duplicates(label_values_dict, subsets_of_interest)
     # print(stats_dict)
-
     return stats_dict
 

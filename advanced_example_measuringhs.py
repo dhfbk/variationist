@@ -1,6 +1,6 @@
 from src.inspector import InspectorArgs, Inspector, metrics
 from src.data import tokenization
-from src.methods import shared_metrics
+from src.metrics import shared_metrics
 from itertools import islice
 
 # TODO allow the user to input the dataset and the inspector args from command line
@@ -25,13 +25,41 @@ def create_most_frequent_dictionary(label_values_dict, subsets_of_interest):
 
 inspector_arguments = InspectorArgs(text_names=["text"],
                                     var_names=["hatespeech", "annotator_gender"],
-                                    metrics=["most-frequent", "pmi-positive-normalized", "ttr"],
+                                    var_bins = [0, 0],
+                                    metrics=["freq", "pmi", "ttr",
+                                             "n_pmi",
+                                             "p_pmi",
+                                             "np_relevance",
+                                             "npw_relevance",
+                                             "maas",
+                                             "stats"
+                                             ],
                                     stopwords="en",
                                     n_tokens = 1,
-                                    tokenizer = "hf::bert-base-uncased"
+                                    tokenizer = "whitespace"
                                     # n_cooc = 3,
                                     # cooc_window_size = 3                                    
                                     )
+
+
+# inspector_arguments = InspectorArgs(text_names=["0", "1"],
+#                                     var_names=["2"],
+#                                     # var_bins = [0, 10],
+#                                     metrics=["freq", "pmi", "ttr",
+#                                              "n_pmi",
+#                                              "p_pmi",
+#                                              "np_relevance",
+#                                              "npw_relevance",
+#                                              "maas",
+#                                              "stats"
+#                                              ],
+#                                     # stopwords="en",
+#                                     n_tokens = 1,
+#                                     # tokenizer = "hf::bert-base-uncased"
+#                                     tokenizer = "whitespace"
+#                                     # n_cooc = 3,
+#                                     # cooc_window_size = 3                                    
+#                                     )
 
 
 dataset = "hf::ucberkeley-dlab/measuring-hate-speech::train"

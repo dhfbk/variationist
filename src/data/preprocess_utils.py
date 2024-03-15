@@ -9,10 +9,22 @@ from tqdm import tqdm
 import stopwordsiso as stopwords
 
 
+
 def remove_elements(token_list, stopwords):
-    # Take as input two lists first the list of tokens of the sentences and as second the list of stopwords
-    # Removes elements in  'stopwords' from 'token_list'.
-    # Returns token_list without stopwords
+    """"Used for removing stopwords. Given a token array, it will return the same array excluding the elements in stopwords. Used to remove stopwords at the text level.
+    
+    Parameters
+    ----------
+    token_list (`Iterable`):
+        An array of tokens.
+    stopwords (`Iterable`):
+        Array of stopwords to be removed from token_list
+        
+    Returns
+    -------
+    new_array (`Iterable`):
+        The same array, with stopwords removed."""
+
     new_array = []
     for element in token_list:
         if element.lower() not in stopwords:
@@ -21,7 +33,19 @@ def remove_elements(token_list, stopwords):
 
 
 def remove_stopwords(text_column, language):
-    # Takes as input an already tokenized array/series of texts and a language and return it without stopwords
+    """"Used for removing stopwords. Given an already tokenized pandas Series of texts, it will return the same series, excluding the elements in stopwords. Used to remove stopwords at the column level.
+    
+    Parameters
+    ----------
+    token_column (`pandas.Series`):
+        A series containing the already tokenized texts.
+    language (`str`):
+        The language we should retrieve stopwords for.
+        
+    Returns
+    -------
+    text_column (`pandas.Series`):
+        The same tokenized series as input, with stopwords removed."""
     # Language need to be ISO 639-1  two-letter codes e.g en, it, fr, de 
     lang_stopwords = stopwords.stopwords(language)
     text_column = text_column.squeeze().apply(lambda x: remove_elements(x,lang_stopwords))
@@ -29,8 +53,19 @@ def remove_stopwords(text_column, language):
     
 
 def convert_to_ngrams(token_list, n_tokens):
-    # Takes as input a list of tokens and  the length of the ngrams
-    # Returns token_list merged into ngrams
+    """Function for creating n-grams from tokens. Given a list of tokens and the number of tokens for the n-grams, it returns the same list, but with n-grams as units instead of single tokens. Used to create n-grams at the text level.
+    
+    Parameters
+    ----------
+    token_list (`Iterable`):
+        An array of tokens.
+    n_tokens (`int`):
+        The n to use for n-grams. E.g., a value of 2 will result in bi-grams.
+        
+    Returns
+    -------
+    new_array (`Iterable`):
+        The same array, with n-grams instead of single tokens as units."""
     new_array = []
     for i in range(len(token_list) - n_tokens + 1):
         new_array.append(" ".join(token_list[i: i + n_tokens]))
@@ -38,8 +73,19 @@ def convert_to_ngrams(token_list, n_tokens):
 
 
 def create_tokenized_ngrams_column(tokenized_text_column, n_tokens):
-    # Takes as input an already tokenized array/series of texts and the length of the ngrams
-    # Returns tokenized_text_column with the tokens merged into ngrams
+    """Function for creating n-grams from tokens. Given an already tokenized pandas Series of texts, it will return the same series, but with n-grams as units instead of single tokens. Used to create n-grams at the text column level.
+    
+    Parameters
+    ----------
+    tokenized_text_column (`pandas.Series`):
+        A series containing the already tokenized texts.
+    n_tokens (`int`):
+        The n to use for n-grams. E.g., a value of 2 will result in bi-grams.
+        
+    Returns
+    -------
+    new_array (`Iterable`):
+        The same array, with n-grams instead of single tokens as units."""
     tqdm.pandas()
     tokenized_text_column = tokenized_text_column.squeeze().progress_apply(lambda x: convert_to_ngrams(x,n_tokens))
     return(tokenized_text_column)
@@ -52,7 +98,22 @@ def create_tokenized_ngrams_column(tokenized_text_column, n_tokens):
     #     return dataframe
 
 
-def discretize_bins_col(dataframe_var_col, curr_var_type, curr_var_semantic, curr_var_bins):
+def discretize_bins_col(dataframe_var_col, curr_var_bins):
+    """A function that will split a variable into bins, assigning new values to that variable based on how many bins were selected by the user with the var_bins parameter in InspectorArgs.
+    
+    Parameters
+    ----------
+    dataframe_var_col (pandas.Series):
+        A pandas Series, corresponding to the pandas Dataframe column containing the variable that should be divided into bins.
+    curr_var_bins (`int`):
+        The number of bins to divide the current variable into, as specified by the user using var_bins.
+    
+    Returns
+    -------
+    discretized_var_col (pandas.Series):
+        The same Series as input, but with values split into bins.
+    """
+    
     discretized_var_col, bin_names = pd.cut(dataframe_var_col,
                                             bins=curr_var_bins,
                                             retbins=True)
@@ -61,7 +122,23 @@ def discretize_bins_col(dataframe_var_col, curr_var_type, curr_var_semantic, cur
 
 
 def extract_combinations(token_list, n_items, context_window, unique_cooc):
-    # Takes as input a list of tokens, the number of words that cooccur and the context window size 
+    """A Function that will extract co-occurrences from tokens if this was set by the user. Used to extract co-occurrences at the text level.
+    
+    Parameters
+    ----------
+    token_list (`Iterable`):
+        An array of tokens for the text, out of which to extract co-occurrences.
+    n_items (`int`):
+        The number of co-occurring tokens we should consider. Corresponds to `n_cooc` set by the user in InspectorArgs.
+    context_window (`int`):
+        Size of the context window for co-occurrences, corresponding to `cooc_window_size` in InspectorArgs.
+    unique_cooc (`bool`):
+        A boolean for whether to consider unique co-occurrences. If True, multiple occurrences of the same token in a text will be discarded.
+
+    Returns
+    -------
+    new_array (list):
+        returns the new array of tokens, with co-occurrences as basic units rather than the original tokens."""
     # Returns token_list merged into cooccurrences
     if context_window == 0:
         context_window = len(token_list)
@@ -75,9 +152,24 @@ def extract_combinations(token_list, n_items, context_window, unique_cooc):
     
 
 def create_tokenized_cooccurrences_column(tokenized_text_column, n_items, context_window, unique_cooc):
-    # Takes as input an already tokenized array/series of texts, the number of words that cooccur and the context window size 
-    # By default cooccurrences are extracted from the entire text
-    # Returns tokenized_text_column with the al the cooccurrences of n words occurring in the test
+    """A Function that will extract co-occurrences from tokens if this was set by the user. Used to extract co-occurrences at the column level.
+    
+    Parameters
+    ----------
+    tokenized_text_column (`pandas.Series`):
+        A series containing the already tokenized texts.
+    n_items (`Int`):
+        The number of co-occurring tokens we should consider. Corresponds to `n_cooc` set by the user in InspectorArgs.
+    context_window (`Int`):
+        Size of the context window for co-occurrences, corresponding to `cooc_window_size` in InspectorArgs.
+    unique_cooc (`Bool`):
+        A boolean for whether to consider unique co-occurrences. If True, multiple occurrences of the same token in a text will be discarded.
+
+    Returns
+    -------
+    text_column (`pandas.Series`):
+        The same tokenized series as input (overall length of the series will be the same), but with co-occurrences in lieu of the original tokens (meaning sequence length will be far lengthier)."""
+    
     if n_items > context_window and context_window!=0:
         sys.exit(f"ERROR: The size of the context windows cannot be lower than the number of words when extracting the cooccurrences!\nExit.")
     tqdm.pandas()
@@ -87,19 +179,44 @@ def create_tokenized_cooccurrences_column(tokenized_text_column, n_items, contex
                                                             
 
 def get_label_values(input_dataframe, col_names_dict):
-    """Returns a dictionary with all unique label values for the specified variables."""
+    """Returns a dictionary with all unique label values for the specified variables.
+    
+    Parameters
+    ----------
+    input_dataframe (`pandas.DataFrame`):
+        The dataset to be analyzed.
+    col_names_dict (`dict`):
+        A dictionary containing the var_names provided by the user.
+    
+    Returns
+    -------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    """
     current_labels = col_names_dict[utils.LABEL_COLS_KEY]
     
     # Create dictionary with names of label columns and label values
     label_values_dict = {}
     for label in current_labels:
-        # TODO FutureWarning: unique with argument that is not not a Series, Index, ExtensionArray, 
-        # or np.ndarray is deprecated and will raise in a future version.
         label_values_dict[label] = pd.unique(input_dataframe[label]).tolist()
     return label_values_dict
 
 
 def update_label_values_dict_with_inters(label_values_dict, text_names):
+    """Updates label_values_dict with the intersection names if we have more than 1 var_name or text_name.
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    text_names (`list`):
+        The list of text column names.
+    
+    Returns
+    -------
+    inters_label_values_dict (`dict`):
+        A dictionary containing all of the possible intersections of text columns and variables in the input dataset.    
+    """
     inters_label_values_dict = {}
     current_var_values = list(label_values_dict.values())
     current_vars = list(label_values_dict.keys())
@@ -118,8 +235,22 @@ def update_label_values_dict_with_inters(label_values_dict, text_names):
 
 
 def get_subset_dict(input_dataframe, tok_columns_dict, label_values_dict):
-    """create a dictionary containing all the subsets of the datasets we will be analyzing."""
-    # TODO handle nan values for a specific label.
+    """Creates a dictionary containing all the desired subsets of the dataset we will be analyzing.
+    
+    Parameters
+    ----------
+    input_dataframe (`pandas.DataFrame`):
+        The dataset to be analyzed.
+    tok_columns_dict (`dict`):
+        A dictionary containing the names of the columns containing the tokenized specified text columns.
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+        
+    Returns
+    -------
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable value specified by the user.
+    """    
     current_vars = label_values_dict.keys()
     subsets_of_interest = {}
     # loop through all columns containing text
@@ -141,6 +272,23 @@ def get_subset_dict(input_dataframe, tok_columns_dict, label_values_dict):
 
 
 def get_subset_intersections(input_dataframe, tok_columns_dict, label_values_dict):
+    """Creates a dictionary containing all the desired subsets of the dataset we will be analyzing if we have intersections among different text or var columns.
+    
+    Parameters
+    ----------
+    input_dataframe (`pandas.DataFrame`):
+        The dataset to be analyzed.
+    tok_columns_dict (`dict`):
+        A dictionary containing the names of the columns containing the tokenized specified text columns.
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+        
+    Returns
+    -------
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user in the case of multiple text and variable columns.
+    """
+        
     current_var_values = list(label_values_dict.values())
     current_vars = list(label_values_dict.keys())
     n_vars = len(label_values_dict.keys())

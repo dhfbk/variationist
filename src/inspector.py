@@ -40,7 +40,7 @@ class InspectorArgs:
         n_cooc (`Int`):
             The number of tokens used for calculating non-consecutive co-occurrences. For example, n=2 means we consider as the base units for our analysis any pair of tokens that co-occur in the same sentence. n=3 means we consider triplets of tokens, etc. Defaults to n=1, meaning no co-occurrences are taken into consideration, and we only consider n-grams.
         unique_cooc (`Bool`):
-            Whether to consider unique co-occurrences or not. Default to False (keep duplicate tokens). This does not affect the co-occurrences window size by design (the window size considers the original number of tokens and therefore the original allowed maximum distance between tokens).
+            Whether to consider unique co-occurrences or not. Default to False (keep duplicate tokens). If True, multiple occurrences of the same token in a text will be discarded. This does not affect the co-occurrences window size by design (the window size considers the original number of tokens and therefore the original allowed maximum distance between tokens).
         cooc_window_size (`Int`):
             Size of the context window for co-occurrences. For instance, a `cooc_window_size` of 3 means we use a context window of 3 to calculate co-occurrences, meaning that any token that is within 3 tokens before or after a given token is added as a co-occurrence.
         freq_cutoff (`Int`):
@@ -72,6 +72,7 @@ class InspectorArgs:
     ignore_null_var: Optional[bool] = False
     
     def check_values(self):
+        """Checks the values in text_names, var_names and metrics."""
         if self.text_names == None:
             sys.exit("ERROR: No text_names were provided. These are the names or indices of the columns containing the text to be analyzed.")
         if self.var_names == None:
@@ -214,11 +215,7 @@ class Inspector:
                         if curr_sem == "temporal":
                             curr_var_column = pd.to_datetime(curr_var_column)
                         print(f"INFO: For the variable {curr_var_name}, bins were defined. It will therefore be split into {curr_bins} equal bins.")
-                        self.dataframe[curr_var_name] = preprocess_utils.discretize_bins_col(curr_var_column,
-                                                                                            curr_type,
-                                                                                            curr_sem,
-                                                                                            curr_bins
-                                                                                            )
+                        self.dataframe[curr_var_name] = preprocess_utils.discretize_bins_col(curr_var_column,curr_bins)
                     else:
                         sys.exit(f"ERROR: var_bins was defined, but not correctly. We expected a list of integer values for each variable (with 0 for variables where no binning is desired), but instead for the variable {curr_var_name} the input was of type {type(curr_bins).__name__}.")
                 else:

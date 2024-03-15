@@ -63,6 +63,17 @@ class Metric:
         
     
     def calculate_metric(self, label_values_dict, subsets_of_interest):
-        """Calls the appropriate metric function."""
+        """Calls the appropriate metric function.
         
+        Parameters
+        ----------
+        label_values_dict (`dict`):
+            A dictionary containing all of the possible values each variable can take in the input dataset.
+        subsets_of_interest (`dict`):
+            A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+        
+        Returns
+        -------
+        A `dict` with the results of the calculated metric function.
+            """
         return self.metric_fn(label_values_dict, subsets_of_interest, self.args)

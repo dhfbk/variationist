@@ -2,7 +2,7 @@ import pandas as pd
 
 
 def get_all_frequencies(pandas_series):
-    """"""
+    """Returns all token frequencies inside a pandas Series."""
     freq_dict = dict()
     for sentence in pandas_series:
         if len(sentence) == 0:

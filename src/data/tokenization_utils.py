@@ -11,17 +11,16 @@ def whitespace_tokenization(text_column: pd.Series,
     
     Parameters
     ----------
-        text_column (`pandas.Series`):
-            A pandas Series of text that should be tokenized.
-        args (`InspectorArgs`):
-            The InspectorArgs that were passed to Inspector.
+    text_column (`pandas.Series`):
+        A pandas Series of text that should be tokenized.
+    args (`InspectorArgs`):
+        The InspectorArgs that were passed to Inspector.
     
     Returns
     -------
-        tok_column: `pandas.Series`:
-            A pandas Series containing the initial texts but tokenized.
-    """
-    # Remove punctuation and any not alphanumeric charachter      
+    tok_column: `pandas.Series`:
+        A pandas Series containing the initial texts but tokenized.
+    """     
     
     tqdm.pandas()
     if args.lowercase:
@@ -42,15 +41,15 @@ def huggingface_tokenization(text_column: pd.Series,
     
     Parameters
     ----------
-        text_column (`pandas.Series`):
-            A pandas Series of text that should be tokenized.
-        args (`InspectorArgs`):
-            The InspectorArgs that were passed to Inspector.
+    text_column (`pandas.Series`):
+        A pandas Series of text that should be tokenized.
+    args (`InspectorArgs`):
+        The InspectorArgs that were passed to Inspector.
     
     Returns
     -------
-        tok_column: `pandas.Series`:
-            A pandas Series containing the initial texts but tokenized.
+    tok_column: (`pandas.Series`):
+        A pandas Series containing the initial texts but tokenized.
     """
     tokenizer_name = args.tokenizer.strip("hf::")
     hf_tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)

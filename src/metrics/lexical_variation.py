@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 
 def safe_divide(numerator, denominator):
-    """"""
+    """Utility function to avoid zero division errors."""
     if denominator == 0 or denominator == 0.0:
         result = 0
     else:
@@ -14,7 +14,22 @@ def safe_divide(numerator, denominator):
 
 
 def ttr(label_values_dict, subsets_of_interest, args):
-    """"""
+    """Calculates Type Token Ratio.
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+    args (`InspectorArgs`):
+        The arguments selected by the user.
+    
+    Returns
+    -------
+    values_dict (`dict`):
+        A dictionary with the mean TTR score for each subset and its standard deviation.
+    """
     values_dict = dict()
     for column in label_values_dict:
         for l in tqdm(range(len(label_values_dict[column]))):
@@ -42,7 +57,22 @@ def ttr(label_values_dict, subsets_of_interest, args):
 
 
 def rttr(label_values_dict, subsets_of_interest, args):
-    """"""
+    """Calculates Root Type Token Ratio.
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+    args (`InspectorArgs`):
+        The arguments selected by the user.
+    
+    Returns
+    -------
+    values_dict (`dict`):
+        A dictionary with the mean RTTR score for each subset and its standard deviation.
+    """
     values_dict = dict()
     for column in label_values_dict:
         for l in tqdm(range(len(label_values_dict[column]))):
@@ -70,7 +100,22 @@ def rttr(label_values_dict, subsets_of_interest, args):
 
 
 def maas(label_values_dict, subsets_of_interest, args):
-    """"""
+    """Calculates Maas's index (Maas, 1972).
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+    args (`InspectorArgs`):
+        The arguments selected by the user.
+    
+    Returns
+    -------
+    values_dict (`dict`):
+        A dictionary with the mean Maas index score for each subset and its standard deviation.
+    """
     values_dict = dict()
     for column in label_values_dict:
         for l in tqdm(range(len(label_values_dict[column]))):
@@ -98,7 +143,22 @@ def maas(label_values_dict, subsets_of_interest, args):
 
 
 def lttr(label_values_dict, subsets_of_interest, args):
-    """"""
+    """Calculates Log Type Token Ratio.
+    
+    Parameters
+    ----------
+    label_values_dict (`dict`):
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest (`dict`):
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+    args (`InspectorArgs`):
+        The arguments selected by the user.
+    
+    Returns
+    -------
+    values_dict (`dict`):
+        A dictionary with the mean LTTR score for each subset and its standard deviation.
+    """
     values_dict = dict()
     for column in label_values_dict:
         for l in tqdm(range(len(label_values_dict[column]))):
