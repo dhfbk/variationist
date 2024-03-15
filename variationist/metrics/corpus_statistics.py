@@ -189,11 +189,17 @@ def create_frequency_dictionary(label_values_dict, subsets_of_interest, args):
 def compute_basic_stats(label_values_dict, subsets_of_interest, args):
     """A wrapper function for calling all of the basic statistics functions."""
     stats_dict = dict()
-    stats_dict["number_of_texts"] = number_of_texts(label_values_dict, subsets_of_interest)
-    stats_dict["average_text_length"] = average_text_length(label_values_dict, subsets_of_interest)
-    stats_dict["number-of-words"] = num_words(label_values_dict, subsets_of_interest)
-    stats_dict["vocabulary-size"] = vocab_size(label_values_dict, subsets_of_interest)
-    stats_dict["number-of-duplicates"] = number_of_duplicates(label_values_dict, subsets_of_interest)
+    for stat in ["number_of_texts", 
+                 "average_text_length",
+                 "number-of-words",
+                 "vocabulary-size",
+                 "number-of-duplicates"]:
+        stats_dict[stat] = {}
+    stats_dict["number_of_texts"][list(label_values_dict.keys())[0]] = number_of_texts(label_values_dict, subsets_of_interest)
+    stats_dict["average_text_length"][list(label_values_dict.keys())[0]] = average_text_length(label_values_dict, subsets_of_interest)
+    stats_dict["number-of-words"][list(label_values_dict.keys())[0]] = num_words(label_values_dict, subsets_of_interest)
+    stats_dict["vocabulary-size"][list(label_values_dict.keys())[0]] = vocab_size(label_values_dict, subsets_of_interest)
+    stats_dict["number-of-duplicates"][list(label_values_dict.keys())[0]] = number_of_duplicates(label_values_dict, subsets_of_interest)
     # print(stats_dict)
     return stats_dict
 

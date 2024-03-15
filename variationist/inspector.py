@@ -257,7 +257,11 @@ class Inspector:
                 metric_name = metric
             print(f"INFO: Currently calculating metric: '{metric_name}'")
             results_dict[metric_name] = {}
-            results_dict[metric_name][list(label_values_dict.keys())[0]] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
+            
+            if metric_name == "stats":
+                results_dict[metric_name] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
+            else:
+                results_dict[metric_name][list(label_values_dict.keys())[0]] = current_metric.calculate_metric(label_values_dict, subsets_of_interest)
             
         self.results_dict = results_dict
         return subsets_of_interest,results_dict
