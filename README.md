@@ -102,7 +102,7 @@ You can find more information on specific topics in the following documents:
 ## Contributors
 
 - **[Alan Ramponi](https://alanramponi.github.io)**, *Fondazione Bruno Kessler*
-- **[Camilla Casula](https://dh.fbk.eu/author/camilla/)**, *Fondazione Bruno Kessler*
+- **[Camilla Casula](https://dh.fbk.eu/author/camilla/)**, *Fondazione Bruno Kessler*, *University of Trento*
 - **[Stefano Menini](https://dh.fbk.eu/author/stefano/)**, *Fondazione Bruno Kessler*
 
 
