@@ -1,11 +1,10 @@
 import altair as alt
 import os
 import pandas as pd
-
 from typing import Any, Optional, Union
 
-from src import utils
-from src.visualization import chart_utils
+from variationist import utils
+from variationist.visualization import chart_utils
 
 
 class VisualizerArgs:

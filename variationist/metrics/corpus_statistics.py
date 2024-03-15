@@ -5,7 +5,7 @@ from itertools import islice
 from statistics import stdev, mean
 from tqdm import tqdm
 
-from src.metrics import shared_metrics
+from variationist.metrics import shared_metrics
 
 
 def take(n, iterable):

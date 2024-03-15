@@ -1,17 +1,19 @@
 """
 The Inspector class, to handle all the operations of Variationist.
 """
+import json
 import os
+import pandas as pd
 import sys
 from dataclasses import dataclass, asdict, field
 from datasets import Dataset
-import pandas as pd
-from src import utils
 from typing import Callable, List, Optional, Tuple, Union, Dict
-import json
-from src.data import preprocess_utils
-from src.data.tokenization import Tokenizer
-from src.metrics import metrics
+
+from variationist import utils
+from variationist.data import preprocess_utils
+from variationist.data.tokenization import Tokenizer
+from variationist.metrics import metrics
+
 
 @dataclass
 class InspectorArgs:
@@ -71,6 +73,7 @@ class InspectorArgs:
     lowercase: Optional[bool] = False
     ignore_null_var: Optional[bool] = False
     
+
     def check_values(self):
         """Checks the values in text_names, var_names and metrics."""
         if self.text_names == None:
@@ -81,6 +84,7 @@ class InspectorArgs:
             print("WARNING: No metrics were defined. Variationist will assume only some basic dataset statistics are needed. Please consult the documentation to read what metrics are natively supported and how to use your own.")
             self.metrics = ["basic-stats"]
     
+
     def to_dict(self):
         """Returns the InspectorArgs values inside a dictionary."""
         self_as_dict = asdict(self)
@@ -132,7 +136,6 @@ class Inspector:
             self.args.var_bins = [default_bin] * len(self.args.var_names)
             # print(f"INFO: No values have been set for var_bins. Defaults to {default_bin}.")
 
-
         # Dictionary for the metadata to be printed in the json output
         metadata_dict = self.args.to_dict()
         print("INFO: The metadata we will be using for the current analysis are:")
@@ -152,7 +155,6 @@ class Inspector:
         text_names_type = utils.check_column_type(args.text_names)
         label_names_type = utils.check_column_type(args.var_names)
     
-        
         # Since the input file/dataset is the same, we require texts and labels columns to be of the same type
         if text_names_type != label_names_type:
             sys.exit(f"ERROR! text_cols are {text_names_type} while label_cols are {label_names_type}. "
@@ -268,13 +270,15 @@ class Inspector:
         output_dict["metrics"] = self.results_dict
         self.output_dict = output_dict
     
+
     def inspect(self):
         """Wrapper function for tokenizing, carrying out computation, and saving the output dictionary, which it returns."""
         self.dataframe = self.tokenizer.tokenize(self.dataframe)
         self.compute()
         self.create_output_dict()
         return self.output_dict
-        
+
+
     def save_output_to_json(self,
                             output_path = "output.json"
                             ):

@@ -15,6 +15,3 @@ geopandas==0.14.3
 pyogrio==0.7.2                # speed-up vector-based spatial data processing
 vl-convert-python==1.2.4      # required only if pdf, svg or png outputs have to be created (using altair)
 kaleido==0.2.1                # required only if pdf, svg or png outputs have to be created (using plotly)
-
-# Web application
-streamlit==1.31.1

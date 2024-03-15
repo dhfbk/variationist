@@ -2,9 +2,9 @@
 
 import csv
 import emoji
-import pandas as pd
 import json
 import os
+import pandas as pd
 from typing import Union
 
 
@@ -148,6 +148,7 @@ def check_column_type(cols):
 # Partly taken from https://github.com/explosion/spaCy/blob/master/spacy/lang/char_classes.py
 merge_chars = lambda char: list(char.strip().split(" "))
 
+
 SYMBOLS = (
     # Punctuation chars
     ". … , : ; ! ? ¿ ؟ ¡ ( ) [ ] { } < > _ # * @ ° § % "
@@ -167,6 +168,7 @@ SYMBOLS = (
     # Remove variant selector (@TODO handle this for emojis in the future)
     "\ufe0f "
 )
+
 
 def replace_symbols(text):
     symbols_list = merge_chars(SYMBOLS)

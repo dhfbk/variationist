@@ -3,7 +3,7 @@ import pandas as pd
 
 from typing import Optional
 
-from src.visualization.altair_chart import AltairChart
+from variationist.visualization.altair_chart import AltairChart
 
 
 class TemporalLineChart(AltairChart):

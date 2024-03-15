@@ -1,8 +1,8 @@
 from typing import Callable, Union
 
-from src.metrics import corpus_statistics
-from src.metrics import lexical_variation
-from src.metrics import pmi
+from variationist.metrics import corpus_statistics
+from variationist.metrics import lexical_variation
+from variationist.metrics import pmi
 
 
 class Metric:
@@ -40,8 +40,8 @@ class Metric:
             self.metric_fn = pmi.class_relevance_normalized_weighted
         elif self.metric == "npw_relevance":
             self.metric_fn = pmi.class_relevance_positive_normalized_weighted
-        elif self.metric == "lex_art":
-            self.metric_fn = pmi.pmi_lexical_artifacts
+        # elif self.metric == "lex_art":
+        #     self.metric_fn = pmi.pmi_lexical_artifacts
         elif self.metric == "ttr":
             self.metric_fn = lexical_variation.ttr
         elif self.metric == "root_ttr":

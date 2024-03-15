@@ -7,7 +7,7 @@ import vl_convert as vlc
 
 from typing import Union, Optional
 
-from src.visualization.chart import Chart
+from variationist.visualization.chart import Chart
 
 
 class AltairChart(Chart):

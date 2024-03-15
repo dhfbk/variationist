@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 
 from typing import Optional
 
-from src.visualization.chart import Chart
+from variationist.visualization.chart import Chart
 
 
 class PlotlyChart(Chart):

@@ -1,13 +1,19 @@
-import altair as alt
+import geopandas as gpd
+import os
 import pandas as pd
+import plotly.express as px
 
 from typing import Optional
 
-from src.visualization.altair_chart import AltairChart
+from variationist.visualization.plotly_chart import PlotlyChart
+
+# Speed up vector-based spatial data processing
+# See: https://geopandas.org/en/stable/docs/user_guide/io.html#reading-spatial-data
+gpd.options.io_engine = "pyogrio"
 
 
-class HeatmapChart(AltairChart):
-    """A class for building a HeatmapChart object."""
+class DensityGeoChart(PlotlyChart):
+    """A class for building a DensityGeoChart object."""
 
     def __init__(
         self,
@@ -20,7 +26,7 @@ class HeatmapChart(AltairChart):
         top_per_class_ngrams: Optional[int] = None,
     ) -> None:
         """
-        Initialization function for a building a HeatmapChart object.
+        Initialization function for a building a DensityGeoChart object.
 
         Parameters
         ----------
@@ -56,43 +62,40 @@ class HeatmapChart(AltairChart):
         else:
             self.text_label = "tokens"
 
-        # Set base chart style
-        self.base_chart = self.base_chart.mark_rect()
-
         # Get relevant dimensions
-        x_name, x_type = self.get_dim("x", chart_dims)
-        y_name, y_type = self.get_dim("y", chart_dims)
+        lat_name, lat_type = self.get_dim("lat", chart_dims)
+        lon_name, lon_type = self.get_dim("lon", chart_dims)
         color_name, color_type = self.get_dim("color", chart_dims)
 
-        # Set dimensions
-        x_domain = sorted(list(df_data[x_name].unique()))
-        y_domain = sorted(list(df_data[y_name].unique()))
-        x_dim = alt.X(x_name, type=x_type, scale=alt.Scale(domain=x_domain))
-        y_dim = alt.Y(y_name, type=y_type, scale=alt.Scale(domain=y_domain))
-        color = alt.Color(color_name, type=color_type, title=chart_metric)
+        # Get the centroids for centering the world map
+        centroid_lat = (df_data[lat_name].astype(float).max() + df_data[lat_name].astype(float).min()) / 2
+        centroid_lon = (df_data[lon_name].astype(float).max() + df_data[lon_name].astype(float).min()) / 2
 
-        # Set tooltip
-        tooltip = [
-            alt.Tooltip("ngram", type="nominal", title=self.text_label),
-            alt.Tooltip(x_name, type=x_type),
-            alt.Tooltip(y_name, type=y_type),
-            alt.Tooltip(color_name, type=color_type, title=self.metric_label)
-        ]
+        # Set base chart style, dimensions, tooltip, encoding, and extra properties
+        self.base_chart = px.density_mapbox(
+            df_data, 
 
-        # Encoding the data
-        self.base_chart = self.base_chart.encode(
-            x_dim,
-            y_dim,
-            # Note: color will be conditionally added by the "add_search_component"
-            tooltip
+            # Set dimensions
+            lat = lat_name,
+            lon = lon_name,
+            z = color_name,
+
+            # Set base chart style
+            radius = 10,
+            center = dict(lat=centroid_lat, lon=centroid_lon),
+            zoom = 4.5,
+            color_continuous_scale = px.colors.sequential.Inferno,
+            opacity = 0.25,
+            mapbox_style = "carto-positron",
+
+            # Set tooltip
+            hover_data = {
+                lat_name: True,
+                lon_name: True,
+                "ngram": True,
+                color_name: ':.0f'
+            }
         )
-
-        # Set extra properties
-        num_labels_x = len(list(df_data[x_name].unique()))
-        num_labels_y = len(list(df_data[y_name].unique()))
-        chart_width = min(num_labels_x * 50, 800)
-        chart_height = min(num_labels_y * 50, 600)
-        self.base_chart = self.base_chart.properties(width=chart_width, height=chart_height, center=True)
 
         # The chart has to be filterable, therefore create and add search/dropdown components to it
         dropdown_keys = []
@@ -101,13 +104,9 @@ class HeatmapChart(AltairChart):
             dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
         for dropdown_key in dropdown_keys:
             dropdown_values.append(list(set(df_data[dropdown_key])))
-        self.base_chart = self.add_dropdown_components(
-            self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "fill")
+        self.base_chart = self.add_dropdown_components(self.base_chart, dropdown_values)
 
-        # If the chart has to be zoomable, set the property
-        if self.zoomable == True:
-            self.base_chart = self.base_chart.interactive()
-
-        # Create the final chart
-        self.chart = self.base_chart
+        # If the chart has to be zoomable, set the property (supported by default by Plotly)
+        # if self.zoomable == True:
+        #     self.base_chart = self.base_chart.interactive()
 

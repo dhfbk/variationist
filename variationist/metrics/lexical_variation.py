@@ -8,7 +8,7 @@ def safe_divide(numerator, denominator):
     if denominator == 0 or denominator == 0.0:
         result = 0
     else:
-        result = numerator/denominator
+        result = numerator / denominator
 
     return result
 

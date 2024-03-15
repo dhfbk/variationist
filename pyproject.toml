@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "variationist"
+version = "0.1.0"
+authors = [
+  {name = "Alan Ramponi"},
+  {name = "Camilla Casula"},
+  {name = "Stefano Menini"},
+]
+description = "Variationist: Exploring multifaceted variation and bias in written language data"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.9"
+dependencies = [
+    "pandas==2.2.1",
+    "transformers==4.38.1",
+    "datasets==2.17.1",
+    "stopwordsiso==0.6.1",
+    "emoji==2.10.1",
+    "altair==5.2.0",
+    "plotly==5.19.0",
+    "geopandas==0.14.3",
+    "pyogrio==0.7.2",
+    "vl-convert-python==1.2.4",
+    "kaleido==0.2.1"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/dhfbk/variationist"

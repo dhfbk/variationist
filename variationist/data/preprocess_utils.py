@@ -1,13 +1,13 @@
+import itertools
+import os
 import pandas as pd
 import re
-import os
-from src import utils
-from src.data import tokenization_utils
-import itertools
+import stopwordsiso as stopwords
 import sys
 from tqdm import tqdm
-import stopwordsiso as stopwords
 
+from variationist import utils
+from variationist.data import tokenization_utils
 
 
 def remove_elements(token_list, stopwords):

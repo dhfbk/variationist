@@ -1,10 +1,11 @@
 """
 The Tokenizer class, to handle all the tokenization-related operations of Variationist.
 """
-from src.data import preprocess_utils, tokenization_utils
-from src import utils
 import pandas as pd
 import sys
+
+from variationist.data import preprocess_utils, tokenization_utils
+from variationist import utils
 
 
 class Tokenizer:
@@ -67,7 +68,6 @@ class Tokenizer:
             tokenized_text_column = preprocess_utils.create_tokenized_cooccurrences_column(tokenized_text_column, self.args.n_cooc, self.args.cooc_window_size, self.args.unique_cooc)
         return tokenized_text_column
     
-        
 
     def tokenize(self, dataframe):
         """A wrapper function to tokenize each text column and add it to the original input dataframe as 'tok_ORIGINAL_TEXT_COL_NAME'. Returns the dataframe with the added tokenized columns.

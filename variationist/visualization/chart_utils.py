@@ -1,10 +1,10 @@
-from src.visualization.bar_chart import BarChart
-from src.visualization.choropleth_chart import ChoroplethChart
-from src.visualization.heatmap_chart import HeatmapChart
-from src.visualization.scatter_chart import ScatterChart
-from src.visualization.scatter_geo_chart import ScatterGeoChart
-from src.visualization.temporal_line_chart import TemporalLineChart
-# from src.visualization.density_geo_chart import DensityGeoChart
+from variationist.visualization.bar_chart import BarChart
+from variationist.visualization.choropleth_chart import ChoroplethChart
+from variationist.visualization.heatmap_chart import HeatmapChart
+from variationist.visualization.scatter_chart import ScatterChart
+from variationist.visualization.scatter_geo_chart import ScatterGeoChart
+from variationist.visualization.temporal_line_chart import TemporalLineChart
+# from variationist.visualization.density_geo_chart import DensityGeoChart
 
 
 # Definition of variable types and semantics and their mapping to charts, including how single

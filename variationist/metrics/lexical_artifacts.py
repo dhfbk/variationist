@@ -6,7 +6,10 @@ from collections import Counter
 from transformers import AutoTokenizer
 from typing import List
 
-from src.metrics import utils
+from variationist.metrics import utils
+
+
+# From: https://github.com/dhfbk/hate-speech-artifacts/blob/main/lexartifacts-package/src/lexartifacts/lexical_artifacts.py
 
 
 def compute_pmi(
@@ -285,120 +288,3 @@ def compute(
     
     return sorted_pmi_scores
 
-
-def make_report(
-    artifacts_df: pd.core.frame.DataFrame, 
-    top_k: int = 20,
-    output_format: str = "raw",
-    output_filepath: str = None
-) -> None:
-    """
-    A function that generates a report of lexical artifacts either on the console or on a file,
-    in a variety of formats (i.e., tsv, txt, tex).
-    Parameters
-    ----------
-    artifacts_df: pd.core.frame.DataFrame
-        Pandas dataframe with tokens as rows and label_of_interest as column
-    top_k: int
-        Number of top artifacts to list. Default: 20
-    output_format: str
-        Format for the lexical artifacts output (choices: tsv, txt, tex). Default: tsv
-    output_filepath: str
-        Optional filepath where to write the output. Default: None (i.e., console print)
-    """
-    if output_format == "tsv":
-        table_content = ["\t".join(["rank", "token", "score"])]
-        curr_rank = 1
-        for token, row in artifacts_df.head(top_k).iterrows():
-            table_content.append(
-                str(curr_rank) + "\t" + 
-                token + "\t" + 
-                str(round(row[artifacts_df.columns[0]], 2))
-            )
-            curr_rank += 1
-
-    elif output_format == "txt":
-        title_style_open = ""
-        title_style_close = utils.NEWLINE
-        top_k_string = f" k={top_k} "
-        class_name_string = f" \"{artifacts_df.columns[0]}\" "
-        table_reference_string = f" in the following:"
-        table_string = str(artifacts_df.head(top_k))
-        notes_string = f""
-
-    elif output_format == "tex":
-        title_style_open = utils.OPEN_TEXTSC
-        title_style_close = utils.CLOSE_TEXTSC
-        top_k_string = f" $k={top_k}$ "
-        class_name_string = f" \\emph{{{artifacts_df.columns[0]}}} "
-        table_reference_string = f" in Table \\ref{{tab:top-k-lexical-artifacts}}."
-        table_content = []
-        curr_rank = 1
-        for token, row in artifacts_df.head(top_k).iterrows():
-            table_content.append(
-                " " * 8 + 
-                str(curr_rank) + " & " + 
-                token.replace("#", "\\#") + " & " + 
-                str(round(row[artifacts_df.columns[0]], 2)) + " \\\\"
-            )
-            curr_rank += 1
-        table_legend = f"    \\caption{{\\label{{tab:top-k-lexical-artifacts}} Top {top_k} most informative tokens for the {artifacts_df.columns[0]} class according to PMI.}}\n\\end{{table}}"
-        table_string = utils.LATEX_TABLE_PART1 + utils.NEWLINE.join(table_content) + utils.LATEX_TABLE_PART2 + table_legend
-        notes_string = utils.LATEX_IMPORTS
-
-    else:
-        sys.exit(f"ERROR. The format {output_format} is not supported. Exit.")
-
-    if output_format != "tsv":
-        SECTION_1 = "".join([
-            title_style_open,
-            utils.LEXART_TEMPLATE_SEC1_TITLE,
-            title_style_close,
-            utils.LEXART_TEMPLATE_SEC1_CONTENT[0],
-            top_k_string,
-            utils.LEXART_TEMPLATE_SEC1_CONTENT[1],
-            class_name_string,
-            utils.LEXART_TEMPLATE_SEC1_CONTENT[2],
-            table_reference_string,
-            utils.NEWLINE,
-            table_string,
-            utils.NEWLINE
-        ])
-        SECTION_2 = "".join([
-            title_style_open,
-            utils.LEXART_TEMPLATE_SEC2_TITLE,
-            title_style_close,
-            utils.LEXART_TEMPLATE_SEC2_CONTENT[0],
-            class_name_string,
-            utils.LEXART_TEMPLATE_SEC2_CONTENT[1],
-            utils.NEWLINE
-        ])
-        SECTION_3 = "".join([
-            title_style_open,
-            utils.LEXART_TEMPLATE_SEC3_TITLE,
-            title_style_close,
-            utils.LEXART_TEMPLATE_SEC3_CONTENT[0],
-            class_name_string,
-            utils.LEXART_TEMPLATE_SEC3_CONTENT[1],
-            utils.NEWLINE,
-            utils.LEXART_TEMPLATE_SEC3_CONTENT[2],
-            utils.NEWLINE,
-            utils.LEXART_TEMPLATE_SEC3_CONTENT[3],
-            notes_string
-        ])
-
-    if output_filepath != None:
-        output_file = open(output_filepath, "w")
-        if output_format != "tsv":
-            output_file.write(SECTION_1 + utils.NEWLINE + SECTION_2 + utils.NEWLINE + SECTION_3)
-        else:
-            output_file.write(utils.NEWLINE.join(table_content))
-        output_file.close()
-
-    else:
-        if output_format != "tsv":
-            print(SECTION_1)
-            print(SECTION_2)
-            print(SECTION_3)
-        else:
-            print(utils.NEWLINE.join(table_content))

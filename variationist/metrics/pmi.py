@@ -5,7 +5,7 @@ from collections import Counter
 from itertools import islice
 from tqdm import tqdm
 
-from src.metrics import shared_metrics, lexical_artifacts
+from variationist.metrics import shared_metrics, lexical_artifacts
 
 
 def safe_divide(numerator, denominator):

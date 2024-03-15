@@ -1,9 +1,11 @@
+import pandas as pd
 import re
-from src import utils
-from src import inspector
 from tqdm import tqdm
 from transformers import AutoTokenizer
-import pandas as pd
+
+from variationist import utils
+from variationist import inspector
+
 
 def whitespace_tokenization(text_column: pd.Series, 
                             args):
