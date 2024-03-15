@@ -49,7 +49,7 @@ class InspectorArgs:
             The token frequency, expressed as an integer, below which we do not consider the token in the analysis of pmi-based metrics. Defaults to 3.
         stopwords (`Bool`):
             Whether to remove stopwords from texts before tokenization or not (using default lists in a given `language`). Will default to False.
-        custom_stopwords (`Optional[Union[str, list]]):
+        custom_stopwords (`Optional[Union[str, list]]`):
             A list of stopwords (or a path to a file containing stopwords, one per line) to be removed before tokenization. If `stopwords` is True, these stopwords will be added to that list. Will default to None.
         lowercase (`Bool`):
             Whether to lowercase all the texts before tokenization or not. Will default to False.

@@ -36,7 +36,7 @@ def remove_elements(token_list, stopwords):
     return new_array
 
 
-def remove_stopwords(text_column, language):
+def remove_stopwords(text_column, language, custom_stopwords):
     """"
     Used for removing stopwords. Given an already tokenized pandas Series of texts, 
     it will return the same series, excluding the elements in stopwords. Used to 
@@ -48,6 +48,10 @@ def remove_stopwords(text_column, language):
         A series containing the already tokenized texts.
     language (`str`):
         The language we should retrieve stopwords for.
+    custom_stopwords (`Optional[Union[str, list]]`):
+        A list of stopwords (or a path to a file containing stopwords, one per line) 
+        to be removed before tokenization. If `stopwords` is True, these stopwords 
+        will be added to that list. Will default to None.
         
     Returns
     -------
@@ -55,12 +59,49 @@ def remove_stopwords(text_column, language):
         The same tokenized series as input, with stopwords removed.
     """
 
-    # Language need to be ISO 639-1  two-letter codes e.g en, it, fr, de 
-    lang_stopwords = stopwords.stopwords(language)
-    text_column = text_column.squeeze().apply(lambda x: remove_elements(x,lang_stopwords))
+    lang_stopwords = []
+
+    # Language need to be ISO 639-1 (two-letter codes, e.g., en, it, fr, de, etc.) 
+    if language != None:
+        lang_stopwords = stopwords.stopwords(language)
+    
+    if custom_stopwords != None:
+        extra_stopwords = get_custom_stopword_list(custom_stopwords)
+        lang_stopwords.update(extra_stopwords)
+
+    text_column = text_column.squeeze().apply(lambda x: remove_elements(x, lang_stopwords))
 
     return text_column
+
+
+def get_custom_stopword_list(custom_stopwords):
+    """
+    Function that returns a list of stopwords from a file (one stopword per line)
+    or returns the list itself
     
+    Parameters
+    ----------
+    custom_stopwords (`Optional[Union[str, list]]`):
+        A list of stopwords (or a path to a file containing stopwords, one per line) 
+        to be removed before tokenization. If `stopwords` is True, these stopwords 
+        will be added to that list. Will default to None.
+        
+    Returns
+    -------
+    extra_stopwords (`list`):
+        A list including the custom stopwords.
+    """
+
+    if (type(custom_stopwords) == list):
+        extra_stopwords = custom_stopwords
+    else:
+        extra_stopwords = []
+        with open(custom_stopwords, "r") as f:
+            for line in f:
+                extra_stopwords.append(line.rstrip("\n"))
+
+    return extra_stopwords
+
 
 def convert_to_ngrams(token_list, n_tokens):
     """

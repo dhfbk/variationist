@@ -56,8 +56,18 @@ class Tokenizer:
         """
         tokenized_text_column = self.tok_function(text_column, self.args)
 
-        if self.args.stopwords is not False:        
-            tokenized_text_column = preprocess_utils.remove_stopwords(tokenized_text_column, self.args.stopwords)
+        if (self.args.stopwords == True):
+            if (self.args.language != None) or (self.args.custom_stopwords != None):
+                tokenized_text_column = preprocess_utils.remove_stopwords(
+                    tokenized_text_column, self.args.language, self.args.custom_stopwords)
+            else:
+                print("WARNING: Stopword removal has been selected, but the \"language\"",
+                    "parameter has not been defined. Skipping stopword removal.")
+        else:
+            if (self.args.custom_stopwords != None):
+                tokenized_text_column = preprocess_utils.remove_stopwords(
+                    tokenized_text_column, self.args.language, self.args.custom_stopwords)
+
         # print(tokenized_text_column)    
         if self.args.n_tokens > 1:
             print("INFO: Creating n-grams...")
