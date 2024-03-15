@@ -4,7 +4,7 @@ This section includes our tutorials to learn how to better leverage 🕵️‍�
 
 | Tutorial name | Notebook |
 | ----------- | -------- |
-| Quickstart | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]([https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist-Quickstart.ipynb](https://colab.research.google.com/drive/1YOM5T0mk_kOF8QJM_5HejMkIYi0uEn_C?usp=sharing)) |
+| Quickstart | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1YOM5T0mk_kOF8QJM_5HejMkIYi0uEn_C?usp=sharing)) |
 | Example 1 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/.../examples/example.ipynb) |
 | Example 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/.../examples/example.ipynb) |
 | ... | ... |
