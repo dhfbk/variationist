@@ -22,7 +22,6 @@ class ChoroplethChart(AltairChart):
         metadata: dict,
         extra_args: dict = {},
         chart_dims: dict = {},
-        filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         top_per_class_ngrams: Optional[int] = None,
     ) -> None:
@@ -42,18 +41,18 @@ class ChoroplethChart(AltairChart):
             A dictionary storing the extra arguments for this chart type. Default = {}.
         chart_dims: dict
             The mapping dictionary for the variables for the given chart.
-        filterable: Optional[bool] = True
-            Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
-            Whether the (HTML) chart should be zoomable using the mouse or not.
+            Whether the (HTML) chart should be zoomable using the mouse or not (if this
+            is allowed for the resulting chart type by the underlying visualization 
+            library).
         top_per_class_ngrams: int = 20
-            The maximum number of highest scoring per-class n-grams to show. If set to 
-            None, it will show all the ngrams in the corpus (it may easily be 
-            overwhelming). By default is 20 to keep the visualization compact.
+            The maximum number of highest scoring per-class n-grams to show (for bar
+            charts only). If set to None, it will show all the n-grams in the corpus 
+            (it may easily be overwhelming). By default is 20 to keep the visualization 
+            compact. This parameter is ignored when creating other chart types.
         """
 
-        super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
+        super().__init__(df_data, chart_metric, metadata, extra_args, zoomable)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
@@ -72,9 +71,11 @@ class ChoroplethChart(AltairChart):
 
         # Check if the specified filepath "shapefile_path" is defined and exists. If not, warn and exit
         if self.shapefile_path is None:
-            raise ValueError(f"ERROR. \"shapefile_path\" must be specified for creating spatial charts.\n")
+            raise ValueError(
+                f"ERROR. \"shapefile_path\" must be specified for creating spatial charts.\n")
         if not os.path.exists(self.shapefile_path):
-            raise ValueError(f"ERROR. The filepath for the shapefile \"{self.shapefile_path}\" does not exist.\n")
+            raise ValueError(
+                f"ERROR. The filepath for the shapefile \"{self.shapefile_path}\" does not exist.\n")
 
         # Load the shapefile and transform geometries to a standard coordinate reference system
         gdf = gpd.read_file(self.shapefile_path).to_crs("epsg:4286")
@@ -82,7 +83,8 @@ class ChoroplethChart(AltairChart):
         # Check if the specified column "shapefile_var_name" exists in the geodataframe
         # If not, warn the user, give them the available options, and exit
         if self.shapefile_var_name not in gdf.columns:
-            raise ValueError(f"ERROR. The key \"{self.shapefile_var_name}\" is not in the shapefile.",
+            raise ValueError(
+                f"ERROR. The key \"{self.shapefile_var_name}\" is not in the shapefile.",
                 f"\"{self.shapefile_path}\".\nPlease use one among: {', '.join([col for col in gdf.columns])}.")
 
         # Check if some variable values (area names) do not match the area names in the shapefile
@@ -111,10 +113,14 @@ class ChoroplethChart(AltairChart):
         # Collect information from the geopandas dataframe
         self.base_chart = self.base_chart.transform_lookup(
             lookup = color_name,
-            from_ = alt.LookupData(data=gdf, key=self.shapefile_var_name, fields=["geometry", "type"]))
+            from_ = alt.LookupData(
+                data = gdf,
+                key = self.shapefile_var_name,
+                fields = ["geometry", "type"]
+            )
+        )
 
         # Set dimensions
-        # @TODO: Fix "min" and "NaN" together in the starting legend
         color = alt.Color("value", type="quantitative", title=chart_metric,
             scale=alt.Scale(scheme="lighttealblue", domainMin=min(self.df_data["value"])))
 
@@ -136,16 +142,15 @@ class ChoroplethChart(AltairChart):
         background = background.properties(width=chart_base_size, height=chart_base_size)
         self.base_chart = self.base_chart.properties(width=chart_base_size, height=chart_base_size)
 
-        # If the chart has to be filterable, create and add search/dropdown components to it
-        # Note: the chart is always filterable for choropleth charts
-        if self.filterable == True:
-            dropdown_keys = []
-            dropdown_values = []
-            for i in range(len(chart_dims["dropdown"])):
-                dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
-            for dropdown_key in dropdown_keys:
-                dropdown_values.append(list(set(df_data[dropdown_key])))
-            self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "fill")
+        # The chart has to be filterable, therefore create and add search/dropdown components to it
+        dropdown_keys = []
+        dropdown_values = []
+        for i in range(len(chart_dims["dropdown"])):
+            dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
+        for dropdown_key in dropdown_keys:
+            dropdown_values.append(list(set(df_data[dropdown_key])))
+        self.base_chart = self.add_dropdown_components(
+            self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "fill")
 
         # If the chart has to be zoomable, set the property (not supported for choropleth chart by Altair)
         # if self.zoomable == True:

@@ -17,7 +17,6 @@ class PlotlyChart(Chart):
         chart_metric: str,
         metadata: dict,
         extra_args: dict = {},
-        filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
     ) -> None:
         """
@@ -34,13 +33,13 @@ class PlotlyChart(Chart):
             A dictionary storing the metadata about the prior analysis.
         extra_args: dict = {}
             A dictionary storing the extra arguments for this chart type. Default = {}.
-        filterable: Optional[bool] = True
-            Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
-            Whether the (HTML) chart should be zoomable using the mouse or not.
+            Whether the (HTML) chart should be zoomable using the mouse or not (if this
+            is allowed for the resulting chart type by the underlying visualization 
+            library).
         """
 
-        super().__init__(df_data, chart_metric, metadata, filterable, zoomable)
+        super().__init__(df_data, chart_metric, metadata, zoomable)
 
         # Create the base chart object which stores the data
         self.base_chart = self.create_base_chart(df_data)
@@ -73,26 +72,26 @@ class PlotlyChart(Chart):
     def add_dropdown_components(
         self,
         base_chart, # plotly.graph_objs._figure.Figure,
-        dropdown_elements: list[str],
+        dropdown_elements: list[list[str]],
     ): # -> plotly.graph_objs._figure.Figure:
         """
-        A function that creates a dropdown component and adds it to the chart.
+        A function that creates dropdown components and adds them to the chart.
 
         Parameters
         ----------
         base_chart: alt.Chart
-            The base chart object in which to add the dropdown component.
-        dropdown_elements: list[str]
-            A list of possible values for the field to put in the dropdown.
+            The base chart object in which to add the dropdown components.
+        dropdown_elements: list[list[str]]
+            A list of lists, each containing the values for each dropdown (1:1 with dropdown_keys).
 
         Returns
         -------
         base_chart: alt.Chart
-            The same base chart object with the dropdown component added.
+            The same base chart object with the dropdown components added.
         """
 
         # Set the elements on the dropdown
-        # @TODO: Release in the next version (0.2.0), also note that this is non trivial: 
+        # @TODO: Release in the next version (0.2.0), also note that this is non-trivial: 
         # See: https://stackoverflow.com/questions/72130267/how-to-modify-points-drawn-on-map-using-a-dropdown-menu
         buttons = []
         # for dropdown_element in dropdown_elements:
@@ -111,7 +110,7 @@ class PlotlyChart(Chart):
                     xanchor = "left",
                     y = 1.1,
                     yanchor = "top"
-                ),
+                )
             ]
         )
 
@@ -124,7 +123,7 @@ class PlotlyChart(Chart):
                     x = 0,
                     y = 1.085,
                     yref = "paper",
-                    align="left"
+                    align = "left"
                 )
             ]
         )
@@ -151,6 +150,7 @@ class PlotlyChart(Chart):
         output_formats: Optional[list[str]] = ["html"]
             A list of output formats for the charts. By default, only the interactive
             HTML chart is saved, i.e., ["html"]. Extra choices: ["pdf", "svg", "png"].
+            Note that for very large datasets the extra choices are too heavy to build.
         """
 
         # If output formats have been specified, save the chart in those formats to 

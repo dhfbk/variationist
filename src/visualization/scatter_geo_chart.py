@@ -22,7 +22,6 @@ class ScatterGeoChart(AltairChart):
         metadata: dict,
         extra_args: dict = {},
         chart_dims: dict = {},
-        filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         top_per_class_ngrams: Optional[int] = None,
         shapefile_path: Optional[str] = None,
@@ -43,14 +42,13 @@ class ScatterGeoChart(AltairChart):
             A dictionary storing the extra arguments for this chart type. Default = {}.
         chart_dims: dict
             The mapping dictionary for the variables for the given chart.
-        filterable: Optional[bool] = True
-            Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
         top_per_class_ngrams: int = 20
-            The maximum number of highest scoring per-class n-grams to show. If set to 
-            None, it will show all the ngrams in the corpus (it may easily be 
-            overwhelming). By default is 20 to keep the visualization compact.
+            The maximum number of highest scoring per-class n-grams to show (for bar
+            charts only). If set to None, it will show all the n-grams in the corpus 
+            (it may easily be overwhelming). By default is 20 to keep the visualization 
+            compact. This parameter is ignored when creating other chart types.
         shapefile_path: Optional[str] = None
             A path to the .shp shapefile to be visualized as background map to the chart.
             Note that auxiliary files to the .shp one (i.e., .dbf, .prg, .shx ones) are 
@@ -61,8 +59,7 @@ class ScatterGeoChart(AltairChart):
             other ones and shapefiles provided by national/regional institutions.
         """
 
-        super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
+        super().__init__(df_data, chart_metric, metadata, extra_args, zoomable)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
@@ -98,7 +95,6 @@ class ScatterGeoChart(AltairChart):
         color_name, color_type = self.get_dim("color", chart_dims)
 
         # Set dimensions
-        # @TODO: Fix "min" and "NaN" together in the starting legend
         lat_dim = alt.Latitude(lat_name, type=lat_type)
         lon_dim = alt.Longitude(lon_name, type=lon_type)
         color = alt.Color(color_name, type=color_type, title=chart_metric,
@@ -125,16 +121,16 @@ class ScatterGeoChart(AltairChart):
         background = background.properties(width=chart_base_size, height=chart_base_size)
         self.base_chart = self.base_chart.properties(width=chart_base_size, height=chart_base_size)
 
-        # If the chart has to be filterable, create and add search/dropdown components to it
-        # Note: the chart is always filterable for scatter geo charts
-        if self.filterable == True:
-            dropdown_keys = []
-            dropdown_values = []
-            for i in range(len(chart_dims["dropdown"])):
-                dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
-            for dropdown_key in dropdown_keys:
-                dropdown_values.append(list(set(df_data[dropdown_key])))
-            self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "fill")
+        # The chart has to be filterable, therefore create and add search/dropdown components to it
+        dropdown_keys = []
+        dropdown_values = []
+        for i in range(len(chart_dims["dropdown"])):
+            dropdown_keys.append(
+                self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
+        for dropdown_key in dropdown_keys:
+            dropdown_values.append(list(set(df_data[dropdown_key])))
+        self.base_chart = self.add_dropdown_components(
+            self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "fill")
 
         # If the chart has to be zoomable, set the property (not supported for scatter geo chart by Altair)
         # if self.zoomable == True:

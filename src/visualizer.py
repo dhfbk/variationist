@@ -15,7 +15,6 @@ class VisualizerArgs:
         self,
         output_folder: str,
         output_formats: Optional[list[str]] = ["html"],
-        filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         top_per_class_ngrams: Optional[int] = 20,
         ngrams: Optional[list[str]] = None,
@@ -33,15 +32,13 @@ class VisualizerArgs:
         output_formats: Optional[list[str]] = ["html"]
             A list of output formats for the charts. By default, only the interactive
             HTML chart is saved, i.e., ["html"]. Extra choices: ["pdf", "svg", "png"].
-        filterable: Optional[bool] = True
-            Whether the charts should be searchable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
         top_per_class_ngrams: int = 20
             The maximum number of highest scoring per-class n-grams to show (for bar
             charts only). If set to None, it will show all the n-grams in the corpus 
             (it may easily be overwhelming). By default is 20 to keep the visualization 
-            compact.
+            compact. This parameter is ignored when creating other chart types.
         ngrams: Optional[list[str]] = None
             A list of n-grams of interest to focus the resulting visualizations on.
             N-grams should match the number of tokens used in the prior computation
@@ -65,7 +62,6 @@ class VisualizerArgs:
         
         self.output_folder = output_folder
         self.output_formats = output_formats
-        self.filterable = filterable
         self.zoomable = zoomable
         self.top_per_class_ngrams = top_per_class_ngrams
         self.ngrams = ngrams
@@ -301,8 +297,9 @@ class Visualizer:
                 # Create the chart object
                 print(f"INFO: Creating a {ChartClass.__name__} object...")
                 chart = ChartClass(
-                    df_data, metric, self.metadata, extra_args, chart_info, self.args.filterable, self.args.zoomable,
-                    self.args.top_per_class_ngrams)
+                    df_data, metric, self.metadata, extra_args, chart_info, 
+                    self.args.zoomable, self.args.top_per_class_ngrams
+                )
                 
                 # Save the chart to the output folder
                 output_filepath = os.path.join(self.args.output_folder, metric)

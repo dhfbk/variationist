@@ -7,7 +7,7 @@ from src.visualization.altair_chart import AltairChart
 
 
 class TemporalLineChart(AltairChart):
-    """A class for building a BarChart object."""
+    """A class for building a TemporalLineChart object."""
 
     def __init__(
         self,
@@ -16,12 +16,11 @@ class TemporalLineChart(AltairChart):
         metadata: dict,
         extra_args: dict = {},
         chart_dims: dict = {},
-        filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         top_per_class_ngrams: Optional[int] = None,
     ) -> None:
         """
-        Initialization function for a building a BarChart object.
+        Initialization function for a building a TemporalLineChart object.
 
         Parameters
         ----------
@@ -36,18 +35,19 @@ class TemporalLineChart(AltairChart):
             A dictionary storing the extra arguments for this chart type. Default = {}.
         chart_dims: dict
             The mapping dictionary for the variables for the given chart.
-        filterable: Optional[bool] = True
-            Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
-            Whether the (HTML) chart should be zoomable using the mouse or not.
+            Whether the (HTML) chart should be zoomable using the mouse or not (if this
+            is allowed for the resulting chart type by the underlying visualization 
+            library).
         top_per_class_ngrams: int = 20
-            The maximum number of highest scoring per-class n-grams to show. If set to 
-            None, it will show all the ngrams in the corpus (it may easily be 
-            overwhelming). By default is 20 to keep the visualization compact.
+            The maximum number of highest scoring per-class n-grams to show (for bar
+            charts only). If set to None, it will show all the n-grams in the corpus 
+            (it may easily be overwhelming). By default is 20 to keep the visualization 
+            compact. This parameter is ignored when creating other chart types.
         """
 
         super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
+            df_data, chart_metric, metadata, extra_args, zoomable)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
@@ -89,7 +89,7 @@ class TemporalLineChart(AltairChart):
             y_dim = alt.Y(y_name, type=y_type, title=chart_metric)
             color = alt.Color("ngram", type="nominal", title="", legend=None)
 
-        # Set tooltip (it will be overwritten if "filterable" is True)
+        # Set tooltip
         tooltip = [
             alt.Tooltip("ngram", type="nominal", title=self.text_label),
             alt.Tooltip(x_name, type=x_type),
@@ -126,21 +126,23 @@ class TemporalLineChart(AltairChart):
         chart_width = 800
         self.base_chart = self.base_chart.properties(width=chart_width, center=True)
 
-        # If the chart has to be filterable, create and add a search component to it
-        if self.filterable == True:
-            if ("size" in chart_dims) or ("shape" in chart_dims):
-                dropdown_keys = []
-                dropdown_values = []
-                for i in range(len(chart_dims["dropdown"])):
-                    dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
-                for dropdown_key in dropdown_keys:
-                    dropdown_values.append(list(set(df_data[dropdown_key])))
-                if "size" in chart_dims:
-                    self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "size")
-                else:
-                    self.base_chart = self.add_dropdown_components(self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "shape")
+        # The chart has to be filterable, therefore create and add a search component to it
+        if ("size" in chart_dims) or ("shape" in chart_dims):
+            dropdown_keys = []
+            dropdown_values = []
+            for i in range(len(chart_dims["dropdown"])):
+                dropdown_keys.append(
+                    self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
+            for dropdown_key in dropdown_keys:
+                dropdown_values.append(list(set(df_data[dropdown_key])))
+            if "size" in chart_dims:
+                self.base_chart = self.add_dropdown_components(
+                    self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "size")
             else:
-                self.base_chart = self.add_search_component(self.base_chart, tooltip, color)
+                self.base_chart = self.add_dropdown_components(
+                    self.base_chart, tooltip, dropdown_keys, dropdown_values, color, "shape")
+        else:
+            self.base_chart = self.add_search_component(self.base_chart, tooltip, color)
 
         # If the chart has to be zoomable, set the property
         if self.zoomable == True:

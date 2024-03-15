@@ -16,7 +16,6 @@ class BarChart(AltairChart):
         metadata: dict,
         extra_args: dict = {},
         chart_dims: dict = {},
-        filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         top_per_class_ngrams: Optional[int] = None,
     ) -> None:
@@ -36,18 +35,18 @@ class BarChart(AltairChart):
             A dictionary storing the extra arguments for this chart type. Default = {}.
         chart_dims: dict
             The mapping dictionary for the variables for the given chart.
-        filterable: Optional[bool] = True
-            Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
-            Whether the (HTML) chart should be zoomable using the mouse or not.
+            Whether the (HTML) chart should be zoomable using the mouse or not (if this
+            is allowed for the resulting chart type by the underlying visualization 
+            library).
         top_per_class_ngrams: int = 20
-            The maximum number of highest scoring per-class n-grams to show. If set to 
-            None, it will show all the ngrams in the corpus (it may easily be 
-            overwhelming). By default is 20 to keep the visualization compact.
+            The maximum number of highest scoring per-class n-grams to show (for bar
+            charts only). If set to None, it will show all the n-grams in the corpus 
+            (it may easily be overwhelming). By default is 20 to keep the visualization 
+            compact. This parameter is ignored when creating other chart types.
         """
 
-        super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
+        super().__init__(df_data, chart_metric, metadata, extra_args, zoomable)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
@@ -73,7 +72,7 @@ class BarChart(AltairChart):
             header=alt.Header(labelFontWeight="bold"))
         color = alt.Color(color_name, color_type, legend=None) # for aestethics only
 
-        # Set tooltip (it will be overwritten if "filterable" is True)
+        # Set tooltip
         tooltip = [
             alt.Tooltip(y_name, type=y_type, title=self.text_label),
             alt.Tooltip(x_name, type=x_type, title=self.metric_label)
@@ -108,9 +107,8 @@ class BarChart(AltairChart):
         chart_width = max(100, 800 / len(list(df_data[column_name].unique())))
         self.base_chart = self.base_chart.properties(width=chart_width, center=True)
 
-        # If the chart has to be filterable, create and add a search component to it
-        if self.filterable == True:
-            self.base_chart = self.add_search_component(self.base_chart, tooltip, y_dim)
+        # The chart has to be filterable, therefore create and add a search component to it
+        self.base_chart = self.add_search_component(self.base_chart, tooltip, y_dim)
 
         # If the chart has to be zoomable, set the property (disallowed for bar chart)
         # if self.zoomable == True:

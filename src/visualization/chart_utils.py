@@ -7,9 +7,10 @@ from src.visualization.temporal_line_chart import TemporalLineChart
 # from src.visualization.density_geo_chart import DensityGeoChart
 
 
-# Definition of variable types and semantics and their mapping to charts, including
-# how single variables should be presented and filtered. Note: var_types for > 3 
-# dimensions are lexicographically-ordered, and var_semantics are ordered accordingly
+# Definition of variable types and semantics and their mapping to charts, including how single
+# variables should be presented and filtered. Note: var_types in charts with more than three
+# dimensions are lexicographically-ordered, and the var_semantics are ordered accordingly.
+
 VAR_CHARTS_MAP = {
     "3-dims": {
         "coordinates": {

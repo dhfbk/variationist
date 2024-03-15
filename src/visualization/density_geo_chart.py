@@ -22,7 +22,6 @@ class DensityGeoChart(PlotlyChart):
         metadata: dict,
         extra_args: dict = {},
         chart_dims: dict = {},
-        filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
         top_per_class_ngrams: Optional[int] = None,
     ) -> None:
@@ -42,18 +41,18 @@ class DensityGeoChart(PlotlyChart):
             A dictionary storing the extra arguments for this chart type. Default = {}.
         chart_dims: dict
             The mapping dictionary for the variables for the given chart.
-        filterable: Optional[bool] = True
-            Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
-            Whether the (HTML) chart should be zoomable using the mouse or not.
+            Whether the (HTML) chart should be zoomable using the mouse or not (if this
+            is allowed for the resulting chart type by the underlying visualization 
+            library).
         top_per_class_ngrams: int = 20
-            The maximum number of highest scoring per-class n-grams to show. If set to 
-            None, it will show all the ngrams in the corpus (it may easily be 
-            overwhelming). By default is 20 to keep the visualization compact.
+            The maximum number of highest scoring per-class n-grams to show (for bar
+            charts only). If set to None, it will show all the n-grams in the corpus 
+            (it may easily be overwhelming). By default is 20 to keep the visualization 
+            compact. This parameter is ignored when creating other chart types.
         """
 
-        super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
+        super().__init__(df_data, chart_metric, metadata, extra_args, zoomable)
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
@@ -98,16 +97,16 @@ class DensityGeoChart(PlotlyChart):
             }
         )
 
-        # If the chart has to be filterable, create and add search/dropdown components to it
-        if self.filterable == True:
-            dropdown_keys = []
-            dropdown_values = []
-            for i in range(len(chart_dims["dropdown"])):
-                dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
-            for dropdown_key in dropdown_keys:
-                dropdown_values.append(list(set(df_data[dropdown_key])))
-            self.base_chart = self.add_dropdown_components(self.base_chart, dropdown_values)
+        # The chart has to be filterable, therefore create and add search/dropdown components to it
+        dropdown_keys = []
+        dropdown_values = []
+        for i in range(len(chart_dims["dropdown"])):
+            dropdown_keys.append(self.get_dim("dropdown", {"dropdown": chart_dims["dropdown"][i]})[0])
+        for dropdown_key in dropdown_keys:
+            dropdown_values.append(list(set(df_data[dropdown_key])))
+        self.base_chart = self.add_dropdown_components(self.base_chart, dropdown_values)
 
         # If the chart has to be zoomable, set the property (supported by default by Plotly)
         # if self.zoomable == True:
         #     self.base_chart = self.base_chart.interactive()
+

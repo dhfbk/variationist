@@ -12,7 +12,6 @@ class Chart:
         chart_metric: str,
         metadata: dict,
         extra_args: dict = {},
-        filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
     ) -> None:
         """
@@ -29,10 +28,10 @@ class Chart:
             A dictionary storing the metadata about the prior analysis.
         extra_args: dict = {}
             A dictionary storing the extra arguments for this chart type. Default = {}.
-        filterable: Optional[bool] = True
-            Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
-            Whether the (HTML) chart should be zoomable using the mouse or not.
+            Whether the (HTML) chart should be zoomable using the mouse or not (if this
+            is allowed for the resulting chart type by the underlying visualization 
+            library).
         """
 
         self.df_data = df_data
@@ -43,7 +42,6 @@ class Chart:
         self.n_tokens = metadata["n_tokens"]
         self.n_cooc = metadata["n_cooc"]
         self.extra_args = {}
-        self.filterable = filterable
         self.zoomable = zoomable
         self.chart = None
 

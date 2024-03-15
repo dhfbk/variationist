@@ -19,7 +19,6 @@ class AltairChart(Chart):
         chart_metric: str,
         metadata: dict,
         extra_args: dict = {},
-        filterable: Optional[bool] = True,
         zoomable: Optional[bool] = True,
     ) -> None:
         """
@@ -36,14 +35,14 @@ class AltairChart(Chart):
             A dictionary storing the metadata about the prior analysis.
         extra_args: dict = {}
             A dictionary storing the extra arguments for this chart type. Default = {}.
-        filterable: Optional[bool] = True
-            Whether the chart should be filterable by using regexes on ngrams or not.
         zoomable: Optional[bool] = True
-            Whether the (HTML) chart should be zoomable using the mouse or not.
+            Whether the (HTML) chart should be zoomable using the mouse or not (if this
+            is allowed for the resulting chart type by the underlying visualization 
+            library).
         """
 
         super().__init__(
-            df_data, chart_metric, metadata, extra_args, filterable, zoomable)
+            df_data, chart_metric, metadata, extra_args, zoomable)
 
         # alt.data_transformers.enable("vegafusion")
 
@@ -150,7 +149,7 @@ class AltairChart(Chart):
             A list of alt.Tooltip objects.
         dropdown_keys: list[str]
             A list of keys corresponding to each dropdown.
-        dropdown_values: list[str[str]]
+        dropdown_elements: list[str[str]]
             A list of lists, each containing the values for each dropdown (1:1 with dropdown_keys).
         color: alt.Color
             The alt.Color dimension to be filtered in the chart.
@@ -173,7 +172,8 @@ class AltairChart(Chart):
 
             # Create the dropdown component
             dropdown = alt.binding_select(
-                options = sorted(["*Select " + str(dropdown_label) + "*"] + [str(el) for el in dropdown_elements[i]]), 
+                options = sorted(
+                    ["*Select " + str(dropdown_label) + "*"] + [str(el) for el in dropdown_elements[i]]), 
                 name = f"Filter by {dropdown_label} ",
             )
             select = alt.selection_point(
@@ -268,7 +268,7 @@ class AltairChart(Chart):
         dim: Union[int, str]
             The dimension of interest (e.g., "x", "y", "lat", "lon", "color", etc).
         chart_dims: dict
-            The mapping dictionary for the variables for the given chart.
+            The mapping dictionary for the variables of the given chart.
 
         Returns
         -------
@@ -317,6 +317,7 @@ class AltairChart(Chart):
         output_formats: Optional[list[str]] = ["html"]
             A list of output formats for the charts. By default, only the interactive
             HTML chart is saved, i.e., ["html"]. Extra choices: ["pdf", "svg", "png"].
+            Note that for very large datasets the extra choices are too heavy to build.
         """
 
         # If output formats have been specified, save the chart in those formats to 
