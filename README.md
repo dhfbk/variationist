@@ -105,20 +105,21 @@ There you can also find a set of interesting case studies using real-world datas
 The documentation for 🕵️‍♀️ **Variationist** is available at: [https://variationist.readthedocs.io/en/latest/](https://variationist.readthedocs.io/en/latest/).
 
 You can find more information on specific topics in the following documents:
-- [Units](https://github.com/dhfbk/variationist/tree/main/docs/units.md)
-- [Tokenizers](https://github.com/dhfbk/variationist/tree/main/docs/tokenizers.md)
-- [Variables](https://github.com/dhfbk/variationist/tree/main/docs/variables.md)
-- [Preprocessing](https://github.com/dhfbk/variationist/tree/main/docs/preprocessing.md)
-- [Metrics](https://github.com/dhfbk/variationist/tree/main/docs/metrics.md)
-- [Charts](https://github.com/dhfbk/variationist/tree/main/docs/charts.md)
-- [Custom components](https://github.com/dhfbk/variationist/tree/main/docs/custom-components.md)
+- [Units](https://github.com/dhfbk/variationist/tree/main/docs/units.md): from tokens and *n*-grams to co-occurrences and their windows
+- [Tokenizers](https://github.com/dhfbk/variationist/tree/main/docs/tokenizers.md): from a whitespace tokenizer to [Hugging Face](https://huggingface.co/) and custom ones
+- [Variables](https://github.com/dhfbk/variationist/tree/main/docs/variables.md): variable types and semantics, and their interdependence
+- [Preprocessing](https://github.com/dhfbk/variationist/tree/main/docs/preprocessing.md): stopwords removal using custom, [stopwords-iso](https://github.com/stopwords-iso/stopwords-iso), or combined lists, and others
+- [Metrics](https://github.com/dhfbk/variationist/tree/main/docs/metrics.md): from basic stats to lexical diversity, association, and custom metrics
+- [Charts](https://github.com/dhfbk/variationist/tree/main/docs/charts.md): from scatter charts to choroplets, from heatmaps to temporal line plots
+- [Custom components](https://github.com/dhfbk/variationist/tree/main/docs/custom-components.md): how to define your own components
 
 
 ## Roadmap
 
 🕵️‍♀️ **Variationist** aims to be as accessible as possible to researchers from a wide range of fields. We thus aim to provide the following features in the next releases:
-- An easy to use graphical user interface to be installed locally or used through [Hugging Face Spaces](https://huggingface.co/spaces).
-- Multi-dimensional visualization for binned or low-granularity data across quantitative types, and temporal and spatial semantics.
+- An easy to use graphical user interface to be installed locally or used through [Hugging Face Spaces](https://huggingface.co/spaces)
+- Binned/low-granularity multi-dimensional charts across quantitative, temporal, and spatial variables
+- Extension of the `unit` types to also cover linguistic aspects beyond the lexical level
 
 
 ## Contributors
