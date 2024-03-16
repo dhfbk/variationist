@@ -105,6 +105,7 @@ There you can also find a set of interesting case studies using real-world datas
 The documentation for 🕵️‍♀️ **Variationist** is available at: [https://variationist.readthedocs.io/en/latest/](https://variationist.readthedocs.io/en/latest/).
 
 You can find more information on specific topics in the following documents:
+- [Input dataset](https://github.com/dhfbk/variationist/tree/main/docs/input-dataset.md): from `.tsv` or `.csv` files to [Hugging Face](https://huggingface.co/) datasets
 - [Units](https://github.com/dhfbk/variationist/tree/main/docs/units.md): from tokens and *n*-grams to co-occurrences and their windows
 - [Tokenizers](https://github.com/dhfbk/variationist/tree/main/docs/tokenizers.md): from a whitespace tokenizer to [Hugging Face](https://huggingface.co/) and custom ones
 - [Variables](https://github.com/dhfbk/variationist/tree/main/docs/variables.md): variable types and semantics, and their interdependence
