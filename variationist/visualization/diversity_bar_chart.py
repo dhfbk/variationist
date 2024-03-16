@@ -6,8 +6,8 @@ from typing import Optional
 from variationist.visualization.altair_chart import AltairChart
 
 
-class StatsBarChart(AltairChart):
-    """A class for building a BarChart object for basic stats."""
+class DiversityBarChart(AltairChart):
+    """A class for building a BarChart object for lexical diversity metrics."""
 
     def __init__(
         self,
@@ -20,7 +20,8 @@ class StatsBarChart(AltairChart):
         top_per_class_ngrams: Optional[int] = None,
     ) -> None:
         """
-        Initialization function for a building a BarChart object for basic stats.
+        Initialization function for a building a BarChart object for lexical 
+        diversity metrics.
 
         Parameters
         ----------
@@ -50,9 +51,12 @@ class StatsBarChart(AltairChart):
 
         # Get relevant dimensions
         variables = list(self.df_data.keys())
-        for main_col in ["statistics", "val_1", "val_2"]:
+        for main_col in ["ngram", "value"]:
             variables.remove(main_col)
+        x_name, x_type = "value", "quantitative"
         y_name, y_type = variables[0], "nominal"
+        column_name, column_type = "ngram", "nominal"
+        color_name, color_type = "ngram", "nominal"
 
         # Set attributes
         self.top_per_class_ngrams = top_per_class_ngrams
@@ -63,17 +67,16 @@ class StatsBarChart(AltairChart):
         self.base_chart = self.base_chart.mark_bar(height=15, binSpacing=0.5, cornerRadiusEnd=5)
 
         # Set dimensions
-        x_dim = alt.X("val_1", type="quantitative", title="")
-        y_dim = alt.Y(y_name, type=y_type, title="").sort("-x")
-        column_dim = alt.Column("statistics", type="nominal", 
-            header=alt.Header(labelFontWeight="bold"))
-        color = alt.Color("statistics", "nominal", legend=None) # for aestethics only
+        x_dim = alt.X(x_name, type=x_type, title="")
+        y_dim = alt.Y(y_name, type=y_type, title="")
+        column_dim = alt.Column(column_name, type=column_type, 
+            header=alt.Header(labelFontWeight="bold"), title=chart_metric)
+        color = alt.Color(color_name, color_type, legend=None) # for aestethics only
 
         # Set tooltip
         tooltip = [
             alt.Tooltip(y_name, type=y_type, title=self.text_label),
-            alt.Tooltip("val_1", type="quantitative", title="mean"),
-            alt.Tooltip("val_2", type="quantitative", title="stdev")
+            alt.Tooltip(x_name, type=x_type, title=self.metric_label)
         ]
 
         # Encoding the data
@@ -92,8 +95,7 @@ class StatsBarChart(AltairChart):
         )
 
         # Set extra properties
-        chart_width = max(100, 800 / len(list(df_data["statistics"].unique())))
-        self.base_chart = self.base_chart.properties(width=chart_width, center=True)
+        self.base_chart = self.base_chart.properties(width=250, center=True)
 
         # The chart has not to be filterable
         self.base_chart = self.base_chart.encode(color=y_dim)

@@ -5,6 +5,7 @@ from typing import Any, Optional, Union
 
 from variationist import utils
 from variationist.visualization import chart_utils
+from variationist.visualization.diversity_bar_chart import DiversityBarChart
 from variationist.visualization.stats_bar_chart import StatsBarChart
 
 
@@ -371,6 +372,16 @@ class Visualizer:
                 # Save the chart to the output folder
                 output_filepath = os.path.join(self.args.output_folder, metric)
                 chart.save(output_filepath, "StatsBarChart", self.args.output_formats)
+
+            elif metric in ["ttr", "root_ttr", "log_ttr", "maas"]:
+                chart = DiversityBarChart(
+                    df_data, metric, self.metadata, extra_args, {}, 
+                    self.args.zoomable, self.args.top_per_class_ngrams
+                )
+
+                # Save the chart to the output folder
+                output_filepath = os.path.join(self.args.output_folder, metric)
+                chart.save(output_filepath, "DiversityBarChart", self.args.output_formats)
 
             else:
                 # Get dictionary containing information on which and how to create charts
