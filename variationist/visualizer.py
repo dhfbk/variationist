@@ -5,6 +5,7 @@ from typing import Any, Optional, Union
 
 from variationist import utils
 from variationist.visualization import chart_utils
+from variationist.visualization.stats_bar_chart import StatsBarChart
 
 
 class VisualizerArgs:
@@ -109,16 +110,27 @@ class Visualizer:
             # Store the concatenated string useful for multiple variables
             var_names_concat = utils.MULTI_VAR_SEP.join(self.variable_names)
 
-            # Retrieve the possible values for the variable (combination) and the given metric
-            self.variable_values[metric] = list(
-                json_data["metrics"][metric][var_names_concat].keys())
+            if metric == "stats":
+                # Retrieve the possible values for the variable (combination) and the given metric
+                self.variable_values[metric] = list(
+                    json_data["metrics"][metric]["num_texts"][var_names_concat].keys())
 
-            # Get the long-form dataframe
-            self.df_metric_data[metric] = self.get_df_from_json(
-                json_data = json_data["metrics"][metric], 
-                var_names_concat = var_names_concat,
-                top_per_class_ngrams = self.args.top_per_class_ngrams,
-                focus_ngrams = self.args.ngrams)
+                # Get the long-form dataframe
+                self.df_metric_data[metric] = self.get_stats_df_from_json(
+                    json_data = json_data["metrics"][metric], 
+                    var_names_concat = var_names_concat)
+
+            else:
+                # Retrieve the possible values for the variable (combination) and the given metric
+                self.variable_values[metric] = list(
+                    json_data["metrics"][metric][var_names_concat].keys())
+
+                # Get the long-form dataframe
+                self.df_metric_data[metric] = self.get_df_from_json(
+                    json_data = json_data["metrics"][metric], 
+                    var_names_concat = var_names_concat,
+                    top_per_class_ngrams = self.args.top_per_class_ngrams,
+                    focus_ngrams = self.args.ngrams)
 
 
     def get_df_from_json(
@@ -185,6 +197,70 @@ class Visualizer:
         dict_data["value"] = values
         df_data = pd.DataFrame(dict_data)
         
+        return df_data
+
+
+    def get_stats_df_from_json(
+        self,
+        json_data: dict[str, Any],
+        var_names_concat: str,
+    ) -> pd.core.frame.DataFrame:
+        """
+        A function that returns a long-form dataframe from a json which 
+        stores the information about a prior analysis using Variationist.
+        Optionally, it takes a list of n-grams to focus the filtering on.
+        This is a variant of get_df_from_json() to handle basic stats.
+
+        Parameters
+        ----------
+        json_data: dict[str, Any]
+            The json object storing the results from a prior analysis in the form:
+            {substatA: {colnameA: {varA: value1, ...}, ...}, substatB: {colnameA:
+            {varA: {"mean": value, "stdev": value}, ...}, ...}, ...}. Note
+            that varA, varB, etc. could also take the form of "::"-concatenated
+            variable names if multiple variables are present in the analysis.
+        var_names_concat: str
+            A string denoting the ordered concatenation of variable names (i.e., 
+            original column names), separated by utils.MULTI_VAR_SEP, to be used for 
+            giving meaningful names to the long-form dataframe.
+
+        Returns
+        -------
+        df_data: pd.core.frame.DataFrame
+            A long-form dataframe storing the results of a prior analysis.
+        """
+
+        # Initialize the lists for variables, submetrics, and values
+        variables, submetric_list, val_1_list, val_2_list = dict(), [], [], []
+
+        # Get the individual variables and initialize each of them
+        var_names = var_names_concat.split(utils.MULTI_VAR_SEP)
+        for var_name in var_names:
+            variables[var_name] = []
+
+        # Iterate through the dictionary to create lists for creating the dataframe
+        for submetric, vars_label_vals in json_data.items():
+            for raw_vars, label_vals in vars_label_vals.items():
+                for label, vals in label_vals.items():
+                    is_vals_dict = (type(vals)==dict)
+                    if is_vals_dict:
+                        val_1, val_2 = vals["mean"], vals["stdev"]
+                    else:
+                        val_1, val_2 = vals, None
+
+                    for i in range(len(var_names)):
+                        variables[var_names[i]].append(str(label).split(utils.MULTI_VAR_SEP)[i])
+                    submetric_list.append(submetric)
+                    val_1_list.append(val_1)
+                    val_2_list.append(val_2)
+
+        # Create the long-form dataframe
+        dict_data = variables
+        dict_data["statistics"] = submetric_list
+        dict_data["val_1"] = val_1_list
+        dict_data["val_2"] = val_2_list
+        df_data = pd.DataFrame(dict_data)
+
         return df_data
 
 
@@ -285,29 +361,38 @@ class Visualizer:
         # Build chart objects for each computed metric based on variable types and
         # semantics, then save them to the user-specified output folder
         for metric, df_data in self.df_metric_data.items():
-            # @TODO: Differentiate chart creation by metric
-            # @TODO: var_bins = self.metadata["var_bins"]
 
-            # Get dictionary containing information on which and how to create charts
-            charts_metadata = self.get_charts_metadata(metric)
-
-            # Iterate over the results and create and save charts based on these information
-            for ChartClass, chart_info in charts_metadata.items():
-                # Create the chart object
-                print(f"INFO: Creating a {ChartClass.__name__} object...")
-                chart = ChartClass(
-                    df_data, metric, self.metadata, extra_args, chart_info, 
+            if metric == "stats":
+                chart = StatsBarChart(
+                    df_data, metric, self.metadata, extra_args, {}, 
                     self.args.zoomable, self.args.top_per_class_ngrams
                 )
-                
+
                 # Save the chart to the output folder
                 output_filepath = os.path.join(self.args.output_folder, metric)
-                chart.save(output_filepath, ChartClass.__name__, self.args.output_formats)
+                chart.save(output_filepath, "StatsBarChart", self.args.output_formats)
 
-                # Add the chart to the dictionary of metric-associated charts
-                if metric not in charts:
-                    charts[metric] = [chart]
-                else:
-                    charts[metric].append(chart)
+            else:
+                # Get dictionary containing information on which and how to create charts
+                charts_metadata = self.get_charts_metadata(metric)
+
+                # Iterate over the results and create and save charts based on these information
+                for ChartClass, chart_info in charts_metadata.items():
+                    # Create the chart object
+                    print(f"INFO: Creating a {ChartClass.__name__} object...")
+                    chart = ChartClass(
+                        df_data, metric, self.metadata, extra_args, chart_info, 
+                        self.args.zoomable, self.args.top_per_class_ngrams
+                    )
+                    
+                    # Save the chart to the output folder
+                    output_filepath = os.path.join(self.args.output_folder, metric)
+                    chart.save(output_filepath, ChartClass.__name__, self.args.output_formats)
+
+                    # Add the chart to the dictionary of metric-associated charts
+                    if metric not in charts:
+                        charts[metric] = [chart]
+                    else:
+                        charts[metric].append(chart)
 
         return charts
