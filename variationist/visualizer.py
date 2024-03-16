@@ -14,7 +14,7 @@ class VisualizerArgs:
 
     def __init__(
         self,
-        output_folder: str,
+        output_folder: Optional[str] = None,
         output_formats: Optional[list[str]] = ["html"],
         zoomable: Optional[bool] = True,
         top_per_class_ngrams: Optional[int] = 20,
@@ -27,9 +27,13 @@ class VisualizerArgs:
 
         Parameters
         ----------
-        output_folder: str
+        output_folder: Optional[str] = None
             A path to the output folder in which to store the charts and associated
             metadata. If the folder does not exist, it will be automatically created.
+            If no path is provided, the charts will not be serialized and the possible
+            output_formats will be ignored (in this case, the chart objects will be only 
+            accessible from the dictionary returned by the "create()" function and be
+            shown by using the "show()" function.
         output_formats: Optional[list[str]] = ["html"]
             A list of output formats for the charts. By default, only the interactive
             HTML chart is saved, i.e., ["html"]. Extra choices: ["pdf", "svg", "png"].
@@ -333,7 +337,7 @@ class Visualizer:
         return charts_metadata
 
 
-    def visualize(
+    def create(
         self,
     ) -> dict[str, list[alt.Chart]]:
         """
@@ -362,26 +366,39 @@ class Visualizer:
         # Build chart objects for each computed metric based on variable types and
         # semantics, then save them to the user-specified output folder
         for metric, df_data in self.df_metric_data.items():
+            charts[metric] = dict()
 
             if metric == "stats":
+                # Create the chart object
+                print(f"INFO: Creating a BarChart object for metric \"{metric}\"...")
                 chart = StatsBarChart(
                     df_data, metric, self.metadata, extra_args, {}, 
                     self.args.zoomable, self.args.top_per_class_ngrams
                 )
 
                 # Save the chart to the output folder
-                output_filepath = os.path.join(self.args.output_folder, metric)
-                chart.save(output_filepath, "StatsBarChart", self.args.output_formats)
+                if self.args.output_folder != None:
+                    output_filepath = os.path.join(self.args.output_folder, metric)
+                    chart.save(output_filepath, "StatsBarChart", self.args.output_formats)
+
+                # Add the chart to the dictionary of metric-associated charts
+                charts[metric]["BarChart"] = chart.base_chart
 
             elif metric in ["ttr", "root_ttr", "log_ttr", "maas"]:
+                # Create the chart object
+                print(f"INFO: Creating a BarChart object for metric \"{metric}\"...")
                 chart = DiversityBarChart(
                     df_data, metric, self.metadata, extra_args, {}, 
                     self.args.zoomable, self.args.top_per_class_ngrams
                 )
 
                 # Save the chart to the output folder
-                output_filepath = os.path.join(self.args.output_folder, metric)
-                chart.save(output_filepath, "DiversityBarChart", self.args.output_formats)
+                if self.args.output_folder != None:
+                    output_filepath = os.path.join(self.args.output_folder, metric)
+                    chart.save(output_filepath, "DiversityBarChart", self.args.output_formats)
+
+                # Add the chart to the dictionary of metric-associated charts
+                charts[metric]["BarChart"] = chart.base_chart
 
             else:
                 # Get dictionary containing information on which and how to create charts
@@ -390,20 +407,18 @@ class Visualizer:
                 # Iterate over the results and create and save charts based on these information
                 for ChartClass, chart_info in charts_metadata.items():
                     # Create the chart object
-                    print(f"INFO: Creating a {ChartClass.__name__} object...")
+                    print(f"INFO: Creating a {ChartClass.__name__} object for metric \"{metric}\"...")
                     chart = ChartClass(
                         df_data, metric, self.metadata, extra_args, chart_info, 
                         self.args.zoomable, self.args.top_per_class_ngrams
                     )
                     
                     # Save the chart to the output folder
-                    output_filepath = os.path.join(self.args.output_folder, metric)
-                    chart.save(output_filepath, ChartClass.__name__, self.args.output_formats)
+                    if self.args.output_folder != None:
+                        output_filepath = os.path.join(self.args.output_folder, metric)
+                        chart.save(output_filepath, ChartClass.__name__, self.args.output_formats)
 
                     # Add the chart to the dictionary of metric-associated charts
-                    if metric not in charts:
-                        charts[metric] = [chart]
-                    else:
-                        charts[metric].append(chart)
+                    charts[metric][ChartClass.__name__] = chart.base_chart
 
         return charts
