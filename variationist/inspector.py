@@ -185,7 +185,7 @@ class Inspector:
         metadata_dict = self.args.to_dict()
         print("INFO: The metadata we will be using for the current analysis are:")
         print(metadata_dict)
-        metadata_dict["dataset"] = self.dataset     
+        metadata_dict["dataset"] = self.dataset 
         self.metadata_dict = metadata_dict
         
         # Check if variable definitions match in length
@@ -207,7 +207,21 @@ class Inspector:
         self.cols_type = text_names_type
         print(f"INFO: all column identifiers are treated as column {self.cols_type}.")
         
-        self.dataframe = utils.convert_file_to_dataframe(self.dataset, cols_type=self.cols_type)
+        if type(self.dataset) is Dataset:
+            self.dataframe = pd.DataFrame(self.dataset)
+            self.metadata_dict["dataset"] = self.dataset.info.dataset_name
+        elif type(self.dataset) is pd.DataFrame:
+            try:
+                self.metadata_dict["dataset"] = self.dataset.name
+            except:
+                self.metadata_dict["dataset"] = "Custom_User_DataFrame"
+            self.dataframe = self.dataset
+            pass
+        elif type(self.dataset) is str:
+            self.dataframe = utils.convert_file_to_dataframe(self.dataset, cols_type=self.cols_type)
+        else:
+            sys.exit(f"The specified dataset is not one of the accepted ones (string, a pandas DataFrame or a Huggingface Dataset), but a type {type(self.dataset)} instead.")
+            
         
         # Create a dictionary containing the specified column strings (values) for texts and labels (keys)
         self.col_names_dict = {
