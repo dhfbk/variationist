@@ -73,7 +73,7 @@ def average_text_length(label_values_dict, subsets_of_interest):
     return values_dict
 
 
-def num_words(label_values_dict, subsets_of_interest):
+def num_tokens(label_values_dict, subsets_of_interest):
     """Returns a dictionary with the total number of tokens in each subset.
     
     Parameters
@@ -191,13 +191,13 @@ def compute_basic_stats(label_values_dict, subsets_of_interest, args):
     stats_dict = dict()
     for stat in ["num_texts", 
                  "avg_text_len",
-                 "num_words",
+                 "num_tokens",
                  "vocab_size",
                  "num_duplicates"]:
         stats_dict[stat] = {}
     stats_dict["num_texts"][list(label_values_dict.keys())[0]] = number_of_texts(label_values_dict, subsets_of_interest)
     stats_dict["avg_text_len"][list(label_values_dict.keys())[0]] = average_text_length(label_values_dict, subsets_of_interest)
-    stats_dict["num_words"][list(label_values_dict.keys())[0]] = num_words(label_values_dict, subsets_of_interest)
+    stats_dict["num_tokens"][list(label_values_dict.keys())[0]] = num_tokens(label_values_dict, subsets_of_interest)
     stats_dict["vocab_size"][list(label_values_dict.keys())[0]] = vocab_size(label_values_dict, subsets_of_interest)
     stats_dict["num_duplicates"][list(label_values_dict.keys())[0]] = number_of_duplicates(label_values_dict, subsets_of_interest)
     # print(stats_dict)
