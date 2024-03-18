@@ -17,5 +17,5 @@ A unit can be defined through the **`n_tokens`** and **`n_cooc`** parameters of 
 Units may optionally undergo preprocessing using specific parameters of the `InspectorArgs` class:
 
 - **lowercase**: a boolean denoting whether to lowercase all the texts before tokenization or not. It defaults to *False*
-- **stopwords**: a boolean denoting whether to remove stopwords from texts before tokenization or not. It will use default lists from the (stopwords-iso)[https://github.com/stopwords-iso] package in a given `language` defined by the user (as ISO 639-1 code strings) and defaults to *False*
+- **stopwords**: a boolean denoting whether to remove stopwords from texts before tokenization or not. It will use default lists from the [stopwords-iso](https://github.com/stopwords-iso) package in a given `language` defined by the user (as ISO 639-1 code strings) and defaults to *False*
     - **custom_stopwords**: a list of stopwords (or a path to a file containing stopwords, one per line) to be removed before tokenization. If `stopwords` is *True*, these stopwords will be added to that list. It defaults to *None*
