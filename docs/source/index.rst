@@ -61,7 +61,7 @@ Alternatively, Variationist can be installed from source as follows:
 Getting started
 ---------------
 
-For getting started, please refer to our `GitHub repository`_ for materials such as a `quickstart`_, extra `documentation`_, and `tutorials`_.
+For getting started, please refer to our `GitHub repository`_ for materials such as a `quickstart`_, `extra documentation`_, and `tutorials`_.
 
 
 Citation
@@ -86,16 +86,7 @@ Contents
 .. toctree::
     :maxdepth: 2
 
-    index
     api/index
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
 
 .. _PyPi: https://pypi.org/

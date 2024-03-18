@@ -1,40 +1,17 @@
 API reference
 =============
 
-The main user-facing classes and related parameters and functions are indicated below.
+The main user-facing classes and its link to detailed code documentation are indicated below.
 
-.. toctree::
-    :maxdepth: 2
+- `Inspector`_
 
-    Inspector
-    InspectorArgs
-    Visualizer
-    VisualizerArgs
+- `InspectorArgs`_
 
+- `Visualizer`_
 
-.. Inspector
-.. ---------
+- `VisualizerArgs`_
 
-.. .. autoclass:: variationist.inspector.Inspector
-..     :members:
-
-
-.. InspectorArgs
-.. -------------
-
-.. .. autoclass:: variationist.inspector.InspectorArgs
-..     :members:
-
-
-.. Visualizer
-.. ----------
-
-.. .. autoclass:: variationist.visualizer.Visualizer
-..     :members:
-
-
-.. VisualizerArgs
-.. --------------
-
-.. .. autoclass:: variationist.visualizer.VisualizerArgs
-..     :members:
+.. _Inspector: https://github.com/dhfbk/variationist/blob/f10cb35b630ff2db6545501d8d5140acd8f060a4/variationist/inspector.py#L139
+.. _InspectorArgs: https://github.com/dhfbk/variationist/blob/f10cb35b630ff2db6545501d8d5140acd8f060a4/variationist/inspector.py#L19
+.. _Visualizer: https://github.com/dhfbk/variationist/blob/f10cb35b630ff2db6545501d8d5140acd8f060a4/variationist/visualizer.py#L77
+.. _VisualizerArgs: https://github.com/dhfbk/variationist/blob/f10cb35b630ff2db6545501d8d5140acd8f060a4/variationist/visualizer.py#L12
