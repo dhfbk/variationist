@@ -25,17 +25,14 @@ class Tokenizer:
             utils.TEXT_COLS_KEY: self.args.text_names,
             utils.LABEL_COLS_KEY: self.args.var_names
         }
-        
-        if self.args.tokenizer.lower() == "whitespace":
+        if callable(self.args.tokenizer):
+            self.tok_function = self.args.tokenizer
+        elif self.args.tokenizer.lower() == "whitespace":
             self.tok_function = tokenization_utils.whitespace_tokenization
-        elif self.args.tokenizer.lower() == "spacy":
-            self.tok_function = tokenization_utils.spacy_tokenization
         elif self.args.tokenizer.startswith("hf::"):
             self.tok_function = tokenization_utils.huggingface_tokenization
-        elif callable(self.args.tokenizer):
-            self.tok_function = self.args.tokenizer
         else:
-            sys.exit(f"The selected tokenizer ({self.args.tokenizer}) does not match any of the available options. If you intend to use a pretrained tokenizer from HuggingFace, please use the format 'hf::TOKENIZER_NAME'. Other available options are 'whitespace', 'spacy', and a callable function.")
+            sys.exit(f"The selected tokenizer ({self.args.tokenizer}) does not match any of the available options. If you intend to use a pretrained tokenizer from HuggingFace, please use the format 'hf::TOKENIZER_NAME'. Other available options are 'whitespace', and a callable function.")
         # TODO add the possibility to add a custom tokenizer as a function in inspectorargs.
     
     
