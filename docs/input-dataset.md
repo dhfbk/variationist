@@ -4,7 +4,7 @@ An input dataset can be defined through the **`dataset`** parameter of the `Insp
 
 - A local filepath to tab-separated (`.tsv`) or comme-separated (`.csv`) file
 - Pre-computed [pandas](https://pandas.pydata.org/) dataframes
-- Any dataset from the 🤗 [Hugging Face datasets] repository
+- Any dataset from the 🤗 [Hugging Face datasets](https://huggingface.co/datasets) repository
 
 Note that Hugging Face datasets are often characterized by *subsets* and *splits*. For importing datasets from this repository, we therefore require a string following the format `hf::$DATASET_NAME::$SUBSET::$SPLIT`, where:
 
