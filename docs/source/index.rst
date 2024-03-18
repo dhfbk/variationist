@@ -90,6 +90,14 @@ Contents
     api/index
 
 
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+
 .. _PyPi: https://pypi.org/
 .. _GitHub repository: https://github.com/dhfbk/variationist
 .. _python 3.9: https://www.python.org/downloads/release/python-390/
