@@ -75,12 +75,17 @@ def convert_file_to_dataframe(data_filepath, cols_type):
         string_parts = data_filepath.split("::")
         if len(string_parts) == 3:
             prefix, dataset_name, split = string_parts
-            print(f"INFO: 'Loading {data_filepath}' as a HuggingFace dataset (\"{split}\" split).")
+            print(f"INFO: 'Loading {data_filepath}' as a HuggingFace dataset. We assume the last element in the specified string is the split (\"{split}\").")
             dataframe = pd.DataFrame(load_dataset(dataset_name)[split])
+        elif len(string_parts) == 4:
+            prefix, dataset_name, subset, split = string_parts
+            print(f"INFO: 'Loading {data_filepath}' as a HuggingFace dataset. We assume the third element in the specified string is the subset (\"{subset}\") and the last is the split (\"{split}\").")
+            dataframe = pd.DataFrame(load_dataset(dataset_name, subset)[split])
+
         else:
             raise Exception(f"ERROR: {data_filepath} seems to refer to a HuggingFace dataset, however " 
-                "there is no specification about the split to use. Please ensure that \"data_filepath\" "
-                "follows the format hf::DATASET_NAME::SPLIT.")
+                "there is no specification about the split to use, or they are not specified as expected. Please ensure that \"data_filepath\" "
+                "follows the format hf::DATASET_NAME::SPLIT or hf::DATASET_NAME::SUBSET::SPLIT.")
     
     elif (type(data_filepath) == str) and (not os.path.isfile(data_filepath)):
         raise ValueError(f"ERROR: the '{data_filepath}' filepath does not exist.")
