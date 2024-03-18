@@ -4,7 +4,7 @@ This section includes our tutorials to learn how to better leverage 🕵️‍�
 
 | Tutorial name | Notebook |
 | ----------- | -------- |
-| Quickstart | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1YOM5T0mk_kOF8QJM_5HejMkIYi0uEn_C?usp=sharing) |
+| Quickstart | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist-Quickstart.ipynb) |
 | Example 1: Custom Tokenizers | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1e1ob-uh5GL0SEiBw0B7uzrdZj-amD6vo?usp=sharing) |
 | Example 2: Custom Metrics | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1tE56vYqSi0ijsuwz30hvcGEaZniYSZdg?usp=sharing) |
 
