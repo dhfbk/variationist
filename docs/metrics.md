@@ -22,7 +22,7 @@ Metrics can be defined through the **`metric`** parameter of the `InspectorArgs`
 - `maas` (**Maas' index**): the mean Maas' index [(Maas, 1972)](#) score for each subset and its standard deviation
 
 
-## Text-variables association metrics
+## Unit-variables association metrics
 
 - `pmi` (**pointwise mutual information [PMI]**): the PMI for each token in each subset of interest
 - `n_pmi` (**normalized PMI**): the normalized PMI for each token in each subset of interest
@@ -35,3 +35,5 @@ Metrics can be defined through the **`metric`** parameter of the `InspectorArgs`
 - `np_relevance` (**normalized positive class relevance**): the normalized positive class relevance metric for each token in each subset of interest (based on [Ramponi and Tonelli (2022)](https://aclanthology.org/2022.naacl-main.221/))
 - `nw_relevance` (**normalized weighted class relevance**): the normalized weighted class relevance metric for each token in each subset of interest (based on [Ramponi and Tonelli (2022)](https://aclanthology.org/2022.naacl-main.221/))
 - `npw_relevance` (**normalized positive weighted class relevance**): the normalized positive weighted class relevance metric for each token in each subset of interest (based on [Ramponi and Tonelli (2022)](https://aclanthology.org/2022.naacl-main.221/))
+
+For unit-variables association metrics, it is possible to also set the `freq_cutoff` parameter, i.e., the token frequency, expressed as an integer, below which we do not consider the token in the analysis. It defaults to 3

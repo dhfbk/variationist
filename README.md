@@ -71,11 +71,11 @@ Now, we aim to **inspect the data**. For this example, we use a column `text` an
 
 ```python
 # Define the inspector arguments
-inspector_args = InspectorArgs(text_names=["text"], var_names=["label"], 
-	metrics=["npw_pmi"], n_tokens=1, language="en", stopwords=True, lowercase=True)
+ins_args = InspectorArgs(text_names=["text"], var_names=["label"], 
+    metrics=["npw_pmi"], n_tokens=1, language="en", stopwords=True, lowercase=True)
 
-# Create an inspector instance, run it, and get the results in json
-results = Inspector(dataset="my_dataset.tsv", args=inspector_args).inspect()
+# Run the inspector and get the results
+res = Inspector(dataset="data.tsv", args=ins_args).inspect()
 ```
 
 ### 3) Define and run the *Visualizer*
@@ -83,11 +83,11 @@ results = Inspector(dataset="my_dataset.tsv", args=inspector_args).inspect()
 Finally, we aim to **visualize the results**. The visualizer currently handles the creation of interactive [charts](https://github.com/dhfbk/variationist/tree/main/docs/charts.md) for more than 30 combinations of [variable type and semantics](https://github.com/dhfbk/variationist/tree/main/docs/variables.md) up to five dimensions, in which two of them are naturally fixed: the [units](https://github.com/dhfbk/variationist/tree/main/docs/units.md) (*nominal*) and their [metric](https://github.com/dhfbk/variationist/tree/main/docs/charts.md) scores (*quantitative*). For this example, we output in the output folder `my_charts` the results in a `html` format (i.e., the default and suggested one for the sake of interactivity).
 
 ```python
-# Define the visualizer arguments (requesting serialization on "my_charts")
-visualizer_args = VisualizerArgs(output_folder="my_charts", output_formats=["html"])
+# Define the visualizer arguments
+vis_args = VisualizerArgs(output_folder="charts", output_formats=["html"])
 
 # Create interactive charts for all metrics
-Visualizer(input_json=results, args=visualizer_args).create()
+charts = Visualizer(input_json=res, args=vis_args).create()
 ```
 
 Optionally, interactive charts can be visualized in notebooks by just taking the object returned from the `create()` function. For instance, if the object is stored in a variable named `charts`, visualization would be as simple as writing the following string in the notebook: `charts[$METRIC][$CHART_TYPE]`, where `$METRIC` is the metric of interest and `$CHART_TYPE` is a specific chart type associated with that metric.
