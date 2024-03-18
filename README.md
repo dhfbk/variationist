@@ -3,7 +3,7 @@
 <div align="center">
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![v0.1.2](https://img.shields.io/badge/pypi-v0.1.2-orange)](https://pypi.org/project/variationist/0.1.2/)
+[![v0.1.3](https://img.shields.io/badge/pypi-v0.1.3-orange)](https://pypi.org/project/variationist/0.1.3/)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue)](https://www.python.org/downloads/)
 [![Documentation](https://img.shields.io/readthedocs/:packageName/:version)](https://variationist.readthedocs.io/en/latest/)
 [![Tutorials](https://img.shields.io/badge/tutorials-colab-orange)](https://github.com/dhfbk/variationist/tree/main/examples)
