@@ -15,7 +15,7 @@ Variationist's documentation
     :target: https://www.python.org/downloads/
     :alt: Python 3.9+
 
-.. |documentation| image:: https://img.shields.io/readthedocs/:packageName/:version
+.. |documentation| image:: https://readthedocs.org/projects/variationist/badge/?version=latest
     :target: https://variationist.readthedocs.io/en/latest/
     :alt: Documentation
 
@@ -80,6 +80,12 @@ A preprint will be available soon! In the meanwhile, if you use Variationist in 
     }
 
 
+Contents
+--------
+
+.. toctree::
+
+   api
 
 
 .. _PyPi: https://pypi.org/
