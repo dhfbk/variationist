@@ -3,14 +3,14 @@
 <div align="center">
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![v0.1.1](https://img.shields.io/badge/pypi-v0.1.1-orange)](https://pypi.org/project/variationist/0.1.1/)
+[![v0.1.2](https://img.shields.io/badge/pypi-v0.1.2-orange)](https://pypi.org/project/variationist/0.1.2/)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue)](https://www.python.org/downloads/)
 [![Documentation](https://img.shields.io/readthedocs/:packageName/:version)](https://variationist.readthedocs.io/en/latest/)
 [![Tutorials](https://img.shields.io/badge/tutorials-colab-orange)](https://github.com/dhfbk/variationist/tree/main/examples)
 
 </div>
 
-🕵️‍♀️ **Variationist** is a highly-modular, flexible, and customizable tool to analyze and explore language variation and bias in written language data. It allows researchers, from NLP practitioners to linguists and social scientists, to seamlessly investigate language use across a wide range of use cases.
+🕵️‍♀️ **Variationist** is a highly-modular, flexible, and customizable tool to analyze and explore language variation and bias in written language data. It allows researchers, from NLP practitioners to linguists and social scientists, to seamlessly investigate language use across many dimensions and a wide range of use cases.
 
 - :cd: [**Installation**](#installation)
 - :checkered_flag: [**Quickstart**](#quickstart)
@@ -67,7 +67,7 @@ A brief description for the classes is the following:
 
 ### 2) Define and run the *Inspector*
 
-Now, we aim to **inspect the data**. For this example, we use a column `text` and just a single `label` variable (with a default *nominal* [variable type](https://github.com/dhfbk/variationist/tree/main/docs/variables.md) and a default *general* [variable semantics](https://github.com/dhfbk/variationist/tree/main/docs/variables.md)); however, note that 🕵️‍♀️ Variationist can seamlessly handle a potentially unlimited number of variables and up to two text columns during computation. We just use `npw_pmi` as our association [metric](https://github.com/dhfbk/variationist/tree/main/docs/metrics.md) and rely on single tokens as our [unit of information](https://github.com/dhfbk/variationist/tree/main/docs/metrics.md), using a default [tokenizer](https://github.com/dhfbk/variationist/blob/main/docs/tokenizers.md). We also require some [preprocessing](https://github.com/dhfbk/variationist/tree/main/docs/preprocessing.md) steps (stopwords removal in English and lowercasing). The output is stored in the `results` variable but it can alternatively be serialized to a .json file for later use.
+Now, we aim to **inspect the data**. For this example, we use a column `text` and just a single `label` variable (with a default *nominal* [variable type](https://github.com/dhfbk/variationist/tree/main/docs/variables.md) and a default *general* [variable semantics](https://github.com/dhfbk/variationist/tree/main/docs/variables.md)); however, note that 🕵️‍♀️ Variationist can seamlessly handle a potentially unlimited number of variables and up to two text columns during computation. We just use `npw_pmi` as our association [metric](https://github.com/dhfbk/variationist/tree/main/docs/metrics.md) and rely on single tokens as our [unit of information](https://github.com/dhfbk/variationist/tree/main/docs/units.md), using a default [tokenizer](https://github.com/dhfbk/variationist/blob/main/docs/tokenizers.md). We also ask for some [preprocessing](https://github.com/dhfbk/variationist/tree/main/docs/preprocessing.md) steps (stopwords removal in English and lowercasing). The output is stored in the `results` variable but it can alternatively be serialized to a .json file for later use.
 
 ```python
 # Define the inspector arguments
@@ -105,31 +105,40 @@ There you can also find a set of interesting case studies using real-world datas
 The documentation for 🕵️‍♀️ **Variationist** is available at: [https://variationist.readthedocs.io/en/latest/](https://variationist.readthedocs.io/en/latest/).
 
 You can find more information on specific topics in the following documents:
-- [Input dataset](https://github.com/dhfbk/variationist/tree/main/docs/input-dataset.md): from `.tsv` or `.csv` files to [Hugging Face](https://huggingface.co/) datasets
-- [Units](https://github.com/dhfbk/variationist/tree/main/docs/units.md): from tokens and *n*-grams to co-occurrences and their windows
-- [Tokenizers](https://github.com/dhfbk/variationist/tree/main/docs/tokenizers.md): from a whitespace tokenizer to [Hugging Face](https://huggingface.co/) and custom ones
-- [Variables](https://github.com/dhfbk/variationist/tree/main/docs/variables.md): variable types and semantics, and their interdependence
-- [Preprocessing](https://github.com/dhfbk/variationist/tree/main/docs/preprocessing.md): stopwords removal using custom, [stopwords-iso](https://github.com/stopwords-iso/stopwords-iso), or combined lists, and others
-- [Metrics](https://github.com/dhfbk/variationist/tree/main/docs/metrics.md): from basic stats to lexical diversity, association, and custom metrics
-- [Charts](https://github.com/dhfbk/variationist/tree/main/docs/charts.md): from scatter charts to choroplets, from heatmaps to temporal line plots
+- [Input dataset](https://github.com/dhfbk/variationist/tree/main/docs/input-dataset.md): from `.tsv` or `.csv` files to pandas dataframes and [Hugging Face](https://huggingface.co/) datasets
+- [Units](https://github.com/dhfbk/variationist/tree/main/docs/units.md): from tokens and *n*-grams to co-occurrences with windows and duplicate handling
+- [Tokenizers](https://github.com/dhfbk/variationist/tree/main/docs/tokenizers.md): from a whitespace tokenizer to [Hugging Face](https://huggingface.co/) tokenizers and custom ones
+- [Variables](https://github.com/dhfbk/variationist/tree/main/docs/variables.md): possible variable types and variable semantics, and their interdependence
+- [Metrics](https://github.com/dhfbk/variationist/tree/main/docs/metrics.md): from basic statistics to lexical diversity, association metrics, and custom ones
+- [Charts](https://github.com/dhfbk/variationist/tree/main/docs/charts.md): from scatter charts to choroplets, from heatmaps to temporal line plots and others
 - [Custom components](https://github.com/dhfbk/variationist/tree/main/docs/custom-components.md): how to define your own components
 
 
 ## Roadmap
 
 🕵️‍♀️ **Variationist** aims to be as accessible as possible to researchers from a wide range of fields. We thus aim to provide the following features in the next releases:
-- An easy to use graphical user interface to be installed locally or used through [Hugging Face Spaces](https://huggingface.co/spaces)
-- Binned/low-granularity multi-dimensional charts across quantitative, temporal, and spatial variables
-- Extension of the `unit` types to also cover linguistic aspects beyond the lexical level
+- An easy to use graphical user interface to be installed locally or used through [Hugging Face Spaces](https://huggingface.co/spaces);
+- Binned/low-granularity multi-dimensional charts across quantitative, temporal, and spatial variables;
+- Extension of the `unit` concept to also cover linguistic aspects beyond the lexical level.
 
 
 ## Contributors
 
 - **[Alan Ramponi](https://alanramponi.github.io)**, *Fondazione Bruno Kessler*
-- **[Camilla Casula](https://dh.fbk.eu/author/camilla/)**, *Fondazione Bruno Kessler*, *University of Trento*
+- **[Camilla Casula](https://dh.fbk.eu/author/camilla/)**, *Fondazione Bruno Kessler* and *University of Trento*
 - **[Stefano Menini](https://dh.fbk.eu/author/stefano/)**, *Fondazione Bruno Kessler*
 
 
 ## Citation
 
-A preprint will be available soon! :construction:
+A preprint will be available soon! :construction: In the meanwhile, if you use 🕵️‍♀️ **Variationist** in your work please cite:
+
+```
+@misc{ramponi-etal-2024-variationist,
+  author = {Ramponi, Alan and Casula, Camilla and Menini, Stefano},
+  title = {Variationist: {E}xploring Multifaceted Variation and Bias in Written Language Data},
+  year = {2024},
+  publisher = {GitHub repository},
+  howpublished = {\url{https://github.com/dhfbk/variationist}}
+}
+```
