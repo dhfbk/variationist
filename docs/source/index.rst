@@ -84,8 +84,10 @@ Contents
 --------
 
 .. toctree::
+    :maxdepth: 2
 
-   api
+    index
+    api/index
 
 
 .. _PyPi: https://pypi.org/
@@ -96,6 +98,3 @@ Contents
 .. _quickstart: https://github.com/dhfbk/variationist?tab=readme#quickstart
 .. _extra documentation: https://github.com/dhfbk/variationist?tab=readme#documentation
 .. _tutorials: https://github.com/dhfbk/variationist?tab=readme#tutorials
-
-
-.. toctree::
