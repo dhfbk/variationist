@@ -25,7 +25,7 @@ def get_total(freqs_merged_dict):
     """Function to add up the frequency of tokens across labels."""
     total = 0
     for w in freqs_merged_dict: total += freqs_merged_dict[w]
-    
+
     return total
 
 
@@ -71,7 +71,6 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest, weighted, freq
                 pxy = freqs_dict[label][w]/total
                 px = label_count[label]/total
                 py = freqs_merged_dict[w]/total
-                # pmi_value = math.log2(pxy/(px*py))
                 pmi_value = math.log2(safe_divide(pxy,(px*py)))
                 if weighted:
                     pmi_value = pmi_value*freqs_dict[label][w]
@@ -143,7 +142,7 @@ def pmi_normalized(label_values_dict, subsets_of_interest, args):
     
     for label in output_pmi:
         for w in output_pmi[label]:
-            output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value)
+            output_pmi[label][w] = (output_pmi[label][w] - min_value) / (max_value - min_value) 
     
     # # Print for debug
     # for label in output_pmi:
@@ -211,7 +210,7 @@ def pmi_positive_normalized(label_values_dict, subsets_of_interest, args):
         for w in output_pmi[label]:
             if output_pmi[label][w] < 0:
                 output_pmi[label][w] = 0
-        if len(output_pmi[label]) > 0: # if the list is not empty
+        if len(output_pmi[label]) > 0: # check if the list is not empty
             min_max_list.append(min(output_pmi[label].values()))
             min_max_list.append(max(output_pmi[label].values()))
 
