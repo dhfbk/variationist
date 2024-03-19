@@ -4,7 +4,6 @@ import pandas as pd
 from collections import Counter
 from itertools import islice
 from tqdm import tqdm
-
 from variationist.metrics import shared_metrics, lexical_artifacts
 
 
