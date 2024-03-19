@@ -13,7 +13,6 @@ def safe_divide(numerator, denominator):
         result = 0
     else:
         result = numerator / denominator
-
     return result
 
 
@@ -26,6 +25,7 @@ def get_total(freqs_merged_dict):
     """Function to add up the frequency of tokens across labels."""
     total = 0
     for w in freqs_merged_dict: total += freqs_merged_dict[w]
+    
     return total
 
 

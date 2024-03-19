@@ -1,5 +1,4 @@
 from typing import Callable, Union
-
 from variationist.metrics import corpus_statistics
 from variationist.metrics import lexical_variation
 from variationist.metrics import pmi
