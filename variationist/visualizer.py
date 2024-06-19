@@ -292,9 +292,10 @@ class Visualizer:
         var_names = self.metadata["var_names"]
         var_types = self.metadata["var_types"]
         var_semantics = self.metadata["var_semantics"]
+        var_bins = self.metadata["var_bins"]
 
-        # Double check the lengths of var_types and var_semantics (they must be the same)
-        assert len(var_types) == len(var_semantics)
+        # Double check the lengths of var_* (they must be the same)
+        assert len(var_types) == len(var_semantics) == len(var_bins)
 
         # Check if there are variables and those are at maximum three
         if (1 <= len(var_types) <= 3):
@@ -405,20 +406,31 @@ class Visualizer:
                 charts_metadata = self.get_charts_metadata(metric)
 
                 # Iterate over the results and create and save charts based on these information
+                charts_count = 0
                 for ChartClass, chart_info in charts_metadata.items():
-                    # Create the chart object
-                    print(f"INFO: Creating a {ChartClass.__name__} object for metric \"{metric}\"...")
-                    chart = ChartClass(
-                        df_data, metric, self.metadata, extra_args, chart_info, 
-                        self.args.zoomable, self.args.top_per_class_ngrams
-                    )
-                    
-                    # Save the chart to the output folder
-                    if self.args.output_folder != None:
-                        output_filepath = os.path.join(self.args.output_folder, metric)
-                        chart.save(output_filepath, ChartClass.__name__, self.args.output_formats)
+                    # Check if at least a variable has bins defined
+                    no_bins = all(var_bin == 0 for var_bin in self.metadata["var_bins"])
 
-                    # Add the chart to the dictionary of metric-associated charts
-                    charts[metric][ChartClass.__name__] = chart.base_chart
+                    # Create only the subset of charts based on bins definition
+                    if (no_bins and (chart_info["for_bins"] == False)) or ((no_bins == False) and (chart_info["for_bins"] == True)):
+                        # Create the chart object
+                        print(f"INFO: Creating a {ChartClass.__name__} object for metric \"{metric}\"...")
+                        chart = ChartClass(
+                            df_data, metric, self.metadata, extra_args, chart_info, 
+                            self.args.zoomable, self.args.top_per_class_ngrams
+                        )
+                        
+                        # Save the chart to the output folder
+                        if self.args.output_folder != None:
+                            output_filepath = os.path.join(self.args.output_folder, metric)
+                            chart.save(output_filepath, ChartClass.__name__, self.args.output_formats)
+
+                        # Add the chart to the dictionary of metric-associated charts
+                        charts[metric][ChartClass.__name__] = chart.base_chart
+
+                        charts_count += 1
+
+                if charts_count == 0:
+                    print(f"No visualization is currently supported for the association metric(s) defined, but you can find the results in the output .json file.")
 
         return charts

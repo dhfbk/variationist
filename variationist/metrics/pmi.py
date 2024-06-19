@@ -81,7 +81,7 @@ def create_pmi_dictionary(label_values_dict, subsets_of_interest, weighted, freq
         sorted_pmiDict = sorted(label_pmi_dict.items(), key=lambda x:x[1], reverse=True)
 
         converted_dict = dict(sorted_pmiDict)
-        output_pmi[label] = converted_dict
+        output_pmi[str(label)] = converted_dict
 
     return output_pmi
 

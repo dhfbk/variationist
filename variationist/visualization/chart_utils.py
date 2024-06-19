@@ -1,8 +1,10 @@
 from variationist.visualization.bar_chart import BarChart
 from variationist.visualization.choropleth_chart import ChoroplethChart
 from variationist.visualization.heatmap_chart import HeatmapChart
+from variationist.visualization.line_chart import LineChart
 from variationist.visualization.scatter_chart import ScatterChart
 from variationist.visualization.scatter_geo_chart import ScatterGeoChart
+from variationist.visualization.squarebin_geo_chart import SquareBinGeoChart
 from variationist.visualization.temporal_line_chart import TemporalLineChart
 # from variationist.visualization.density_geo_chart import DensityGeoChart
 
@@ -19,7 +21,17 @@ VAR_CHARTS_MAP = {
                     "x": (0, "quantitative"),
                     "y": ("value", "quantitative"),
                     "dropdown": [],
-                    "search": [("ngram", "nominal")]
+                    "search": [("ngram", "nominal")],
+                    "for_bins": False
+                },
+                BarChart: {
+                    "x": ("value", "quantitative"),
+                    "y": ("ngram", "nominal"),
+                    "column": (0, "nominal"),
+                    "color": (0, "nominal"),
+                    "dropdown": [],
+                    "search": [("ngram", "nominal")],
+                    "for_bins": True
                 },
             },
         },
@@ -31,7 +43,8 @@ VAR_CHARTS_MAP = {
                     "column": (0, "nominal"),
                     "color": (0, "nominal"),
                     "dropdown": [],
-                    "search": [("ngram", "nominal")]
+                    "search": [("ngram", "nominal")],
+                    "for_bins": False
                 },
             },
             "spatial": {
@@ -41,12 +54,14 @@ VAR_CHARTS_MAP = {
                     "column": (0, "nominal"),
                     "color": (0, "nominal"),
                     "dropdown": [],
-                    "search": [("ngram", "nominal")]
+                    "search": [("ngram", "nominal")],
+                    "for_bins": False
                 },
                 ChoroplethChart: {
                     "color": (0, "nominal"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
         },
@@ -58,7 +73,8 @@ VAR_CHARTS_MAP = {
                     "column": (0, "nominal"),
                     "color": (0, "nominal"),
                     "dropdown": [],
-                    "search": [("ngram", "nominal")]
+                    "search": [("ngram", "nominal")],
+                    "for_bins": False
                 },
             },
             "temporal": {
@@ -66,7 +82,15 @@ VAR_CHARTS_MAP = {
                     "x": (0, "temporal"),
                     "y": ("value", "quantitative"),
                     "dropdown": [],
-                    "search": [("ngram", "nominal")]
+                    "search": [("ngram", "nominal")],
+                    "for_bins": False
+                },
+                LineChart: {
+                    "x": (0, "nominal"),
+                    "y": ("value", "quantitative"),
+                    "dropdown": [],
+                    "search": [("ngram", "nominal")],
+                    "for_bins": True
                 },
             },
         },
@@ -76,7 +100,17 @@ VAR_CHARTS_MAP = {
                     "x": (0, "quantitative"),
                     "y": ("value", "quantitative"),
                     "dropdown": [],
-                    "search": [("ngram", "nominal")]
+                    "search": [("ngram", "nominal")],
+                    "for_bins": False
+                },
+                BarChart: {
+                    "x": ("value", "quantitative"),
+                    "y": ("ngram", "nominal"),
+                    "column": (0, "nominal"),
+                    "color": (0, "nominal"),
+                    "dropdown": [],
+                    "search": [("ngram", "nominal")],
+                    "for_bins": True
                 },
             },
         },
@@ -90,7 +124,16 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "opacity": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
+                },
+                HeatmapChart: {
+                    "x": (0, "nominal"),
+                    "y": (1, "nominal"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": [],
+                    "for_bins": True
                 },
             },
             "spatial-spatial": {
@@ -99,7 +142,16 @@ VAR_CHARTS_MAP = {
                     "lon": (1, "quantitative"),
                     "color": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
+                },
+                SquareBinGeoChart: {
+                    "lat": (0, "quantitative"),
+                    "lon": (1, "quantitative"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": [],
+                    "for_bins": True
                 },
                 # DensityGeoChart: {
                 #     "lat": (0, "quantitative"),
@@ -118,7 +170,8 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "extra": (1, "nominal"),
                     "dropdown": [("ngram", "nominal"), (1, "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
         },
@@ -130,7 +183,8 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "extra": (1, "nominal"),
                     "dropdown": [("ngram", "nominal"), (1, "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "general-temporal": {
@@ -140,7 +194,8 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "size": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             }
         },
@@ -152,7 +207,16 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "opacity": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
+                },
+                HeatmapChart: {
+                    "x": (0, "nominal"),
+                    "y": (1, "nominal"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal")],
+                    "search": [],
+                    "for_bins": True
                 },
             },
         },
@@ -163,14 +227,16 @@ VAR_CHARTS_MAP = {
                     "y": (1, "nominal"),
                     "color": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "general-spatial": {
                 ChoroplethChart: {
                     "color": (1, "nominal"),
                     "dropdown": [("ngram", "nominal"), (0, "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
         },
@@ -181,7 +247,8 @@ VAR_CHARTS_MAP = {
                     "y": (1, "ordinal"),
                     "color": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "general-temporal": {
@@ -191,21 +258,24 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "shape": (0, "nominal"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "spatial-general": {
                 ChoroplethChart: {
                     "color": (0, "nominal"),
                     "dropdown": [("ngram", "nominal"), (1, "ordinal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "spatial-temporal": {
                 ChoroplethChart: {
                     "color": (0, "nominal"),
                     "dropdown": [("ngram", "nominal"), (1, "temporal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
         },
@@ -217,14 +287,16 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "extra": (0, "nominal"),
                     "dropdown": [("ngram", "nominal"), (0, "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "spatial-general": {
                 ChoroplethChart: {
                     "color": (0, "nominal"),
                     "dropdown": [("ngram", "nominal"), (1, "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
         },
@@ -235,7 +307,8 @@ VAR_CHARTS_MAP = {
                     "y": (1, "ordinal"),
                     "color": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "general-temporal": {
@@ -245,7 +318,8 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "shape": (0, "nominal"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
         },
@@ -257,7 +331,8 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "extra": (0, "nominal"),
                     "dropdown": [("ngram", "nominal"), (0, "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "temporal-general": {
@@ -267,7 +342,8 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "size": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
         },
@@ -279,7 +355,8 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "opacity": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
         },
@@ -293,7 +370,8 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "opacity": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal"), (2, "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "spatial-spatial-general": {
@@ -302,7 +380,8 @@ VAR_CHARTS_MAP = {
                     "lon": (1, "quantitative"),
                     "color": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal"), (2, "nominal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
         },
@@ -314,7 +393,8 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "opacity": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal"), (2, "ordinal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "general-general-temporal": {
@@ -324,7 +404,8 @@ VAR_CHARTS_MAP = {
                     "color": ("ngram", "nominal"),
                     "opacity": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal"), (2, "temporal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "spatial-spatial-general": {
@@ -333,7 +414,8 @@ VAR_CHARTS_MAP = {
                     "lon": (1, "quantitative"),
                     "color": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal"), (2, "ordinal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
             "spatial-spatial-temporal": {
@@ -342,7 +424,8 @@ VAR_CHARTS_MAP = {
                     "lon": (1, "quantitative"),
                     "color": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal"), (2, "temporal")],
-                    "search": []
+                    "search": [],
+                    "for_bins": False
                 },
             },
         },

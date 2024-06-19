@@ -276,7 +276,9 @@ class Inspector:
             curr_sem = self.args.var_semantics[i]
             curr_var_column = self.dataframe[curr_var_name]
             if curr_bins != 0:
-                if curr_type != "nominal":
+                if (curr_type != "nominal"):
+                    if (curr_type == "ordinal") and (curr_sem != "temporal"):
+                        sys.exit(f"ERROR: var_bins was defined for variable {curr_var_name}, whose type is 'ordinal' but its semantics is not 'temporal'. However, ordinal values cannot be divided into bins if not of temporal semantics. If the {curr_var_name} variable is numeric, please specify another var_type for it. If it is an actual ordinal variable but not temporal, its var_bins value should be 0.")
                     if type(curr_bins) is int:
                         if curr_sem == "temporal":
                             curr_var_column = pd.to_datetime(curr_var_column)
