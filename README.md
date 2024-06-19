@@ -5,7 +5,7 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![v0.1.3](https://img.shields.io/badge/pypi-v0.1.3-orange)](https://pypi.org/project/variationist/0.1.3/)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue)](https://www.python.org/downloads/)
-[![Documentation](https://img.shields.io/readthedocs/:packageName/:version)](https://variationist.readthedocs.io/en/latest/)
+[![Documentation](https://readthedocs.org/projects/variationist/badge/?version=latest)](https://variationist.readthedocs.io/en/latest/)
 [![Tutorials](https://img.shields.io/badge/tutorials-colab-orange)](https://github.com/dhfbk/variationist/tree/main/examples)
 
 </div>
@@ -16,6 +16,7 @@
 - :checkered_flag: [**Quickstart**](#quickstart)
 - :closed_book: [**Tutorials**](#tutorials)
 - :book: [**Documentation**](#documentation)
+- :video_camera: [**Video**](#video)
 - :airplane: [**Roadmap**](#roadmap)
 - :cyclone: [**Contributors**](#contributors)
 - :pencil2: [**Citation**](#citation)
@@ -112,6 +113,11 @@ You can find more information on specific topics in the following documents:
 - [Metrics](https://github.com/dhfbk/variationist/tree/main/docs/metrics.md): from basic statistics to lexical diversity, association metrics, and custom ones
 - [Charts](https://github.com/dhfbk/variationist/tree/main/docs/charts.md): from scatter charts to choroplets, from heatmaps to temporal line plots and others
 - [Custom components](https://github.com/dhfbk/variationist/tree/main/docs/custom-components.md): how to define your own components
+
+
+## Video
+
+An short introductory video is available [here](https://drive.google.com/file/d/1wBQVjiuDnGn9V7OWy-T8J7I4OlbV1gAZ/view?usp=sharing).
 
 
 ## Roadmap
