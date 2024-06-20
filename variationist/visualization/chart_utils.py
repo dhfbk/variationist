@@ -1,10 +1,10 @@
 from variationist.visualization.bar_chart import BarChart
+from variationist.visualization.binned_geo_chart import BinnedGeoChart
 from variationist.visualization.choropleth_chart import ChoroplethChart
 from variationist.visualization.heatmap_chart import HeatmapChart
 from variationist.visualization.line_chart import LineChart
 from variationist.visualization.scatter_chart import ScatterChart
 from variationist.visualization.scatter_geo_chart import ScatterGeoChart
-from variationist.visualization.squarebin_geo_chart import SquareBinGeoChart
 from variationist.visualization.temporal_line_chart import TemporalLineChart
 # from variationist.visualization.density_geo_chart import DensityGeoChart
 
@@ -145,7 +145,7 @@ VAR_CHARTS_MAP = {
                     "search": [],
                     "for_bins": False
                 },
-                SquareBinGeoChart: {
+                BinnedGeoChart: {
                     "lat": (0, "quantitative"),
                     "lon": (1, "quantitative"),
                     "color": ("value", "quantitative"),
@@ -228,7 +228,7 @@ VAR_CHARTS_MAP = {
                     "color": ("value", "quantitative"),
                     "dropdown": [("ngram", "nominal")],
                     "search": [],
-                    "for_bins": False
+                    "for_bins": "any" # @TODO: Adapt this to others, too
                 },
             },
             "general-spatial": {
@@ -383,6 +383,14 @@ VAR_CHARTS_MAP = {
                     "search": [],
                     "for_bins": False
                 },
+                BinnedGeoChart: {
+                    "lat": (0, "quantitative"),
+                    "lon": (1, "quantitative"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal"), (2, "nominal")],
+                    "search": [],
+                    "for_bins": True
+                },
             },
         },
         "coordinates-coordinates-ordinal": {
@@ -417,6 +425,14 @@ VAR_CHARTS_MAP = {
                     "search": [],
                     "for_bins": False
                 },
+                BinnedGeoChart: {
+                    "lat": (0, "quantitative"),
+                    "lon": (1, "quantitative"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal"), (2, "ordinal")],
+                    "search": [],
+                    "for_bins": True
+                },
             },
             "spatial-spatial-temporal": {
                 ScatterGeoChart: {
@@ -426,6 +442,14 @@ VAR_CHARTS_MAP = {
                     "dropdown": [("ngram", "nominal"), (2, "temporal")],
                     "search": [],
                     "for_bins": False
+                },
+                BinnedGeoChart: {
+                    "lat": (0, "quantitative"),
+                    "lon": (1, "quantitative"),
+                    "color": ("value", "quantitative"),
+                    "dropdown": [("ngram", "nominal"), (2, "temporal")],
+                    "search": [],
+                    "for_bins": True
                 },
             },
         },

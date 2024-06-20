@@ -87,7 +87,7 @@ class ScatterGeoChart(AltairChart):
 
         # Set base chart style
         self.base_chart = self.base_chart.mark_point(
-            size=75, strokeWidth=0.5)
+            size=50, strokeWidth=1, opacity=1)
 
         # Get relevant dimensions
         lat_name, lat_type = self.get_dim("lat", chart_dims)

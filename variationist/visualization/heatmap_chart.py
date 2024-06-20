@@ -64,9 +64,20 @@ class HeatmapChart(AltairChart):
         y_name, y_type = self.get_dim("y", chart_dims)
         color_name, color_type = self.get_dim("color", chart_dims)
 
+        # Handle label ordering for bins
+        no_bins = all(var_bin == 0 for var_bin in metadata["var_bins"])
+        if no_bins:
+            x_domain = sorted(list(df_data[x_name].unique()))
+            y_domain = sorted(list(df_data[y_name].unique()), reverse=True)
+        else:
+            # Heuristics: if there are no bins based on the first element, avoid reversing
+            to_reverse = False if df_data[x_name][0].startswith("(") else True
+            x_domain = sorted(list(df_data[x_name].unique()), 
+                key=lambda x: float(x.split(", ")[0][1:]) if x.startswith("(") else x, reverse=False)
+            y_domain = sorted(list(df_data[y_name].unique()), 
+                key=lambda y: float(y.split(", ")[0][1:]) if y.startswith("(") else y, reverse=to_reverse)
+
         # Set dimensions
-        x_domain = sorted(list(df_data[x_name].unique()))
-        y_domain = sorted(list(df_data[y_name].unique()))
         x_dim = alt.X(x_name, type=x_type, scale=alt.Scale(domain=x_domain))
         y_dim = alt.Y(y_name, type=y_type, scale=alt.Scale(domain=y_domain))
         color = alt.Color(color_name, type=color_type, title=chart_metric)

@@ -124,7 +124,6 @@ An short introductory video is available [here](https://drive.google.com/file/d/
 
 🕵️‍♀️ **Variationist** aims to be as accessible as possible to researchers from a wide range of fields. We thus aim to provide the following features in the next releases:
 - An easy to use graphical user interface to be installed locally or used through [Hugging Face Spaces](https://huggingface.co/spaces);
-- Binned/low-granularity multi-dimensional charts across quantitative, temporal, and spatial variables;
 - Extension of the `unit` concept to also cover linguistic aspects beyond the lexical level.
 
 

@@ -308,6 +308,14 @@ class Visualizer:
                 var_semantics_key = var_semantics[0]
             # Otherwise, we need to create an ordered concatenation of variables for searching
             else:
+                # If bins are used and the variable was originally quantitative, change it to nominal here
+                as_nominal_idxs = []
+                for i in range(len(var_types)):
+                    if (var_types[i] == "quantitative") and (var_bins[i] != 0):
+                        as_nominal_idxs.append(i)
+                for as_nominal_idx in as_nominal_idxs:
+                    var_types[as_nominal_idx] = "nominal"
+
                 var_types_ord, var_semantics_ord = zip(*sorted(zip(var_types, var_semantics)))
                 var_types_key = '-'.join([var_type for var_type in var_types_ord])
                 var_semantics_key = '-'.join([var_semantics for var_semantics in var_semantics_ord])
@@ -412,7 +420,7 @@ class Visualizer:
                     no_bins = all(var_bin == 0 for var_bin in self.metadata["var_bins"])
 
                     # Create only the subset of charts based on bins definition
-                    if (no_bins and (chart_info["for_bins"] == False)) or ((no_bins == False) and (chart_info["for_bins"] == True)):
+                    if (chart_info["for_bins"] == "any") or (no_bins and (chart_info["for_bins"] == False)) or ((no_bins == False) and (chart_info["for_bins"] == True)):
                         # Create the chart object
                         print(f"INFO: Creating a {ChartClass.__name__} object for metric \"{metric}\"...")
                         chart = ChartClass(
