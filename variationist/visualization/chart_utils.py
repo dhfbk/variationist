@@ -101,17 +101,8 @@ VAR_CHARTS_MAP = {
                     "y": ("value", "quantitative"),
                     "dropdown": [],
                     "search": [("ngram", "nominal")],
-                    "for_bins": False
-                },
-                BarChart: {
-                    "x": ("value", "quantitative"),
-                    "y": ("ngram", "nominal"),
-                    "column": (0, "nominal"),
-                    "color": (0, "nominal"),
-                    "dropdown": [],
-                    "search": [("ngram", "nominal")],
-                    "for_bins": True
-                },
+                    "for_bins": "any"
+                }
             },
         },
     },
