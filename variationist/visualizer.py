@@ -6,6 +6,7 @@ from typing import Any, Optional, Union
 from variationist import utils
 from variationist.visualization import chart_utils
 from variationist.visualization.diversity_bar_chart import DiversityBarChart
+from variationist.visualization.text_only_bar_chart import TextOnlyBarChart
 from variationist.visualization.stats_bar_chart import StatsBarChart
 
 
@@ -427,32 +428,47 @@ class Visualizer:
                 # Get dictionary containing information on which and how to create charts
                 charts_metadata = self.get_charts_metadata(metric)
 
-                # Iterate over the results and create and save charts based on these information
-                charts_count = 0
-                for ChartClass, chart_info in charts_metadata.items():
-                    # Check if at least a variable has bins defined
-                    no_bins = all(var_bin == 0 for var_bin in self.metadata["var_bins"])
-
-                    # Create only the subset of charts based on bins definition
-                    if (chart_info["for_bins"] == "any") or (no_bins and (chart_info["for_bins"] == False)) or ((no_bins == False) and (chart_info["for_bins"] == True)):
-                        # Create the chart object
-                        print(f"INFO: Creating a {ChartClass.__name__} object for metric \"{metric}\"...")
-                        chart = ChartClass(
-                            df_data, metric, self.metadata, extra_args, chart_info, 
-                            self.args.zoomable, self.args.top_per_class_ngrams
-                        )
-                        
-                        # Save the chart to the output folder
-                        if self.args.output_folder != None:
-                            output_filepath = os.path.join(self.args.output_folder, metric)
-                            chart.save(output_filepath, ChartClass.__name__, self.args.output_formats)
+                if len(self.metadata["var_types"]) == 0:
+                    print(f"INFO: Creating a BarChart object for metric \"{metric}\"...")
+                    chart = TextOnlyBarChart(
+                        df_data, metric, self.metadata, extra_args, {}, 
+                        self.args.zoomable, self.args.top_per_class_ngrams
+                    )
+                            
+                    # Save the chart to the output folder
+                    if self.args.output_folder != None:
+                        output_filepath = os.path.join(self.args.output_folder, metric)
+                        chart.save(output_filepath, "BarChart", self.args.output_formats)
 
                         # Add the chart to the dictionary of metric-associated charts
-                        charts[metric][ChartClass.__name__] = chart.base_chart
+                        charts[metric]["BarChart"] = chart.base_chart
+                else:
+                    # Iterate over the results and create and save charts based on these information
+                    charts_count = 0
+                    for ChartClass, chart_info in charts_metadata.items():
+                        # Check if at least a variable has bins defined
+                        no_bins = all(var_bin == 0 for var_bin in self.metadata["var_bins"])
 
-                        charts_count += 1
+                        # Create only the subset of charts based on bins definition
+                        if (chart_info["for_bins"] == "any") or (no_bins and (chart_info["for_bins"] == False)) or ((no_bins == False) and (chart_info["for_bins"] == True)):
+                            # Create the chart object
+                            print(f"INFO: Creating a {ChartClass.__name__} object for metric \"{metric}\"...")
+                            chart = ChartClass(
+                                df_data, metric, self.metadata, extra_args, chart_info, 
+                                self.args.zoomable, self.args.top_per_class_ngrams
+                            )
+                            
+                            # Save the chart to the output folder
+                            if self.args.output_folder != None:
+                                output_filepath = os.path.join(self.args.output_folder, metric)
+                                chart.save(output_filepath, ChartClass.__name__, self.args.output_formats)
 
-                if charts_count == 0:
-                    print(f"No visualization is currently supported for the association metric(s) defined, but you can find the results in the output .json file.")
+                            # Add the chart to the dictionary of metric-associated charts
+                            charts[metric][ChartClass.__name__] = chart.base_chart
+
+                            charts_count += 1
+
+                    if charts_count == 0:
+                        print(f"No visualization is currently supported for the association metric(s) defined, but you can find the results in the output .json file.")
 
         return charts
