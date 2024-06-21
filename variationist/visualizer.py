@@ -110,6 +110,16 @@ class Visualizer:
         self.metadata = json_data["metadata"]
         self.variable_names = self.metadata["var_names"]
 
+        # Handle case in which 2 text columns are provided (@TODO: Thoroughly test)
+        if (len(self.metadata["text_names"]) == 2):
+            if (len(self.variable_names) >= 1):
+                self.variable_names.insert(0, "text_name")
+                self.metadata["var_types"].insert(0, "nominal")
+                self.metadata["var_semantics"].insert(0, "general")
+                self.metadata["var_bins"].insert(0, 0)
+            else:
+                self.variable_names = ["text_name::"]
+
         # Get per-metric long-form dataframes from the json
         for metric in self.metadata["metrics"]:
             # Store the concatenated string useful for multiple variables
@@ -296,6 +306,10 @@ class Visualizer:
 
         # Double check the lengths of var_* (they must be the same)
         assert len(var_types) == len(var_semantics) == len(var_bins)
+
+        # Skip if no variables have been defined (e.g., case 2 text columns only)
+        if len(var_types) == 0:
+            return {}
 
         # Check if there are variables and those are at maximum three
         if (1 <= len(var_types) <= 3):

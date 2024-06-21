@@ -103,8 +103,6 @@ There you can also find a set of interesting case studies using real-world datas
 
 ## Documentation
 
-The documentation for 🕵️‍♀️ **Variationist** is available at: [https://variationist.readthedocs.io/en/latest/](https://variationist.readthedocs.io/en/latest/).
-
 You can find more information on specific topics in the following documents:
 - [Input dataset](https://github.com/dhfbk/variationist/tree/main/docs/input-dataset.md): from `.tsv` or `.csv` files to pandas dataframes and [Hugging Face](https://huggingface.co/) datasets
 - [Units](https://github.com/dhfbk/variationist/tree/main/docs/units.md): from tokens and *n*-grams to co-occurrences with windows and duplicate handling
@@ -113,6 +111,8 @@ You can find more information on specific topics in the following documents:
 - [Metrics](https://github.com/dhfbk/variationist/tree/main/docs/metrics.md): from basic statistics to lexical diversity, association metrics, and custom ones
 - [Charts](https://github.com/dhfbk/variationist/tree/main/docs/charts.md): from scatter charts to choroplets, from heatmaps to temporal line plots and others
 - [Custom components](https://github.com/dhfbk/variationist/tree/main/docs/custom-components.md): how to define your own components
+
+A technical documentation for 🕵️‍♀️ **Variationist** is also available at: [https://variationist.readthedocs.io/en/latest/](https://variationist.readthedocs.io/en/latest/).
 
 
 ## Video
