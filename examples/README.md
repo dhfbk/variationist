@@ -6,7 +6,7 @@ This section includes our tutorials to learn how to better leverage 🕵️‍�
 | ----------- | -------- |
 | Quickstart | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist_Quickstart.ipynb) |
 | Example 1: Custom Tokenizers | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist_Example_1_Custom_Tokenizers.ipynb) |
-| Example 2: Custom Metrics | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist%20-%20Example%202%3A%20Custom%20Metrics.ipynb) |
+| Example 2: Custom Metrics | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist_Example_2_Custom_Metrics.ipynb) |
 
 | Case study name | Notebook |
 | ----------- | -------- |
