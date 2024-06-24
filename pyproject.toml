@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "variationist"
-version = "0.1.3"
+version = "0.1.4"
 authors = [
   {name = "Alan Ramponi"},
   {name = "Camilla Casula"},
@@ -13,7 +13,7 @@ authors = [
 description = "Variationist: Exploring multifaceted variation and bias in written language data"
 readme = "README.md"
 license = { file="LICENSE" }
-keywords = ["computational linguistics", "language variation", "bias in NLP"]
+keywords = ["computational linguistics", "NLP", "language variation", "bias in NLP", "corpus analysis"]
 requires-python = ">=3.9"
 dependencies = [
     "pandas==2.2.1",
