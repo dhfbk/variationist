@@ -131,7 +131,7 @@ An short introductory video is available [here](https://drive.google.com/file/d/
 
 - **[Alan Ramponi](https://alanramponi.github.io)**, *Fondazione Bruno Kessler*
 - **[Camilla Casula](https://dh.fbk.eu/author/camilla/)**, *Fondazione Bruno Kessler* and *University of Trento*
-- **[Stefano Menini](https://dh.fbk.eu/author/stefano/)**, *Fondazione Bruno Kessler*
+- **[Stefano Menini](https://land.fbk.eu/author/stefano/)**, *Fondazione Bruno Kessler*
 
 
 ## Citation

@@ -4,12 +4,12 @@ This section includes our tutorials to learn how to better leverage 🕵️‍�
 
 | Tutorial name | Notebook |
 | ----------- | -------- |
-| Quickstart | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist%20-%20Quickstart.ipynb) |
-| Example 1: Custom Tokenizers | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist%20-%20Example%201%3A%20Custom%20Tokenizers.ipynb) |
+| Quickstart | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist_Quickstart.ipynb) |
+| Example 1: Custom Tokenizers | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist_Example_1_Custom_Tokenizers.ipynb) |
 | Example 2: Custom Metrics | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist%20-%20Example%202%3A%20Custom%20Metrics.ipynb) |
 
 | Case study name | Notebook |
 | ----------- | -------- |
-| Case study 1: Exploring Language Variation Across Space and Time | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist%20-%20Use%20Case%201%3A%20Language%20Variation%20Across%20Space%20and%20Time.ipynb) |
-| Case study 2: Understanding Human Subjectivity in Hate Speech Annotation | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist%20-%20Use%20Case%202%3A%20Human%20Subjectivity%20in%20Hate%20Speech%20Annotation.ipynb) |
-| Case study 3: Grasping Features of Human vs Generated Texts | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist%20-%20Use%20Case%203%3A%20Grasping%20Features%20of%20Human%20vs%20Generated%20Texts.ipynb) |
+| Case study 1: Exploring Language Variation Across Space | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist_Use_Case_1_Language_Variation_Across_Space.ipynb) |
+| Case study 2: Investigating Human Subjectivity in Hate Speech Annotation | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist_Use_Case_2_Human_Subjectivity_in_Hate_Speech_Annotation.ipynb) |
+| Case study 3: Analyzing Features of Human *versus* Generated Texts | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/dhfbk/variationist/blob/main/examples/Variationist_Use_Case_3_Analyzing_Features_of_Human_vs_Generated_Texts.ipynb) |
