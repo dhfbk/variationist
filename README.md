@@ -12,6 +12,8 @@
 
 🕵️‍♀️ **Variationist** is a highly-modular, flexible, and customizable tool to analyze and explore language variation and bias in written language data. It allows researchers, from NLP practitioners to linguists and social scientists, to seamlessly investigate language use across many dimensions and a wide range of use cases.
 
+Alan Ramponi, Camilla Casula and Stefano Menini. 2024. **Variationist: Exploring Multifaceted Variation and Bias in Written Language Data**. In *Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 3: System Demonstrations)* (To appear), Bangkok, Thailand. ACL. [[cite]](#citation) [[paper]](https://arxiv.org/abs/2406.17647)
+
 - :cd: [**Installation**](#installation)
 - :checkered_flag: [**Quickstart**](#quickstart)
 - :closed_book: [**Tutorials**](#tutorials)
@@ -136,14 +138,14 @@ An short introductory video is available [here](https://drive.google.com/file/d/
 
 ## Citation
 
-A preprint will be available soon! :construction: In the meanwhile, if you use 🕵️‍♀️ **Variationist** in your work please cite:
+If you use 🕵️‍♀️ **Variationist** in your work, please cite our paper as follows:
 
 ```
-@misc{ramponi-etal-2024-variationist,
+@article{ramponi-etal-2024-variationist,
   author = {Ramponi, Alan and Casula, Camilla and Menini, Stefano},
   title = {Variationist: {E}xploring Multifaceted Variation and Bias in Written Language Data},
   year = {2024},
-  publisher = {GitHub repository},
-  howpublished = {\url{https://github.com/dhfbk/variationist}}
+  journal = {arXiv preprint arxiv:2406.17647},
+  url = {https://arxiv.org/abs/2406.17647}
 }
 ```
