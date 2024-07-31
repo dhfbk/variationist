@@ -1,0 +1,12 @@
+version: "0.1.4"
+
+build:
+  tools:
+    python: ">=3.9"
+
+python:
+  install:
+    - requirements: docs/requirements.txt
+
+sphinx:
+  configuration: docs/source/conf.py
