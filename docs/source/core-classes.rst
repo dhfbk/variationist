@@ -2,13 +2,13 @@ Inspector & InspectorArgs
 -----------------------------
 
 .. automodule:: variationist.inspector
-   :no-index:
+   :noindex:
    :members:
 
 Visualizer & VisualizerArgs
 ------------------------------
 
 .. automodule:: variationist.visualizer
-   :no-index:
+   :noindex:
    :members:
 
