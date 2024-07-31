@@ -11,40 +11,18 @@ from variationist.visualization.stats_bar_chart import StatsBarChart
 
 
 class VisualizerArgs:
-    """A class storing the arguments for the visualization component."""
-
-    def __init__(
-        self,
-        output_folder: Optional[str] = None,
-        output_formats: Optional[list[str]] = ["html"],
-        zoomable: Optional[bool] = True,
-        top_per_class_ngrams: Optional[int] = 20,
-        ngrams: Optional[list[str]] = None,
-        shapefile_path: Optional[str] = None,
-        shapefile_var_name: Optional[str] = None,
-    ) -> None:
-        """
-        A function that initializes the arguments useful for visualizing charts.
-
-        Parameters
-        ----------
+    """A class storing the arguments for the visualization component.
+    
+    Parameters
+    ----------
         output_folder: Optional[str] = None
-            A path to the output folder in which to store the charts and associated
-            metadata. If the folder does not exist, it will be automatically created.
-            If no path is provided, the charts will not be serialized and the possible
-            output_formats will be ignored (in this case, the chart objects will be only 
-            accessible from the dictionary returned by the "create()" function and be
-            shown by using the "show()" function.
+            A path to the output folder in which to store the charts and associated metadata. If the folder does not exist, it will be automatically created. If no path is provided, the charts will not be serialized and the possible output_formats will be ignored (in this case, the chart objects will be only accessible from the dictionary returned by the "create()" function and be shown by using the "show()" function.
         output_formats: Optional[list[str]] = ["html"]
-            A list of output formats for the charts. By default, only the interactive
-            HTML chart is saved, i.e., ["html"]. Extra choices: ["pdf", "svg", "png"].
+            A list of output formats for the charts. By default, only the interactive HTML chart is saved, i.e., ["html"]. Extra choices: ["pdf", "svg", "png"].
         zoomable: Optional[bool] = True
             Whether the (HTML) chart should be zoomable using the mouse or not.
         top_per_class_ngrams: int = 20
-            The maximum number of highest scoring per-class n-grams to show (for bar
-            charts only). If set to None, it will show all the n-grams in the corpus 
-            (it may easily be overwhelming). By default is 20 to keep the visualization 
-            compact. This parameter is ignored when creating other chart types.
+            The maximum number of highest scoring per-class n-grams to show (for bar charts only). If set to None, it will show all the n-grams in the corpus (it may easily be overwhelming). By default is 20 to keep the visualization compact. This parameter is ignored when creating other chart types.
         ngrams: Optional[list[str]] = None
             A list of n-grams of interest to focus the resulting visualizations on.
             N-grams should match the number of tokens used in the prior computation
@@ -63,7 +41,20 @@ class VisualizerArgs:
             The key field name in the shapefile which contains the names for the areas 
             which should match the possible values for the variable of interest (e.g., 
             if the variable of interest is "state", here should go the name of the
-            variable name encoded in the shapefile containing the possible states).
+            variable name encoded in the shapefile containing the possible states)."""
+
+    def __init__(
+        self,
+        output_folder: Optional[str] = None,
+        output_formats: Optional[list[str]] = ["html"],
+        zoomable: Optional[bool] = True,
+        top_per_class_ngrams: Optional[int] = 20,
+        ngrams: Optional[list[str]] = None,
+        shapefile_path: Optional[str] = None,
+        shapefile_var_name: Optional[str] = None,
+    ) -> None:
+        """
+        A function that initializes the arguments useful for visualizing charts.
         """
         
         self.output_folder = output_folder
@@ -77,7 +68,15 @@ class VisualizerArgs:
 
 class Visualizer:
     """A class for the visualization component. It orchestrates the creation of charts 
-    based on the results and metadata from a prior analysis using Variationist."""
+    based on the results and metadata from a prior analysis using Variationist.
+    
+    Parameters
+    ----------
+        input_json: `str` or `dict`
+            A path to the json file or a json/dict object storing metadata and results 
+            from a prior analysis using Variationist.
+        args: VisualizerArgs
+            A VisualizerArgs object containing the arguments for the Visualizer"""
 
     def __init__(
         self,
@@ -88,13 +87,7 @@ class Visualizer:
         A function that initializes the arguments of the visualizer, the metadata, and
         the per-metric long-form dataframes that will be used for visualization.
 
-        Parameters
-        ----------
-        input_json: Union[str, dict]
-            A path to the json file or a json/dict object storing metadata and results 
-            from a prior analysis using Variationist.
-        args: VisualizerArgs
-            A VisualizerArgs object containing the arguments for the Visualizer
+        
         """
 
         # Store the visualizer arguments
@@ -177,7 +170,7 @@ class Visualizer:
             charts only). If set to None, it will show all the n-grams in the corpus 
             (it may easily be overwhelming). By default is 20 to keep the visualization 
             compact.
-        fucus_ngrams: Optional[list[str]] = None
+        fucus_ngrams: list[str], *optional*, defaults to `None`
             A list of n-grams of interest to focus the filtering on. N-grams should 
             match the number of tokens used in the prior computation (e.g., if 
             unigrams were chosen, this list should only contain unigrams).

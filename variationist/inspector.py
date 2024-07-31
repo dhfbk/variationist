@@ -21,72 +21,54 @@ class InspectorArgs:
     
     Parameters
     ----------
-        text_names (`List[str]`):
+        text_names: List[str]
             The list of names of text columns in the given dataset to use for the analysis. 
-        var_names (`List[str]`):
+        var_names: List[str]
             The list of variable names to use for the analysis. Each string in var_names 
             should correspond to a dataset column.
-        var_types (`List[str]`):
+        var_types: List[str]
             The list of variable types corresponding to the variables in `var_names`. Should 
             match the length of `var_names`. Available choices are `nominal` (default), 
             `ordinal`, `quantitative`, and `coordinates`. These are mostly used for binning 
             and visualization.
-        var_semantics (`List[str]`):
-            The list of variable semantics corresponding to the variables in `var_names`. 
-            Should match the length of `var_names`. Available choices are `general` (default), 
+        var_semantics: List[str]
+            The list of variable semantics corresponding to the variables in `var_names`. Should match the length of `var_names`. Available choices are `general` (default), 
             `temporal`, and `spatial`. These are mostly used for binning and visualization.
-        var_bins (`List[int]`):
+        var_bins: List[int]
             The list of indices for variables that should be split into bins for the analysis. 
             Works with quantitative variables, dates and timestamps. Will default to 0 for each 
             specified variable, indicating 0 bins.
-        tokenizer (`str` or `Callable`), *optional*, defaults to `whitespace`):
+        tokenizer: `str` or `Callable`, *optional*, defaults to `whitespace`
             The tokenizer used to preprocess the data. Will default to whitespace tokenization 
             if not specified. Alternatively, it can be a string in the format "hf::tokenizer_name" 
             for loading a HuggingFace tokenizer. A custom function can also be passed for 
             tokenization. It should take as input an array of texts (assumed to be a Pandas Series) 
             and the InspectorArgs. It should return the same array but tokenized. Check out our 
             example notebooks for examples.
-        language (`str`):
+        language: str
             The language of the text in the dataset. Used for proper tokenization and stopword 
             removal.
-        metrics (`List[str, Callable]`, *optional*):
-            The list of metrics that should be calculated. It can be one of the metrics natively 
-            implemented by Variationist or a custom callable function.
-        n_tokens (`Int`):
-            The number of tokens that should be considered for the analysis. 1 corresponds to 
-            unigrams, 2 corresponds to bigrams, and so on.
-        n_cooc (`Int`):
-            The number of tokens used for calculating non-consecutive co-occurrences. For example, 
-            n=2 means we consider as the base units for our analysis any pair of tokens that 
-            co-occur in the same sentence. n=3 means we consider triplets of tokens, etc. Defaults 
-            to n=1, meaning no co-occurrences are taken into consideration, and we only consider 
+        metrics: List[str, Callable], *optional*
+            The list of metrics that should be calculated. It can be one of the metrics natively implemented by Variationist or a custom callable function.
+        n_tokens: Int
+            The number of tokens that should be considered for the analysis. 1 corresponds to unigrams, 2 corresponds to bigrams, and so on.
+        n_cooc: Int
+            The number of tokens used for calculating non-consecutive co-occurrences. For example, n=2 means we consider as the base units for our analysis any pair of tokens that co-occur in the same sentence. n=3 means we consider triplets of tokens, etc. Defaults to n=1, meaning no co-occurrences are taken into consideration, and we only consider 
             n-grams.
-        unique_cooc (`Bool`):
-            Whether to consider unique co-occurrences or not. Default to False (keep duplicate 
-            tokens). If True, multiple occurrences of the same token in a text will be discarded. 
-            This does not affect the co-occurrences window size by design (the window size 
-            considers the original number of tokens and therefore the original allowed maximum 
-            distance between tokens).
-        cooc_window_size (`Int`):
-            Size of the context window for co-occurrences. For instance, a `cooc_window_size` of 
-            3 means we use a context window of 3 to calculate co-occurrences, meaning that any 
-            token that is within 3 tokens before or after a given token is added as a co-occurrence.
-        freq_cutoff (`Int`):
-            The token frequency, expressed as an integer, below which we do not consider the token 
-            in the analysis of pmi-based metrics. Defaults to 3.
-        stopwords (`Bool`):
-            Whether to remove stopwords from texts before tokenization or not (using default lists 
-            in a given `language`). Will default to False.
-        custom_stopwords (`Optional[Union[str, list]]`):
-            A list of stopwords (or a path to a file containing stopwords, one per line) to be 
-            removed before tokenization. If `stopwords` is True, these stopwords will be added to 
-            that list. Will default to None.
-        lowercase (`Bool`):
+        unique_cooc: Bool
+            Whether to consider unique co-occurrences or not. Default to False (keep duplicate tokens). If True, multiple occurrences of the same token in a text will be discarded. This does not affect the co-occurrences window size by design (the window size considers the original number of tokens and therefore the original allowed maximum distance between tokens).
+        cooc_window_size: Int
+            Size of the context window for co-occurrences. For instance, a `cooc_window_size` of 3 means we use a context window of 3 to calculate co-occurrences, meaning that any token that is within 3 tokens before or after a given token is added as a co-occurrence.
+        freq_cutoff: Int
+            The token frequency, expressed as an integer, below which we do not consider the token in the analysis of pmi-based metrics. Defaults to 3.
+        stopwords: Bool
+            Whether to remove stopwords from texts before tokenization or not (using default lists in a given `language`). Will default to False.
+        custom_stopwords: `str` or `List`, *optional*, defaults to `None`
+            A list of stopwords (or a path to a file containing stopwords, one per line) to be removed before tokenization. If `stopwords` is True, these stopwords will be added to that list. Will default to None.
+        lowercase: Bool
             Whether to lowercase all the texts before tokenization or not. Will default to False.
-        ignore_null_var (`Bool`):
-            Whether to proceed when null values are present for variables. Defaults to False, as 
-            this behavior can have unpredictable results. Set to True to treat "Nan" as any other 
-            variable value.
+        ignore_null_var: Bool
+            Whether to proceed when null values are present for variables. Defaults to False, as this behavior can have unpredictable results. Set to True to treat "Nan" as any other variable value.
     """
     
     text_names: Optional[List] = None # explicit column name(s)
@@ -144,14 +126,14 @@ class Inspector:
 
     Parameters
     ----------
-        dataset ([`pandas.DataFrame` or `str`]):
-            The dataset to be used for our analysis. It can be a pre-loaded pandas dataframe, 
-            or a string indicating a filepath to a .tsv, .csv file, or a Huggingface dataset. 
-            Huggingface datasets can also be imported using strings, with the following format: 
-            'hf::DATASET_NAME'.
-        args (`InspectorArguments`)
-            The Inspector arguments. Refer to the InspectorArgs class for details on what these 
-            should be.
+    dataset: `datasets.Dataset` or `pandas.DataFrame` or `str`
+        The dataset to be used for our analysis. It can be a pre-loaded pandas dataframe, 
+        or a string indicating a filepath to a .tsv, .csv file, or a Huggingface dataset. 
+        Huggingface datasets can also be imported using strings, with the following format: 
+        'hf::DATASET_NAME'.
+    args: `InspectorArguments`
+        The Inspector arguments. Refer to the InspectorArgs class for details on what these 
+        should be.
         
     """
 

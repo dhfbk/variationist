@@ -13,7 +13,7 @@ class Tokenizer:
     
     Parameters
     ----------
-    inspector_args (`InspectorArgs`): 
+    inspector_args: InspectorArgs
         The arguments that were passed to the Inspector.
     """
     
@@ -42,12 +42,12 @@ class Tokenizer:
         
         Parameters
         ----------
-        text_column (`pandas.Series`):
+        text_column: pandas.Series
             The series (text column) that should be tokenized.
             
         Returns
         -------
-        text_column (`pandas.Series`):
+        text_column: pandas.Series
             The same series as input, but tokenized/regrouped as requested.
              
         """
@@ -81,12 +81,12 @@ class Tokenizer:
         
         Parameters
         ----------
-        dataframe (`pandas.DataFrame`):
+        dataframe: pandas.DataFrame
             The dataframe that contains the data for the analysis
             
         Returns
         -------
-        dataframe (`pandas.DataFrame`):
+        dataframe: pandas.DataFrame
             The same dataframe as input, but with added columns containing the tokenized texts.
         """
         tokenized_col_dict = {}

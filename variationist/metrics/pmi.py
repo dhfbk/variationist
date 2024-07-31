@@ -91,16 +91,16 @@ def pmi(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the pmi for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)
@@ -119,16 +119,16 @@ def pmi_normalized(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the normalized pmi for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)
@@ -160,16 +160,16 @@ def pmi_positive(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the positive PMI for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)
@@ -193,16 +193,16 @@ def pmi_positive_normalized(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the positive normalized PMI for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)
@@ -239,16 +239,16 @@ def pmi_weighted(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the weighted PMI for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
@@ -267,16 +267,16 @@ def pmi_normalized_weighted(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the normalized weighted PMI for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
@@ -308,16 +308,16 @@ def pmi_positive_weighted(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the positive weighted PMI for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
@@ -340,16 +340,16 @@ def pmi_positive_normalized_weighted(label_values_dict, subsets_of_interest, arg
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the positive normalized weighted PMI for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
@@ -385,16 +385,16 @@ def class_relevance_positive_normalized(label_values_dict, subsets_of_interest, 
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the positive normalized class relevance metric for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, False, args.freq_cutoff)
@@ -421,16 +421,16 @@ def class_relevance_normalized_weighted(label_values_dict, subsets_of_interest, 
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the normalized weighted class relevance metric for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
@@ -456,16 +456,16 @@ def class_relevance_positive_normalized_weighted(label_values_dict, subsets_of_i
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    output_pmi (`dict`):
+    output_pmi: Dict
         A dictionary with the positive normalized weighted class relevance metric for each token in each subset of interest.
     """
     output_pmi = create_pmi_dictionary(label_values_dict, subsets_of_interest, True, args.freq_cutoff)
@@ -492,16 +492,16 @@ def pmi_lexical_artifacts(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
         
     Returns
     -------
-    lexical_artifacts_dict (`dict`):
+    lexical_artifacts_dict: Dict
         A dictionary with the associated lexical-artifacts scores for each token in each subset.
     """
     texts_list = []

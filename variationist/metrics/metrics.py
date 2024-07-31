@@ -6,12 +6,20 @@ from variationist.metrics import pmi
 
 
 class Metric:
-    """The Metric class, a generic class that carries out all the metric operations."""
+    """The Metric class, a generic class that carries out all the metric operations.
+    
+    Parameters
+    ----------
+    metric: `Union[str, Callable[[dict, dict], dict]]`
+        A metric's name (if chosen among the ones natively supported by Variationist), or a callable function that takes as arguments `label_values_dict` and `subsets_of_interest`, as `[dict, dict], dict`. 
+    args: InspectorArgs
+        The arguments selected by the user.
+    """
 
     def __init__(
         self,
         metric: Union[str, Callable[[dict, dict], dict]],
-        args: int
+        args
     ) -> None:
         """"""
 
@@ -67,13 +75,14 @@ class Metric:
         
         Parameters
         ----------
-        label_values_dict (`dict`):
+        label_values_dict: dict
             A dictionary containing all of the possible values each variable can take in the input dataset.
-        subsets_of_interest (`dict`):
+        subsets_of_interest: dict
             A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
         
         Returns
         -------
-        A `dict` with the results of the calculated metric function.
+        :dict
+            A `dict` with the results of the calculated metric function.
             """
         return self.metric_fn(label_values_dict, subsets_of_interest, self.args)

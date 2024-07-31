@@ -13,14 +13,14 @@ def whitespace_tokenization(text_column: pd.Series,
     
     Parameters
     ----------
-    text_column (`pandas.Series`):
+    text_column: pandas.Series
         A pandas Series of text that should be tokenized.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The InspectorArgs that were passed to Inspector.
     
     Returns
     -------
-    tok_column: `pandas.Series`:
+    tok_column: pandas.Series
         A pandas Series containing the initial texts but tokenized.
     """     
     
@@ -43,14 +43,14 @@ def huggingface_tokenization(text_column: pd.Series,
     
     Parameters
     ----------
-    text_column (`pandas.Series`):
+    text_column: pandas.Series
         A pandas Series of text that should be tokenized.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The InspectorArgs that were passed to Inspector.
     
     Returns
     -------
-    tok_column: (`pandas.Series`):
+    tok_column:: pandas.Series
         A pandas Series containing the initial texts but tokenized.
     """
     tokenizer_name = args.tokenizer.strip("hf::")

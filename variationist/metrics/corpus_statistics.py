@@ -18,14 +18,14 @@ def number_of_texts(label_values_dict, subsets_of_interest):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
         
     Returns
     -------
-    values_dict (`dict`):
+    values_dict: Dict
         A dict containing the length of each subset.
     """
     values_dict = dict()
@@ -42,14 +42,14 @@ def average_text_length(label_values_dict, subsets_of_interest):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
         
     Returns
     -------
-    values_dict (`dict`):
+    values_dict: Dict
         A dict containing the average length (and its standard deviation) of texts in each subset.
     """
     values_dict = dict()
@@ -78,14 +78,14 @@ def num_tokens(label_values_dict, subsets_of_interest):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
         
     Returns
     -------
-    n_word_dict (`dict`):
+    n_word_dict: Dict
         A dict containing the total number of tokens in each subset."""
     n_word_dict = dict()
     for column in label_values_dict:
@@ -105,14 +105,14 @@ def vocab_size(label_values_dict, subsets_of_interest):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
         
     Returns
     -------
-    vocab_dict (`dict`):
+    vocab_dict: Dict
         A dict containing the vocabulary size of each subset."""
     vocab_dict = dict()
     for column in label_values_dict:
@@ -133,14 +133,14 @@ def number_of_duplicates(label_values_dict, subsets_of_interest):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
         
     Returns
     -------
-    duplicates_dict (`dict`):
+    duplicates_dict: Dict
         A dict containing the number of duplicate texts in each subset."""
         
     duplicates_dict = dict()
@@ -165,14 +165,16 @@ def create_frequency_dictionary(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+    args: InspectorArgs
+        The arguments selected by the user.
         
     Returns
     -------
-    output_freqs (`dict`):
+    output_freqs: Dict
         A dict containing the frequency of each token for each subset of interest."""
     output_freqs = dict()
     for column in label_values_dict:
@@ -187,7 +189,22 @@ def create_frequency_dictionary(label_values_dict, subsets_of_interest, args):
 
 
 def compute_basic_stats(label_values_dict, subsets_of_interest, args):
-    """A wrapper function for calling all of the basic statistics functions."""
+    """A wrapper function for calling all of the basic statistics functions.
+    
+    Parameters
+    ----------
+    label_values_dict: Dict
+        A dictionary containing all of the possible values each variable can take in the input dataset.
+    subsets_of_interest: Dict
+        A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
+    args: InspectorArgs
+        The arguments selected by the user.
+        
+    Returns
+    -------
+    stats_dict: Dict
+        A dict containing the calculated statistics.
+    """
     stats_dict = dict()
     for stat in ["num_texts", 
                  "avg_text_len",

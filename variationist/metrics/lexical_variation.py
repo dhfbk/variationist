@@ -18,16 +18,16 @@ def ttr(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
     
     Returns
     -------
-    values_dict (`dict`):
+    values_dict: Dict
         A dictionary with the mean TTR score for each subset and its standard deviation.
     """
     values_dict = dict()
@@ -61,16 +61,16 @@ def rttr(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
     
     Returns
     -------
-    values_dict (`dict`):
+    values_dict: Dict
         A dictionary with the mean RTTR score for each subset and its standard deviation.
     """
     values_dict = dict()
@@ -104,16 +104,16 @@ def maas(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
     
     Returns
     -------
-    values_dict (`dict`):
+    values_dict: Dict
         A dictionary with the mean Maas index score for each subset and its standard deviation.
     """
     values_dict = dict()
@@ -147,16 +147,16 @@ def lttr(label_values_dict, subsets_of_interest, args):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the input dataset.
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable/text column combination out of the variables and text columns specified by the user.
-    args (`InspectorArgs`):
+    args: InspectorArgs
         The arguments selected by the user.
     
     Returns
     -------
-    values_dict (`dict`):
+    values_dict: Dict
         A dictionary with the mean LTTR score for each subset and its standard deviation.
     """
     values_dict = dict()

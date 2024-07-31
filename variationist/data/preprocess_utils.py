@@ -17,14 +17,14 @@ def remove_elements(token_list, stopwords):
     
     Parameters
     ----------
-    token_list (`Iterable`):
+    token_list: `Iterable`
         An array of tokens.
-    stopwords (`Iterable`):
+    stopwords: `Iterable`
         Array of stopwords to be removed from token_list.
         
     Returns
     -------
-    new_array (`Iterable`):
+    new_array: `Iterable`
         The same array, with stopwords removed.
     """
 
@@ -38,24 +38,20 @@ def remove_elements(token_list, stopwords):
 
 def remove_stopwords(text_column, language, custom_stopwords):
     """"
-    Used for removing stopwords. Given an already tokenized pandas Series of texts, 
-    it will return the same series, excluding the elements in stopwords. Used to 
-    remove stopwords at the column level.
+    Used for removing stopwords. Given an already tokenized pandas Series of texts, it will return the same series, excluding the elements in stopwords. Used to remove stopwords at the column level.
     
     Parameters
     ----------
-    token_column (`pandas.Series`):
+    token_column: pandas.Series
         A series containing the already tokenized texts.
-    language (`str`):
+    language: str
         The language we should retrieve stopwords for.
-    custom_stopwords (`Optional[Union[str, list]]`):
-        A list of stopwords (or a path to a file containing stopwords, one per line) 
-        to be removed before tokenization. If `stopwords` is True, these stopwords 
-        will be added to that list. Will default to None.
+    custom_stopwords: `str` or `List`, *optional*
+        A list of stopwords (or a path to a file containing stopwords, one per line) to be removed before tokenization. If `stopwords` is True, these stopwords will be added to that list. Will default to None.
         
     Returns
     -------
-    text_column (`pandas.Series`):
+    text_column: pandas.Series
         The same tokenized series as input, with stopwords removed.
     """
 
@@ -81,14 +77,12 @@ def get_custom_stopword_list(custom_stopwords):
     
     Parameters
     ----------
-    custom_stopwords (`Optional[Union[str, list]]`):
-        A list of stopwords (or a path to a file containing stopwords, one per line) 
-        to be removed before tokenization. If `stopwords` is True, these stopwords 
-        will be added to that list. Will default to None.
+    custom_stopwords: `str` or `List`, *optional*
+        A list of stopwords (or a path to a file containing stopwords, one per line) to be removed before tokenization. If `stopwords` is True, these stopwords will be added to that list. Will default to None.
         
     Returns
     -------
-    extra_stopwords (`list`):
+    extra_stopwords: List
         A list including the custom stopwords.
     """
 
@@ -111,14 +105,14 @@ def convert_to_ngrams(token_list, n_tokens):
     
     Parameters
     ----------
-    token_list (`Iterable`):
+    token_list: Iterable
         An array of tokens.
-    n_tokens (`int`):
+    n_tokens: int
         The n to use for n-grams. E.g., a value of 2 will result in bi-grams.
         
     Returns
     -------
-    new_array (`Iterable`):
+    new_array: Iterable
         The same array, with n-grams instead of single tokens as units.
     """
 
@@ -137,14 +131,14 @@ def create_tokenized_ngrams_column(tokenized_text_column, n_tokens):
     
     Parameters
     ----------
-    tokenized_text_column (`pandas.Series`):
+    tokenized_text_column: pandas.Series
         A series containing the already tokenized texts.
-    n_tokens (`int`):
+    n_tokens: int
         The n to use for n-grams. E.g., a value of 2 will result in bi-grams.
         
     Returns
     -------
-    new_array (`Iterable`):
+    new_array: Iterable
         The same array, with n-grams instead of single tokens as units.
     """
 
@@ -171,16 +165,16 @@ def discretize_bins_col(dataframe_var_col, curr_var_bins):
     
     Parameters
     ----------
-    dataframe_var_col (pandas.Series):
+    dataframe_var_col: pandas.Series
         A pandas Series, corresponding to the pandas Dataframe column containing 
         the variable that should be divided into bins.
-    curr_var_bins (`int`):
+    curr_var_bins: int
         The number of bins to divide the current variable into, as specified by 
         the user using var_bins.
     
     Returns
     -------
-    discretized_var_col (pandas.Series):
+    discretized_var_col: pandas.Series
         The same Series as input, but with values split into bins.
     """
     
@@ -198,21 +192,21 @@ def extract_combinations(token_list, n_items, context_window, unique_cooc):
     
     Parameters
     ----------
-    token_list (`Iterable`):
+    token_list: Iterable
         An array of tokens for the text, out of which to extract co-occurrences.
-    n_items (`int`):
+    n_items: int
         The number of co-occurring tokens we should consider. Corresponds to `n_cooc` 
         set by the user in InspectorArgs.
-    context_window (`int`):
+    context_window: int
         Size of the context window for co-occurrences, corresponding to `cooc_window_size` 
         in InspectorArgs.
-    unique_cooc (`bool`):
+    unique_cooc: bool
         A boolean for whether to consider unique co-occurrences. If True, multiple 
         occurrences of the same token in a text will be discarded.
 
     Returns
     -------
-    new_array (list):
+    new_array: List
         returns the new array of tokens, with co-occurrences as basic units rather than 
         the original tokens.
     """
@@ -237,21 +231,21 @@ def create_tokenized_cooccurrences_column(tokenized_text_column, n_items, contex
     
     Parameters
     ----------
-    tokenized_text_column (`pandas.Series`):
+    tokenized_text_column: pandas.Series
         A series containing the already tokenized texts.
-    n_items (`Int`):
+    n_items: int
         The number of co-occurring tokens we should consider. Corresponds to `n_cooc` 
         set by the user in InspectorArgs.
-    context_window (`Int`):
+    context_window: int
         Size of the context window for co-occurrences, corresponding to `cooc_window_size` 
         in InspectorArgs.
-    unique_cooc (`Bool`):
+    unique_cooc: bool
         A boolean for whether to consider unique co-occurrences. If True, multiple 
         occurrences of the same token in a text will be discarded.
 
     Returns
     -------
-    text_column (`pandas.Series`):
+    text_column: pandas.Series
         The same tokenized series as input (overall length of the series will be the same), 
         but with co-occurrences in lieu of the original tokens (meaning sequence length will 
         be far lengthier).
@@ -271,14 +265,14 @@ def get_label_values(input_dataframe, col_names_dict):
     
     Parameters
     ----------
-    input_dataframe (`pandas.DataFrame`):
+    input_dataframe: pandas.DataFrame
         The dataset to be analyzed.
-    col_names_dict (`dict`):
+    col_names_dict: Dict
         A dictionary containing the var_names provided by the user.
     
     Returns
     -------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in 
         the input dataset.
     """
@@ -299,15 +293,15 @@ def update_label_values_dict_with_inters(label_values_dict, text_names):
     
     Parameters
     ----------
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the 
         input dataset.
-    text_names (`list`):
+    text_names: List
         The list of text column names.
     
     Returns
     -------
-    inters_label_values_dict (`dict`):
+    inters_label_values_dict: Dict
         A dictionary containing all of the possible intersections of text columns and 
         variables in the input dataset.    
     """
@@ -336,18 +330,18 @@ def get_subset_dict(input_dataframe, tok_columns_dict, label_values_dict):
     
     Parameters
     ----------
-    input_dataframe (`pandas.DataFrame`):
+    input_dataframe: pandas.DataFrame
         The dataset to be analyzed.
-    tok_columns_dict (`dict`):
+    tok_columns_dict: Dict
         A dictionary containing the names of the columns containing the tokenized specified 
         text columns.
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take in the 
         input dataset.
         
     Returns
     -------
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each variable value 
         specified by the user.
     """
@@ -380,18 +374,18 @@ def get_subset_intersections(input_dataframe, tok_columns_dict, label_values_dic
     
     Parameters
     ----------
-    input_dataframe (`pandas.DataFrame`):
+    input_dataframe: pandas.DataFrame
         The dataset to be analyzed.
-    tok_columns_dict (`dict`):
+    tok_columns_dict: Dict
         A dictionary containing the names of the columns containing the tokenized 
         specified text columns.
-    label_values_dict (`dict`):
+    label_values_dict: Dict
         A dictionary containing all of the possible values each variable can take 
         in the input dataset.
         
     Returns
     -------
-    subsets_of_interest (`dict`):
+    subsets_of_interest: Dict
         A dictionary containing a pandas series with tokenized texts for each 
         variable/text column combination out of the variables and text columns 
         specified by the user in the case of multiple text and variable columns.

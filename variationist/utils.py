@@ -23,13 +23,13 @@ def load_json_data_from_filepath_or_dict(
 
     Parameters
     ----------
-    input_json: Union[str, dict]
+    input_json: `str` or `dict`
         A path to the json file or a json/dict object storing metadata and results 
         from a prior analysis using Variationist.
 
     Returns
     -------
-    json_data: dict
+    json_data: `dict`
         A json/dict object storing metadata and results of a prior analysis.
     """
 
@@ -176,6 +176,7 @@ SYMBOLS = (
 
 
 def replace_symbols(text):
+    """Utility function to handle some special characters."""
     symbols_list = merge_chars(SYMBOLS)
     
     for char in SYMBOLS:

@@ -80,6 +80,7 @@ def get_counts(
     """
     A function that calculates relevant counts about a specific label after tokenizing the text 
     according to a given pretrained tokenizer.
+    
     Parameters
     ----------
     texts: List[str]
@@ -133,26 +134,31 @@ def normalize_pmi(pmi_scores: pd.core.frame.DataFrame) -> pd.core.frame.DataFram
     [1] Alan Ramponi and Sara Tonelli. 2022. Features or Spurious Artifacts? Data-centric Baselines 
     for Fair and Robust Hate Speech Detection. In Proceedings of the 2022 Conference of the North 
     American Chapter of the Association for Computational Linguistics: Human Language Technologies.
+
     Parameters
     ----------
     pmi_scores: pd.core.frame.DataFrame
         Pandas dataframe with tokens as rows and classes as columns (namely, label_of_interest and 
         "other"). Values in this matrix are PMI scores.
+
     Returns
     -------
     pmi_normalized: pd.core.frame.DataFrame
         Normalized pandas dataframe with tokens as rows and classes as columns (namely, label_of_interest 
         and "other"). Values in this matrix are normalized PMI scores.
+        
     """
 
     def min_max_normalization(dataframe: pd.core.frame.DataFrame) -> pd.core.frame.DataFrame:
         """
         An auxiliary function that performs the min-max normalization over log2 PMI scores.
+        
         Parameters
         ----------
         dataframe: pd.core.frame.DataFrame
             Pandas dataframe with tokens as rows and classes as columns (namely, label_of_interest and 
             "other"). Values in this matrix are log2 PMI scores.
+            
         Returns
         -------
         df_normalized: pd.core.frame.DataFrame
@@ -223,6 +229,7 @@ def compute(
         Name of the HuggingFace's pretrained tokenizer to use (e.g., "bert-base-uncased")
         For now, BPE-based tokenizers (e.g., RoBERTa-base, GPT2) would not filter stopword correctly,
         if requested, due to the "Ġ" special character. Thorough support on next releases
+        
     Returns
     -------
     sorted_pmi_scores: pd.core.frame.DataFrame
