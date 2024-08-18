@@ -12,7 +12,7 @@
 
 🕵️‍♀️ **Variationist** is a highly-modular, flexible, and customizable tool to analyze and explore language variation and bias in written language data. It allows researchers, from NLP practitioners to linguists and social scientists, to seamlessly investigate language use across many dimensions and a wide range of use cases.
 
-Alan Ramponi, Camilla Casula and Stefano Menini. 2024. **Variationist: Exploring Multifaceted Variation and Bias in Written Language Data**. In *Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 3: System Demonstrations)* (To appear), Bangkok, Thailand. ACL. [[cite]](#citation) [[paper]](https://arxiv.org/abs/2406.17647)
+Alan Ramponi, Camilla Casula and Stefano Menini. 2024. **Variationist: Exploring Multifaceted Variation and Bias in Written Language Data**. In *Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 3: System Demonstrations)*, pages 346–354, Bangkok, Thailand. ACL. [[cite]](#citation) [[paper]](https://aclanthology.org/2024.acl-demos.33/)
 
 - :cd: [**Installation**](#installation)
 - :checkered_flag: [**Quickstart**](#quickstart)
@@ -119,7 +119,7 @@ A technical documentation for 🕵️‍♀️ **Variationist** is also availabl
 
 ## Video
 
-An short introductory video is available [here](https://drive.google.com/file/d/1wBQVjiuDnGn9V7OWy-T8J7I4OlbV1gAZ/view?usp=sharing).
+An short introductory video is available [here](https://drive.google.com/file/d/1hIDn4mBteMmIjS28TERnYuRNY19M-Tf6/).
 
 
 ## Roadmap
@@ -141,11 +141,15 @@ An short introductory video is available [here](https://drive.google.com/file/d/
 If you use 🕵️‍♀️ **Variationist** in your work, please cite our paper as follows:
 
 ```
-@article{ramponi-etal-2024-variationist,
-  author = {Ramponi, Alan and Casula, Camilla and Menini, Stefano},
-  title = {Variationist: {E}xploring Multifaceted Variation and Bias in Written Language Data},
-  year = {2024},
-  journal = {arXiv preprint arxiv:2406.17647},
-  url = {https://arxiv.org/abs/2406.17647}
+@inproceedings{ramponi-etal-2024-variationist,
+    title = "Variationist: Exploring Multifaceted Variation and Bias in Written Language Data",
+    author = "Ramponi, Alan and Casula, Camilla and Menini, Stefano",
+    booktitle = "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 3: System Demonstrations)",
+    month = aug,
+    year = "2024",
+    address = "Bangkok, Thailand",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.acl-demos.33",
+    pages = "346--354"
 }
 ```
