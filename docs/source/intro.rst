@@ -5,7 +5,7 @@ Intro to Variationist
 
 .. container::
 
-   |MIT License| |v0.1.5| |Python 3.10+| |Documentation| |Tutorials|
+   |MIT License| |v0.1.6| |Python 3.10+| |Documentation| |Tutorials|
 
 🕵️‍♀️ **Variationist** is a highly-modular, flexible, and customizable tool
 to analyze and explore language variation and bias in written language
@@ -172,8 +172,8 @@ follows:
 
 .. |MIT License| image:: https://img.shields.io/badge/license-MIT-green.svg
    :target: LICENSE
-.. |v0.1.5| image:: https://img.shields.io/badge/pypi-v0.1.5-orange
-   :target: https://pypi.org/project/variationist/0.1.5/
+.. |v0.1.6| image:: https://img.shields.io/badge/pypi-v0.1.6-orange
+   :target: https://pypi.org/project/variationist/0.1.6/
 .. |Python 3.10+| image:: https://img.shields.io/badge/python-3.10+-blue
    :target: https://www.python.org/downloads/
 .. |Documentation| image:: https://readthedocs.org/projects/variationist/badge/?version=latest
