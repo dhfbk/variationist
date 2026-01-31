@@ -3,8 +3,8 @@
 <div align="center">
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![v0.1.4](https://img.shields.io/badge/pypi-v0.1.4-orange)](https://pypi.org/project/variationist/0.1.4/)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue)](https://www.python.org/downloads/)
+[![v0.1.5](https://img.shields.io/badge/pypi-v0.1.5-orange)](https://pypi.org/project/variationist/0.1.5/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue)](https://www.python.org/downloads/)
 [![Documentation](https://readthedocs.org/projects/variationist/badge/?version=latest)](https://variationist.readthedocs.io/en/latest/)
 [![Tutorials](https://img.shields.io/badge/tutorials-colab-orange)](https://github.com/dhfbk/variationist/tree/main/examples)
 
@@ -43,12 +43,12 @@ Alternatively, 🕵️‍♀️ Variationist can be installed from source as fol
 git clone https://github.com/dhfbk/variationist.git
 ```
 
-2) Create an environment with your own preferred package manager. We used [python 3.9](https://www.python.org/downloads/release/python-390/) and dependencies listed in [`requirements.txt`](requirements.txt). If you use [conda](https://docs.conda.io/en/latest/), you can just run the following commands from the root of the project:
+2) Create a [python>=3.10](https://www.python.org/downloads/release/python-31019/) environment with your own preferred package manager and install the dependencies listed in [`requirements.txt`](requirements.txt). If you use [venv](https://docs.python.org/3/library/venv.html), you can just run the following commands from the root of the project:
 
 ```
-conda create --name variationist python=3.9         # create the environment
-conda activate variationist                         # activate the environment
-pip install --user -r requirements.txt              # install the required packages
+python -m venv venv                     # create the environment
+source venv/bin/activate                # activate the environment
+pip install -r requirements.txt         # install the required packages
 ```
 
 
@@ -149,7 +149,8 @@ If you use 🕵️‍♀️ **Variationist** in your work, please cite our paper
     year = "2024",
     address = "Bangkok, Thailand",
     publisher = "Association for Computational Linguistics",
-    url = "https://aclanthology.org/2024.acl-demos.33",
+    url = "https://aclanthology.org/2024.acl-demos.33/",
+    doi = "10.18653/v1/2024.acl-demos.33",
     pages = "346--354"
 }
 ```

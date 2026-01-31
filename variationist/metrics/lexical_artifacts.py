@@ -1,7 +1,11 @@
 import math
 import numpy as np
+import os
 import pandas as pd
 import sys
+
+os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+
 from collections import Counter
 from transformers import AutoTokenizer
 from typing import List

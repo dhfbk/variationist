@@ -72,13 +72,13 @@ class ScatterChart(AltairChart):
             extra_name, extra_type = self.get_dim("extra", chart_dims)
 
         # Use the mean to represent the bin, if defined
-        if df_data[x_name][0].startswith("("):
+        if df_data[x_name].astype(str)[0].startswith("("):
             avgs = []
             for index, row in df_data.iterrows():
                 x_min, x_max = row[x_name][1:-1].split(", ")
                 avgs.append((float(x_min) + float(x_max)) / 2)
             df_data[x_name] = avgs
-        if df_data[y_name][0].startswith("("):
+        if df_data[y_name].astype(str)[0].startswith("("):
             avgs = []
             for index, row in df_data.iterrows():
                 y_min, y_max = row[y_name][1:-1].split(", ")

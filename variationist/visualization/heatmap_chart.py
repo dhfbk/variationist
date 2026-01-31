@@ -71,10 +71,10 @@ class HeatmapChart(AltairChart):
             y_domain = sorted(list(df_data[y_name].unique()), reverse=True)
         else:
             # Heuristics: if there are no bins based on the first element, avoid reversing
-            to_reverse = False if df_data[x_name][0].startswith("(") else True
-            x_domain = sorted(list(df_data[x_name].unique()), 
+            to_reverse = False if df_data[x_name].astype(str)[0].startswith("(") else True
+            x_domain = sorted(list(df_data[x_name].astype(str).unique()), 
                 key=lambda x: float(x.split(", ")[0][1:]) if x.startswith("(") else x, reverse=False)
-            y_domain = sorted(list(df_data[y_name].unique()), 
+            y_domain = sorted(list(df_data[y_name].astype(str).unique()), 
                 key=lambda y: float(y.split(", ")[0][1:]) if y.startswith("(") else y, reverse=to_reverse)
 
         # Set dimensions

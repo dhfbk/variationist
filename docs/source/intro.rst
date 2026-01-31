@@ -5,7 +5,7 @@ Intro to Variationist
 
 .. container::
 
-   |MIT License| |v0.1.4| |Python 3.9+| |Documentation| |Tutorials|
+   |MIT License| |v0.1.5| |Python 3.10+| |Documentation| |Tutorials|
 
 🕵️‍♀️ **Variationist** is a highly-modular, flexible, and customizable tool
 to analyze and explore language variation and bias in written language
@@ -16,9 +16,8 @@ dimensions and a wide range of use cases.
 Alan Ramponi, Camilla Casula and Stefano Menini. 2024. **Variationist:
 Exploring Multifaceted Variation and Bias in Written Language Data**. In
 *Proceedings of the 62nd Annual Meeting of the Association for
-Computational Linguistics (Volume 3: System Demonstrations)* (To
-appear), Bangkok, Thailand. ACL. `[cite] <#citation>`__
-`[paper] <https://arxiv.org/abs/2406.17647>`__
+Computational Linguistics (Volume 3: System Demonstrations)*, pages 346–354, Bangkok, Thailand. ACL. `[cite] <#citation>`__
+`[paper] <https://aclanthology.org/2024.acl-demos.33/>`__
 
 Installation
 ------------
@@ -44,15 +43,14 @@ Alternatively, 🕵️‍♀️ Variationist can be installed from source as fol
 
    git clone https://github.com/dhfbk/variationist.git
 
-2) Create an environment with your own preferred package manager. We used `python 3.9 <https://www.python.org/downloads/release/python-390/>`__ and dependencies listed in `requirements.txt <requirements.txt>`__.
-   If you use `conda <https://docs.conda.io/en/latest/>`__, you can just
-   run the following commands from the root of the project:
+2) Create a `python>=3.10 <https://www.python.org/downloads/release/python-31019/>`__ environment with your own preferred package manager and install the dependencies listed in `requirements.txt <requirements.txt>`__.
+   If you use `venv <https://docs.python.org/3/library/venv.html>`__, you can just run the following commands from the root of the project:
 
 ::
 
-   conda create --name variationist python=3.9         # create the environment
-   conda activate variationist                         # activate the environment
-   pip install --user -r requirements.txt              # install the required packages
+   python -m venv venv                     # create the environment
+   source venv/bin/activate                # activate the environment
+   pip install -r requirements.txt         # install the required packages
 
 Quickstart
 ----------
@@ -159,19 +157,24 @@ follows:
 
 ::
 
-   @article{ramponi-etal-2024-variationist,
-     author = {Ramponi, Alan and Casula, Camilla and Menini, Stefano},
-     title = {Variationist: {E}xploring Multifaceted Variation and Bias in Written Language Data},
-     year = {2024},
-     journal = {arXiv preprint arxiv:2406.17647},
-     url = {https://arxiv.org/abs/2406.17647}
+   @inproceedings{ramponi-etal-2024-variationist,
+     title = "Variationist: Exploring Multifaceted Variation and Bias in Written Language Data",
+     author = "Ramponi, Alan and Casula, Camilla and Menini, Stefano",
+     booktitle = "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 3: System Demonstrations)",
+     month = aug,
+     year = "2024",
+     address = "Bangkok, Thailand",
+     publisher = "Association for Computational Linguistics",
+     url = "https://aclanthology.org/2024.acl-demos.33/",
+     doi = "10.18653/v1/2024.acl-demos.33",
+     pages = "346--354"
    }
 
 .. |MIT License| image:: https://img.shields.io/badge/license-MIT-green.svg
    :target: LICENSE
-.. |v0.1.4| image:: https://img.shields.io/badge/pypi-v0.1.4-orange
-   :target: https://pypi.org/project/variationist/0.1.4/
-.. |Python 3.9+| image:: https://img.shields.io/badge/python-3.9+-blue
+.. |v0.1.5| image:: https://img.shields.io/badge/pypi-v0.1.5-orange
+   :target: https://pypi.org/project/variationist/0.1.5/
+.. |Python 3.10+| image:: https://img.shields.io/badge/python-3.10+-blue
    :target: https://www.python.org/downloads/
 .. |Documentation| image:: https://readthedocs.org/projects/variationist/badge/?version=latest
    :target: https://variationist.readthedocs.io/en/latest/

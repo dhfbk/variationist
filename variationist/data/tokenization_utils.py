@@ -1,5 +1,9 @@
 import pandas as pd
+import os
 import re
+
+os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
